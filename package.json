@@ -2,8 +2,9 @@
   "name": "ilhami",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/server.js", 
   "scripts": {
+    "start": "node src/server.js",
     "build:css": "tailwindcss -i ./src/styles/tailwind.css -o ./public/css/tailwind.css --minify",
     "dev:css": "tailwindcss -i ./src/styles/tailwind.css -o ./public/css/tailwind.css --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
