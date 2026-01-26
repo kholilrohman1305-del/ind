@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jadwal - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+          </head>
+  <body class="app" data-page="jadwal">
+    <main class="content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">≡</button>
+          <div>
+            <div class="page-title">Jadwal</div>
+            <div class="page-subtitle">Atur jadwal privat dan kelas secara terstruktur.</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="tab-bar">
+        <button class="tab-button active" data-tab="privat">Jadwal Privat</button>
+        <button class="tab-button" data-tab="kelas">Jadwal Kelas</button>
+      </div>
+
+      <section class="tab-content" data-tab="privat">
+        <div class="jadwal-grid">
+          <div class="panel table-card">
+            <div class="panel-head">
+              <div class="panel-title">Daftar Jadwal Privat</div>
+              <button class="primary-button" id="openPrivatModal">Tambah Jadwal</button>
+            </div>
+            <div id="privatList" class="card-list"></div>
+            <div id="privatEmpty" class="table-empty">Belum ada jadwal privat.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-content hidden" data-tab="kelas">
+        <div class="jadwal-grid">
+          <div class="panel table-card">
+            <div class="panel-head">
+              <div class="panel-title">Daftar Jadwal Kelas</div>
+              <button class="primary-button" id="openKelasModal">Tambah Jadwal</button>
+            </div>
+            <div id="kelasList" class="card-list"></div>
+            <div id="kelasEmpty" class="table-empty">Belum ada jadwal kelas.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="privatModal" class="modal hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Tambah Jadwal Privat</div>
+            <div class="modal-subtitle">Slot bisa diisi bertahap sesuai kebutuhan.</div>
+          </div>
+          <button id="closePrivatModal" class="icon-button">x</button>
+        </div>
+        <form id="privatForm" class="modal-form">
+          <label>
+            Pilih Siswa
+            <select id="privatSiswa" required></select>
+          </label>
+          <div class="info-card" id="privatProgramInfo">
+            <div class="info-title">Program terpilih</div>
+            <div id="privatProgramText" class="info-value">-</div>
+          </div>
+          <div class="slot-list" id="privatSlots"></div>
+          <div id="privatError" class="form-error"></div>
+          <div class="modal-actions">
+            <button type="button" id="cancelPrivatModal" class="ghost-button">Batal</button>
+            <button type="submit" class="primary-button">Simpan Jadwal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="kelasModal" class="modal hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Tambah Jadwal Kelas</div>
+            <div class="modal-subtitle">Jadwal berulang sesuai hari sampai tanggal berakhir.</div>
+          </div>
+          <button id="closeKelasModal" class="icon-button">x</button>
+        </div>
+        <form id="kelasForm" class="modal-form">
+          <label>
+            Pilih Kelas Gabungan
+            <select id="kelasProgram" required></select>
+          </label>
+
+          <div id="kelasCreateSection" class="hidden">
+            <label>
+              Nama Kelas Gabungan
+              <input id="kelasNama" type="text" placeholder="Contoh: Kelas Matematika SMA" />
+            </label>
+            <div class="info-card">
+              <div class="info-title">Program dalam kelas</div>
+              <div id="kelasProgramChecklist" class="info-list checklist-grid"></div>
+            </div>
+          </div>
+          <div id="kelasProgramInfo" class="info-card hidden">
+            <div class="info-title">Program dalam kelas</div>
+            <div id="kelasProgramList" class="info-list">-</div>
+          </div>
+
+          <label>
+            Edukator
+            <select id="kelasEdukator" required></select>
+          </label>
+          <label>
+            Tanggal Mulai
+            <input id="kelasTanggalMulai" type="date" required />
+          </label>
+          <label>
+            Tanggal Berakhir
+            <input id="kelasTanggalAkhir" type="date" required />
+          </label>
+          <div class="info-card">
+            <div class="info-title">Siswa terdaftar</div>
+            <div id="kelasSiswaList" class="info-list">Belum ada siswa.</div>
+          </div>
+          <div class="slot-list" id="kelasSlots"></div>
+          <button type="button" id="addKelasSlot" class="ghost-button">Tambah Hari</button>
+          <div id="kelasError" class="form-error"></div>
+          <div class="modal-actions">
+            <button type="button" id="cancelKelasModal" class="ghost-button">Batal</button>
+            <button type="submit" class="primary-button">Simpan Jadwal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="editModal" class="modal hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Edit Jadwal</div>
+            <div class="modal-subtitle">Perbarui tanggal dan jam jadwal.</div>
+          </div>
+          <button id="closeEditModal" class="icon-button">x</button>
+        </div>
+        <form id="editForm" class="modal-form">
+          <input type="hidden" id="editJadwalId" />
+          <label>
+            Tanggal
+            <input id="editTanggal" type="date" required />
+          </label>
+          <label>
+            Jam Mulai
+            <input id="editMulai" type="time" />
+          </label>
+          <label>
+            Jam Selesai
+            <input id="editSelesai" type="time" />
+          </label>
+          <label>
+            Edukator
+            <select id="editEdukator" required></select>
+          </label>
+          <label>
+            Mapel
+            <select id="editMapel" required></select>
+          </label>
+          <div id="editError" class="form-error"></div>
+          <div class="modal-actions">
+            <button type="button" id="cancelEditModal" class="ghost-button">Batal</button>
+            <button type="submit" class="primary-button">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="detailModal" class="modal hidden">
+      <div class="modal-card detail-modal">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Detail Jadwal Siswa</div>
+            <div id="detailSubtitle" class="modal-subtitle">-</div>
+          </div>
+          <button id="closeDetailModal" class="icon-button">x</button>
+        </div>
+        <div class="detail-table">
+          <div class="detail-row header">
+            <div>Pertemuan</div>
+            <div>Edukator</div>
+            <div>Mapel</div>
+            <div>Materi</div>
+            <div>Tanggal</div>
+            <div>Jam</div>
+            <div>Status</div>
+            <div>Aksi</div>
+          </div>
+          <div id="detailRows"></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="closeDetailFooter" class="ghost-button">Tutup</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="kelasDetailModal" class="modal hidden">
+      <div class="modal-card detail-modal">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Detail Jadwal Kelas</div>
+            <div id="kelasDetailSubtitle" class="modal-subtitle">-</div>
+          </div>
+          <button id="closeKelasDetailModal" class="icon-button">x</button>
+        </div>
+        <div class="detail-table">
+          <div class="detail-row header kelas">
+            <div>Tanggal</div>
+            <div>Jam</div>
+            <div>Edukator</div>
+            <div>Mapel</div>
+            <div>Materi</div>
+            <div>Status</div>
+            <div>Aksi</div>
+          </div>
+          <div id="kelasDetailRows"></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="closeKelasDetailFooter" class="ghost-button">Tutup</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/jadwal.js"></script>
+  </body>
+</html>

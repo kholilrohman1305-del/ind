@@ -1,0 +1,70 @@
+const programService = require("../services/program.service");
+
+const getAll = async (req, res) => {
+  try {
+    const role = req.session.user.role;
+    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const rows = await programService.listProgram(cabangId);
+    return res.json(rows);
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const create = async (req, res) => {
+  try {
+    const role = req.session.user.role;
+    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : req.body.cabang_id;
+    if (!cabangId) {
+      return res.status(400).json({ success: false, message: "Cabang wajib diisi." });
+    }
+    const payload = { ...req.body, cabang_id: cabangId };
+    const result = await programService.createProgram(payload);
+    return res.json({ success: true, data: result });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const update = async (req, res) => {
+  try {
+    const role = req.session.user.role;
+    const id = req.params.id;
+    const existing = await programService.getProgramById(id);
+    if (!existing) {
+      return res.status(404).json({ success: false, message: "Program tidak ditemukan." });
+    }
+    if (role === "admin_cabang" && existing.cabang_id !== req.session.user.cabang_id) {
+      return res.status(403).json({ success: false, message: "Forbidden" });
+    }
+    const result = await programService.updateProgram(id, req.body, existing);
+    return res.json({ success: true, data: result });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const remove = async (req, res) => {
+  try {
+    const role = req.session.user.role;
+    const id = req.params.id;
+    const existing = await programService.getProgramById(id);
+    if (!existing) {
+      return res.status(404).json({ success: false, message: "Program tidak ditemukan." });
+    }
+    if (role === "admin_cabang" && existing.cabang_id !== req.session.user.cabang_id) {
+      return res.status(403).json({ success: false, message: "Forbidden" });
+    }
+    await programService.deleteProgram(id);
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+module.exports = {
+  getAll,
+  create,
+  update,
+  remove,
+};

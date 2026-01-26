@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manajemen Cabang - ILHAMI Pro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+      :root {
+        --bg-app: #F8FAFC;
+      }
+      body { 
+        font-family: 'Plus Jakarta Sans', sans-serif; 
+        background-color: var(--bg-app); 
+        color: #1E293B; 
+      }
+      
+      /* Glass & Card Styles */
+      .cabang-card {
+        background: white;
+        border: 1px solid #F1F5F9;
+        border-radius: 1.25rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        position: relative;
+      }
+      .cabang-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
+        border-color: #E2E8F0;
+      }
+      
+      /* Status Badge Pulse */
+      .status-active::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #10B981;
+        margin-right: 6px;
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+      }
+      .status-inactive::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #94A3B8;
+        margin-right: 6px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+  </head>
+
+  <body class="app h-screen flex flex-col overflow-hidden" data-page="cabang">
+    <main class="content flex-1 overflow-y-auto p-4 md:p-8 w-full relative">
+      
+      <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+         <div class="absolute -top-[10%] -right-[5%] w-[500px] h-[500px] bg-indigo-100/40 rounded-full blur-[80px]"></div>
+         <div class="absolute top-[30%] -left-[5%] w-[400px] h-[400px] bg-blue-100/40 rounded-full blur-[80px]"></div>
+      </div>
+
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+        <div class="flex items-center gap-4">
+          <button class="p-2 rounded-xl hover:bg-white/50 text-slate-500 transition shadow-sm md:hidden" id="sidebarToggle">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div>
+            <h1 class="text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
+              <span class="bg-indigo-100 text-indigo-600 p-2 rounded-xl text-xl shadow-sm"><i class="fa-solid fa-building"></i></span>
+              Manajemen Cabang
+            </h1>
+            <p class="text-slate-500 mt-1 text-sm font-medium">Kelola akses, lokasi, dan admin cabang.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <div class="relative group w-full sm:w-72">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
+                </div>
+                <input type="text" id="searchCabang" 
+                    class="block w-full pl-10 pr-3 py-3 border-none rounded-xl leading-5 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all" 
+                    placeholder="Cari nama atau kode cabang...">
+            </div>
+
+            <button id="addCabang" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg shadow-slate-200 transition-all transform active:scale-95 flex items-center justify-center gap-2 font-bold text-sm">
+                <i class="fa-solid fa-plus"></i> Tambah Cabang
+            </button>
+        </div>
+      </div>
+
+      <div class="relative z-10">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg"><i class="fa-solid fa-store"></i></div>
+                  <div>
+                      <p class="text-xs text-slate-400 font-bold uppercase">Total Cabang</p>
+                      <h4 class="text-xl font-bold text-slate-800" id="totalCabang">0</h4>
+                  </div>
+              </div>
+              <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg"><i class="fa-solid fa-check-circle"></i></div>
+                  <div>
+                      <p class="text-xs text-slate-400 font-bold uppercase">Aktif</p>
+                      <h4 class="text-xl font-bold text-slate-800" id="activeCabang">0</h4>
+                  </div>
+              </div>
+          </div>
+
+          <div id="cabangRows" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              </div>
+
+          <div id="cabangEmpty" class="hidden flex flex-col items-center justify-center py-20 text-center">
+              <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100 shadow-inner">
+                  <i class="fa-solid fa-building-circle-xmark text-4xl text-slate-300"></i>
+              </div>
+              <h3 class="text-lg font-bold text-slate-700">Tidak ada data cabang</h3>
+              <p class="text-slate-400 text-sm mt-1 max-w-xs mx-auto">Mulai tambahkan cabang baru atau ubah pencarian Anda.</p>
+          </div>
+      </div>
+
+    </main>
+
+    <div id="cabangModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/40 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none p-4">
+      <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 overflow-hidden modal-card flex flex-col max-h-[90vh]">
+        
+        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+          <div>
+            <h3 class="text-lg font-bold text-slate-800 modal-title">Kelola Cabang</h3>
+            <p class="text-xs text-slate-500">Informasi detail dan akses admin.</p>
+          </div>
+          <button id="closeModal" class="text-slate-400 hover:text-rose-500 transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-50">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <form id="cabangForm" class="p-6 space-y-5 overflow-y-auto custom-scrollbar">
+            <input type="hidden" id="cabang_id" />
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Kode Cabang <span class="text-rose-500">*</span></label>
+                    <input id="cabang_kode" type="text" required placeholder="Cth: SBY-01" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition font-mono font-semibold text-slate-700 uppercase" />
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Nama Cabang <span class="text-rose-500">*</span></label>
+                    <input id="cabang_nama" type="text" required placeholder="Cth: Surabaya Pusat" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition font-semibold text-slate-700" />
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Alamat Lengkap</label>
+                <div class="relative">
+                    <i class="fa-solid fa-location-dot absolute left-3 top-3 text-slate-400 text-xs"></i>
+                    <input id="cabang_alamat" type="text" placeholder="Jl. Raya Darmo No..." class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">No. Telepon</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-phone absolute left-3 top-3 text-slate-400 text-xs"></i>
+                        <input id="cabang_telepon" type="tel" placeholder="081..." class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition" />
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Tgl Jatuh Tempo</label>
+                    <div class="relative">
+                        <i class="fa-regular fa-calendar absolute left-3 top-3 text-slate-400 text-xs"></i>
+                        <input id="cabang_tempo" type="number" min="1" max="31" placeholder="10" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition" />
+                        <span class="absolute right-3 top-2.5 text-xs text-slate-400">Setiap bulan</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mt-2">
+                <h4 class="text-sm font-bold text-indigo-900 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield"></i> Akses Admin Cabang
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-indigo-400 uppercase mb-1">Email Login</label>
+                        <input id="admin_email" type="email" placeholder="admin@cabang.com" class="w-full px-3 py-2 bg-white border border-indigo-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition" />
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-indigo-400 uppercase mb-1">Password</label>
+                        <input id="admin_password" type="password" placeholder="Min. 6 karakter" class="w-full px-3 py-2 bg-white border border-indigo-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition" />
+                    </div>
+                </div>
+            </div>
+
+            <label class="flex items-center justify-between p-4 border border-slate-200 rounded-xl hover:bg-slate-50 cursor-pointer transition group select-none">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-power-off text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="block font-bold text-slate-700 text-sm">Status Operasional</span>
+                        <span class="block text-xs text-slate-400">Jika nonaktif, admin tidak bisa login.</span>
+                    </div>
+                </div>
+                <div class="relative">
+                    <input id="cabang_active" type="checkbox" checked class="sr-only peer" />
+                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                </div>
+            </label>
+
+            <div class="pt-2 flex gap-3">
+                <button type="button" id="cancelModal" class="flex-1 py-3 text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl font-bold text-sm transition">Batal</button>
+                <button type="submit" class="flex-1 py-3 text-white bg-slate-900 hover:bg-slate-800 shadow-lg shadow-slate-200 rounded-xl font-bold text-sm transition">Simpan Data</button>
+            </div>
+        </form>
+      </div>
+    </div>
+    
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/cabang.js"></script>
+  </body>
+</html>

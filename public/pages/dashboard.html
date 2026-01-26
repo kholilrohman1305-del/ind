@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Admin - ILHAMI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body { font-family: 'Plus Jakarta Sans', sans-serif; }
+      
+      /* Animasi Masuk */
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-enter { 
+        animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        opacity: 0; 
+      }
+      
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+      
+      /* Sidebar Transition */
+      #sidebar { transition: transform 0.3s ease-in-out; }
+      .sidebar-open { transform: translateX(0) !important; }
+      
+      /* Overlay untuk mobile saat sidebar terbuka */
+      #sidebarOverlay.show { opacity: 1; pointer-events: auto; }
+    </style>
+  </head>
+  
+  <body class="bg-[#F8FAFC] flex h-screen overflow-hidden text-slate-800 relative" data-page="dashboard">
+    
+    <div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 z-20 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden"></div>
+
+    <main class="content flex-1 flex flex-col relative h-full overflow-hidden">
+      
+      <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+         <div class="absolute -top-[10%] -right-[5%] w-[600px] h-[600px] bg-violet-100/40 rounded-full blur-[80px]"></div>
+         <div class="absolute -bottom-[10%] -left-[5%] w-[500px] h-[500px] bg-fuchsia-100/40 rounded-full blur-[80px]"></div>
+      </div>
+
+      <header class="topbar h-20 flex items-center justify-between px-8 bg-white/70 backdrop-blur-md border-b border-white/50 sticky top-0 z-10">
+        <div class="topbar-left flex items-center gap-4">
+          <button class="icon-button md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors" id="sidebarToggle" aria-label="Toggle menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div>
+            <div class="page-title text-xl font-bold text-slate-800">Dashboard Cabang</div>
+            <div class="page-subtitle text-xs text-slate-500">Ringkasan operasional cabang bulan ini.</div>
+          </div>
+        </div>
+        
+        <div class="hidden md:flex items-center gap-2 px-3 py-1 bg-violet-50 text-violet-700 rounded-full border border-violet-100 text-xs font-semibold">
+            <span class="w-2 h-2 rounded-full bg-violet-500 animate-pulse"></span>
+            System Online
+        </div>
+      </header>
+
+      <div class="flex-1 overflow-y-auto p-6 md:p-8 relative z-10">
+        
+        <section class="dashboard-hero mb-8 animate-enter">
+            <div class="bg-gradient-to-r from-violet-600 to-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-violet-200 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                
+                <div class="relative z-10">
+                    <div class="hero-label inline-block px-3 py-1 bg-white/20 rounded-lg text-[10px] font-bold uppercase tracking-wider mb-2 backdrop-blur-sm border border-white/10">Snapshot Cabang</div>
+                    <h2 class="hero-title text-3xl font-bold mb-2">Performa Bulan Ini</h2>
+                    <p class="hero-subtitle text-violet-100 text-sm max-w-lg">Pantau operasional, pendapatan, dan kebutuhan aksi cepat secara realtime.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-enter delay-100">
+            
+            <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="stat-label text-xs font-bold text-slate-400 uppercase">Siswa Aktif</div>
+                    <div class="stat-icon p-2 bg-violet-100 text-violet-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                    </div>
+                </div>
+                <div id="statSiswaAktif" class="stat-value text-3xl font-bold text-slate-800">0</div>
+            </div>
+
+            <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="stat-label text-xs font-bold text-slate-400 uppercase">Siswa Privat</div>
+                    <div class="stat-icon p-2 bg-cyan-100 text-cyan-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    </div>
+                </div>
+                <div id="statSiswaPrivat" class="stat-value text-3xl font-bold text-slate-800">0</div>
+            </div>
+
+            <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="stat-label text-xs font-bold text-slate-400 uppercase">Siswa Kelas</div>
+                    <div class="stat-icon p-2 bg-teal-100 text-teal-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    </div>
+                </div>
+                <div id="statSiswaKelas" class="stat-value text-3xl font-bold text-slate-800">0</div>
+            </div>
+
+            <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+                 <div class="flex justify-between items-start mb-4">
+                    <div class="stat-label text-xs font-bold text-slate-400 uppercase">Pendapatan</div>
+                    <div class="stat-icon p-2 bg-amber-100 text-amber-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                </div>
+                <div id="statPendapatan" class="stat-value text-2xl font-bold text-slate-800 tracking-tight">Rp 0</div>
+            </div>
+
+            <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+                 <div class="flex justify-between items-start mb-4">
+                    <div class="stat-label text-xs font-bold text-slate-400 uppercase">Pengeluaran</div>
+                    <div class="stat-icon p-2 bg-rose-100 text-rose-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                    </div>
+                </div>
+                <div id="statPengeluaran" class="stat-value text-2xl font-bold text-slate-800 tracking-tight">Rp 0</div>
+            </div>
+
+            <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="stat-label text-xs font-bold text-slate-400 uppercase">Siswa Baru</div>
+                    <div class="stat-icon p-2 bg-lime-100 text-lime-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+                    </div>
+                </div>
+                <div id="statSiswaBaru" class="stat-value text-3xl font-bold text-slate-800">0</div>
+            </div>
+
+            <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="stat-label text-xs font-bold text-slate-400 uppercase">Jadwal Hari Ini</div>
+                    <div class="stat-icon p-2 bg-blue-100 text-blue-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    </div>
+                </div>
+                <div id="statJadwalHariIni" class="stat-value text-3xl font-bold text-slate-800">0</div>
+            </div>
+
+        </section>
+
+        <section class="dashboard-grid grid grid-cols-1 lg:grid-cols-3 gap-6 animate-enter delay-200">
+            
+            <div class="panel glass lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col">
+                <div class="panel-head flex items-center justify-between p-5 border-b border-slate-50 bg-white/50 backdrop-blur-sm">
+                    <div class="panel-title font-bold text-slate-800">Jadwal Hari Ini</div>
+                    <div class="panel-chip px-2 py-1 bg-violet-50 text-violet-600 text-[10px] font-bold rounded uppercase border border-violet-100">Prioritas</div>
+                </div>
+                
+                <div class="list p-0 divide-y divide-slate-50 min-h-[300px]">
+                    <div id="jadwalList"></div> <div id="jadwalEmpty" class="table-empty py-12 flex flex-col items-center justify-center text-slate-400">
+                        <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-2">
+                            <svg class="w-6 h-6 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <span class="text-sm">Tidak ada jadwal hari ini.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-6">
+                
+                <div class="panel glass highlight bg-gradient-to-br from-fuchsia-600 to-purple-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden group">
+                     <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full group-hover:scale-110 transition-transform duration-500"></div>
+                     <div class="panel-head mb-2">
+                        <div class="panel-title text-sm font-medium text-fuchsia-100">Program Terbanyak</div>
+                     </div>
+                     <div id="programTerbanyak" class="highlight-card text-3xl font-bold mb-4">-</div>
+                     <div class="highlight-foot text-xs text-white/80 bg-white/10 p-2 rounded inline-block backdrop-blur-sm">
+                        Program favorit siswa cabang.
+                     </div>
+                </div>
+
+                <div class="panel glass full bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col flex-1">
+                    <div class="panel-head flex items-center justify-between p-5 border-b border-slate-50">
+                        <div class="panel-title text-sm font-bold text-slate-800">Sisa Pertemuan < 3</div>
+                        <div class="panel-chip warning px-2 py-1 bg-rose-50 text-rose-600 text-[10px] font-bold rounded border border-rose-100">Follow-up</div>
+                    </div>
+                    
+                    <div class="list flex-1 overflow-y-auto max-h-[300px]">
+                        <div id="sisaPertemuanList" class="divide-y divide-slate-50"></div>
+                        
+                        <div id="sisaPertemuanEmpty" class="table-empty py-8 text-center text-xs text-slate-400">
+                            Tidak ada siswa dengan sisa pertemuan rendah.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+      </div>
+    </main>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/dashboard.js"></script>
+
+    <script>
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      const sidebarClose = document.getElementById('sidebarClose');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+
+      function toggleSidebar() {
+        if (sidebar.classList.contains('-translate-x-full')) {
+            // Open
+            sidebar.classList.remove('-translate-x-full');
+            sidebar.classList.add('translate-x-0'); // Paksa visible
+            if(overlay) overlay.classList.remove('opacity-0', 'pointer-events-none');
+        } else {
+            // Close
+            sidebar.classList.add('-translate-x-full');
+            sidebar.classList.remove('translate-x-0');
+            if(overlay) overlay.classList.add('opacity-0', 'pointer-events-none');
+        }
+      }
+
+      if(sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
+      if(sidebarClose) sidebarClose.addEventListener('click', toggleSidebar);
+      if(overlay) overlay.addEventListener('click', toggleSidebar);
+    </script>
+  </body>
+</html>

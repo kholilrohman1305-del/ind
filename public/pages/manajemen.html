@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manajemen - ILHAMI Pro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+      :root {
+        --primary: #4F46E5;
+        --secondary: #EC4899;
+        --bg-app: #F3F4F6;
+      }
+      body { 
+        font-family: 'Plus Jakarta Sans', sans-serif; 
+        background-color: var(--bg-app); 
+        color: #1F2937; 
+      }
+      
+      /* Glass Effect & Cards */
+      .glass-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.5);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border-radius: 1rem;
+        transition: transform 0.2s;
+      }
+      
+      /* Custom Scrollbar */
+      .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 10px; }
+    </style>
+  </head>
+
+  <body class="app h-screen flex flex-col overflow-hidden" data-page="manajemen">
+    <main class="content flex-1 overflow-y-auto p-4 md:p-8 w-full">
+      
+      <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div class="flex items-center gap-4">
+          <button class="p-2 rounded-lg hover:bg-white shadow-sm md:hidden text-gray-600 transition" id="sidebarToggle">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div>
+            <h1 class="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-2">
+              <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg text-xl shadow-sm"><i class="fa-solid fa-sitemap"></i></span>
+              Manajemen Struktur
+            </h1>
+            <p class="text-gray-500 mt-1 text-sm font-medium">Pengaturan jabatan strategis dan kompensasi manajemen.</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        
+        <div class="xl:col-span-1 space-y-6">
+            
+            <div class="glass-card p-6 border-t-4 border-indigo-500 relative overflow-hidden">
+                <div class="absolute right-0 top-0 opacity-5 p-4 pointer-events-none">
+                    <i class="fa-solid fa-chess-king text-9xl"></i>
+                </div>
+                
+                <div class="flex items-center gap-3 mb-5 relative z-10">
+                    <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-sm">
+                        <i class="fa-solid fa-plus"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-gray-800">Buat Jabatan Baru</h3>
+                        <p class="text-xs text-gray-500">Definisikan role & insentif.</p>
+                    </div>
+                </div>
+
+                <form id="manajemenForm" class="space-y-4 relative z-10">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Jabatan</label>
+                        <input id="manajemenNama" type="text" placeholder="Contoh: Kepala Cabang" class="w-full p-3 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Gaji Tambahan / Bulan</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-gray-500 font-bold text-sm">Rp</span>
+                            <input id="manajemenGaji" type="number" min="0" placeholder="0" class="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition shadow-sm font-semibold text-gray-800">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 text-sm font-bold transition flex items-center justify-center gap-2 transform active:scale-95">
+                        <i class="fa-solid fa-save"></i> Simpan Jabatan
+                    </button>
+                </form>
+            </div>
+
+            <div class="glass-card flex flex-col h-[450px]">
+                <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-2xl">
+                    <h3 class="font-bold text-gray-700 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-list-ul text-indigo-500"></i> Daftar Jabatan
+                    </h3>
+                    <span class="text-xs bg-white border border-gray-200 px-2 py-1 rounded text-gray-500 font-mono shadow-sm" id="jabatanCount">0</span>
+                </div>
+                <div class="flex-1 overflow-y-auto p-3 custom-scrollbar bg-gray-50/30">
+                    <div id="manajemenRows" class="space-y-3">
+                        </div>
+                    <div id="manajemenEmpty" class="hidden flex flex-col items-center justify-center py-12 text-center">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-2">
+                            <i class="fa-regular fa-folder-open text-gray-400"></i>
+                        </div>
+                        <p class="text-xs text-gray-400">Belum ada data jabatan.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="xl:col-span-2 space-y-6">
+            
+            <div class="glass-card p-6 bg-gradient-to-r from-white to-blue-50/30 border border-blue-100">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shadow-sm">
+                            <i class="fa-solid fa-user-gear"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-lg">Penugasan Struktur</h3>
+                            <p class="text-sm text-gray-500">Hubungkan edukator dengan jabatan struktural.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="assignManajemenForm" class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
+                    <div class="md:col-span-5">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Pilih Edukator</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-user absolute left-3 top-3.5 text-gray-400 text-xs"></i>
+                            <select id="assignEdukator" class="w-full pl-8 p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer hover:bg-white transition">
+                                <option value="">Memuat data...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="md:col-span-5">
+                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Pilih Jabatan</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-briefcase absolute left-3 top-3.5 text-gray-400 text-xs"></i>
+                            <select id="assignManajemen" class="w-full pl-8 p-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer hover:bg-white transition">
+                                <option value="">Tanpa Jabatan (Lepas Jabatan)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2">
+                        <button type="submit" class="w-full py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 shadow-md text-sm font-bold transition flex items-center justify-center gap-2">
+                            Update
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="glass-card overflow-hidden flex flex-col min-h-[400px]">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-lg">Struktur Tim Saat Ini</h3>
+                        <p class="text-xs text-gray-500 mt-1">Daftar edukator dan tanggung jawab manajemennya.</p>
+                    </div>
+                    <div class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-xs font-bold">
+                        <i class="fa-solid fa-users mr-1"></i> Tim Aktif
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto flex-1">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-50/80 text-xs text-gray-500 uppercase font-semibold border-b border-gray-100">
+                            <tr>
+                                <th class="px-6 py-4">Nama Edukator</th>
+                                <th class="px-6 py-4">Jabatan Struktural</th>
+                                <th class="px-6 py-4 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manajemenAssignRows" class="divide-y divide-gray-50 text-sm">
+                            </tbody>
+                    </table>
+                    
+                    <div id="manajemenAssignEmpty" class="hidden flex flex-col items-center justify-center py-16 text-center">
+                        <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-3">
+                            <i class="fa-solid fa-users-slash text-2xl text-gray-300"></i>
+                        </div>
+                        <p class="text-gray-500 font-medium">Belum ada struktur terbentuk</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+      </div>
+    </main>
+    
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/manajemen.js"></script>
+  </body>
+</html>

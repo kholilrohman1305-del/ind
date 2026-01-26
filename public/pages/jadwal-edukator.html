@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jadwal Edukator - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <style>
+      .calendar-header {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .calendar-cell {
+        min-height: 88px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: 14px;
+        padding: 8px 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: #fff;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .calendar-cell.has-privat {
+        background: rgba(59, 130, 246, 0.12);
+        border-color: rgba(59, 130, 246, 0.35);
+      }
+      .calendar-cell.has-kelas {
+        background: rgba(16, 185, 129, 0.12);
+        border-color: rgba(16, 185, 129, 0.35);
+      }
+      .calendar-cell.has-both {
+        background: linear-gradient(140deg, rgba(59, 130, 246, 0.14), rgba(16, 185, 129, 0.14));
+        border-color: rgba(79, 70, 229, 0.35);
+      }
+      .calendar-cell:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 16px 24px rgba(15, 23, 42, 0.08);
+      }
+      .calendar-cell.is-out {
+        background: #f8fafc;
+        color: #94a3b8;
+        cursor: default;
+        box-shadow: none;
+        transform: none;
+      }
+      .calendar-cell.is-selected {
+        border-color: #6366f1;
+        box-shadow: 0 12px 24px rgba(99, 102, 241, 0.2);
+      }
+      .calendar-cell.is-today {
+        border-color: #2563eb;
+      }
+      .calendar-day {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .calendar-dots {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .calendar-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+      }
+      .calendar-dot.privat {
+        background: #3b82f6;
+      }
+      .calendar-dot.kelas {
+        background: #10b981;
+      }
+      .calendar-legend {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 14px;
+      }
+      .calendar-legend span {
+        display: inline-flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .status-pill.kelas {
+        background: rgba(16, 185, 129, 0.16);
+        color: #047857;
+      }
+      .status-pill.privat {
+        background: rgba(59, 130, 246, 0.16);
+        color: #1d4ed8;
+      }
+      .calendar-scroll {
+        overflow-x: auto;
+        padding-bottom: 6px;
+      }
+      @media (max-width: 720px) {
+        .calendar-header,
+        .calendar-grid {
+          min-width: 560px;
+          gap: 6px;
+        }
+        .calendar-cell {
+          min-height: 64px;
+          padding: 6px 8px;
+        }
+        .calendar-day {
+          font-size: 12px;
+        }
+        .calendar-legend {
+          flex-wrap: wrap;
+        }
+      }
+    </style>
+  </head>
+  <body class="app" data-page="jadwal">
+    <main class="content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">&#8801;</button>
+          <div>
+            <div class="page-title">Jadwal Bulan Ini</div>
+            <div class="page-subtitle">Daftar jadwal privat dan kelas pada bulan berjalan.</div>
+          </div>
+        </div>
+      </header>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Jadwal Bulan Ini</div>
+          <div class="panel-controls">
+            <button class="ghost-button" id="calendarPrev">Sebelumnya</button>
+            <div class="page-subtitle" id="calendarLabel">-</div>
+            <button class="ghost-button" id="calendarNext">Berikutnya</button>
+          </div>
+        </div>
+        <div class="calendar-legend">
+          <span><span class="calendar-dot privat"></span> Privat</span>
+          <span><span class="calendar-dot kelas"></span> Kelas</span>
+        </div>
+        <div class="calendar-scroll">
+          <div class="calendar-header" id="calendarHeader"></div>
+          <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+        <div id="jadwalEmpty" class="table-empty">Belum ada jadwal bulan ini.</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Detail Jadwal</div>
+            <div class="panel-subtitle" id="selectedDateLabel">Pilih tanggal pada kalender.</div>
+          </div>
+        </div>
+        <div id="calendarList" class="list"></div>
+        <div id="calendarEmpty" class="table-empty">Belum ada jadwal pada tanggal ini.</div>
+      </section>
+    </main>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/jadwal-edukator.js"></script>
+  </body>
+</html>

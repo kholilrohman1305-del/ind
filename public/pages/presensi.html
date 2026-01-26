@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Presensi - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+          </head>
+  <body class="app" data-page="presensi">
+    <main class="content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">=</button>
+          <div>
+            <div class="page-title">Absensi Tentor</div>
+            <div class="page-subtitle">Pantau kehadiran edukator secara real-time.</div>
+          </div>
+        </div>
+      </header>
+      <section class="page">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Data Absensi Tentor</div>
+            <div class="panel-controls">
+              <input id="presensiSearch" class="input" type="search" placeholder="Cari edukator..." />
+              <input id="presensiMonth" class="input" type="month" />
+            </div>
+          </div>
+          <div id="presensiList" class="presensi-list"></div>
+          <div id="presensiEmpty" class="table-empty">Belum ada data absensi.</div>
+        </div>
+      </section>
+    </main>
+
+    <div id="presensiDetailModal" class="modal hidden">
+      <div class="modal-card detail-modal">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Detail Absensi</div>
+            <div id="presensiDetailSubtitle" class="modal-subtitle">-</div>
+          </div>
+          <button id="closePresensiDetail" class="icon-button">x</button>
+        </div>
+        <div class="presensi-table">
+          <div class="presensi-row header">
+            <div>Nama Siswa</div>
+            <div>Tanggal</div>
+            <div>Kelas</div>
+            <div>Program</div>
+            <div>Materi</div>
+            <div>Lokasi</div>
+            <div>Waktu Input</div>
+          </div>
+          <div id="presensiDetailRows"></div>
+          <div id="presensiDetailEmpty" class="table-empty">Belum ada presensi.</div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="closePresensiDetailFooter" class="ghost-button">Tutup</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/presensi.js"></script>
+  </body>
+</html>

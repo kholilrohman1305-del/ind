@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Keuangan Siswa - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+  </head>
+  <body class="app" data-page="tagihan">
+    <main class="content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">&#8801;</button>
+          <div>
+            <div class="page-title">Keuangan Siswa</div>
+            <div class="page-subtitle">Tagihan dan pembayaran dalam satu tampilan.</div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="search">
+            <input id="tagihanSearch" type="text" placeholder="Cari siswa/program" />
+            <span class="search-icon"></span>
+          </div>
+          <input id="tagihanMonth" type="month" class="icon-button" style="font-size: 13px" />
+          <select id="tagihanFilter" class="icon-button" style="font-size: 13px">
+            <option value="aktif">Tagihan Aktif</option>
+            <option value="">Semua Status</option>
+            <option value="belum_bayar">Belum bayar</option>
+            <option value="cicilan">Cicilan</option>
+            <option value="lunas">Lunas</option>
+          </select>
+          <button id="addTagihanBtn" class="primary-button">Tambah Tagihan</button>
+        </div>
+      </header>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div class="panel-title">Keuangan Siswa</div>
+          <div class="panel-chip">Auto update</div>
+        </div>
+        <div class="flex gap-2 pb-4">
+          <button id="tabTagihan" class="primary-button" style="padding: 6px 14px">Tagihan</button>
+          <button id="tabPembayaran" class="icon-button" style="padding: 6px 14px; font-size: 12px">
+            Pembayaran
+          </button>
+        </div>
+
+        <div id="tagihanSection">
+          <div class="overflow-auto">
+            <table class="min-w-full text-sm">
+              <thead class="text-left text-slate-500">
+                <tr>
+                  <th class="py-3 pr-4">Siswa</th>
+                  <th class="py-3 pr-4">Program</th>
+                  <th class="py-3 pr-4">Tagihan</th>
+                  <th class="py-3 pr-4">Dibayar</th>
+                  <th class="py-3 pr-4">Sisa</th>
+                  <th class="py-3 pr-4">Progres</th>
+                  <th class="py-3 pr-4">Jatuh Tempo</th>
+                  <th class="py-3 pr-4">Status</th>
+                  <th class="py-3">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tagihanBody" class="text-slate-800"></tbody>
+            </table>
+            <div id="tagihanEmpty" class="table-empty">Belum ada tagihan.</div>
+          </div>
+        </div>
+
+        <div id="pembayaranSection" class="hidden">
+          <div class="flex flex-wrap gap-3 items-end pb-4">
+            <label class="modal-label" style="min-width: 220px">
+              Cari siswa/program
+              <input id="pembayaranSearch" type="text" placeholder="Cari siswa/program" />
+            </label>
+            <label class="modal-label">
+              Dari tanggal
+              <input id="pembayaranDateStart" type="date" />
+            </label>
+            <label class="modal-label">
+              Sampai tanggal
+              <input id="pembayaranDateEnd" type="date" />
+            </label>
+            <label class="modal-label">
+              Bulan
+              <input id="pembayaranMonth" type="month" />
+            </label>
+            <label class="modal-label" style="min-width: 160px">
+              Metode bayar
+              <select id="pembayaranMethod">
+                <option value="">Semua</option>
+                <option value="cash">Cash</option>
+                <option value="transfer">Transfer</option>
+              </select>
+            </label>
+          </div>
+          <div class="overflow-auto">
+            <table class="min-w-full text-sm">
+              <thead class="text-left text-slate-500">
+                <tr>
+                  <th class="py-3 pr-4">Siswa</th>
+                  <th class="py-3 pr-4">Program</th>
+                  <th class="py-3 pr-4">Nominal</th>
+                  <th class="py-3 pr-4">Metode</th>
+                  <th class="py-3 pr-4">Tanggal</th>
+                  <th class="py-3 pr-4">Status Tagihan</th>
+                  <th class="py-3">Catatan</th>
+                </tr>
+              </thead>
+              <tbody id="pembayaranBody" class="text-slate-800"></tbody>
+            </table>
+            <div id="pembayaranEmpty" class="table-empty">Belum ada pembayaran.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="tagihanModal" class="modal hidden">
+      <div class="modal-card" style="width: min(520px, 94vw)">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Tambah Tagihan</div>
+            <div class="modal-subtitle">Tagihan baru akan tercatat untuk siswa.</div>
+          </div>
+          <button class="icon-button" id="closeTagihanModal">x</button>
+        </div>
+        <div class="modal-body">
+          <label class="modal-label">
+            Siswa & Program
+            <select id="enrollmentSelect"></select>
+          </label>
+          <label class="modal-label">
+            Jenis Tagihan
+            <select id="jenisTagihan">
+              <option value="program">Program</option>
+              <option value="bulanan">Bulanan</option>
+            </select>
+          </label>
+          <label class="modal-label">
+            Nominal
+            <input id="tagihanNominal" type="number" min="0" placeholder="Masukkan nominal" />
+          </label>
+          <label class="modal-label">
+            Tanggal Jatuh Tempo
+            <input id="tagihanTanggal" type="date" />
+          </label>
+          <div id="tagihanError" class="form-error"></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost-button" id="cancelTagihanModal">Batal</button>
+          <button type="button" class="primary-button" id="saveTagihanBtn">Simpan</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="pembayaranModal" class="modal hidden">
+      <div class="modal-card" style="width: min(520px, 94vw)">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Tambah Pembayaran</div>
+            <div class="modal-subtitle">Input pembayaran untuk tagihan terpilih.</div>
+          </div>
+          <button class="icon-button" id="closePembayaranModal">x</button>
+        </div>
+        <div class="modal-body">
+          <label class="modal-label">
+            Tagihan
+            <select id="tagihanSelect"></select>
+          </label>
+          <label class="modal-label">
+            Nominal
+            <input id="pembayaranNominal" type="number" min="0" placeholder="Masukkan nominal" />
+          </label>
+          <label class="modal-label">
+            Metode Pembayaran
+            <select id="pembayaranMetode">
+              <option value="cash">Cash</option>
+              <option value="transfer">Transfer</option>
+            </select>
+          </label>
+          <label class="modal-label">
+            Tanggal Pembayaran
+            <input id="pembayaranTanggal" type="date" />
+          </label>
+          <label class="modal-label">
+            Catatan
+            <input id="pembayaranCatatan" type="text" placeholder="Opsional" />
+          </label>
+          <div id="pembayaranError" class="form-error"></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost-button" id="cancelPembayaranModal">Batal</button>
+          <button type="button" class="primary-button" id="savePembayaranBtn">Simpan</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tagihanDetailModal" class="modal hidden">
+      <div class="modal-card" style="width: min(560px, 94vw)">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Detail Tagihan</div>
+            <div id="tagihanDetailSubtitle" class="modal-subtitle">Ringkasan tagihan siswa.</div>
+          </div>
+          <button class="icon-button" id="closeDetailModal">x</button>
+        </div>
+        <div class="modal-body">
+          <div class="grid gap-3 text-sm text-slate-700">
+            <div><strong>Program:</strong> <span id="detailProgram">-</span></div>
+            <div><strong>Tagihan:</strong> <span id="detailNominal">-</span></div>
+            <div><strong>Total Dibayar:</strong> <span id="detailPaid">-</span></div>
+            <div><strong>Kekurangan:</strong> <span id="detailRemaining">-</span></div>
+            <div><strong>Status:</strong> <span id="detailStatus">-</span></div>
+          </div>
+          <div style="margin-top: 16px">
+            <div class="text-xs text-slate-500">Progres pembayaran</div>
+            <div style="height: 8px; background: rgba(148,163,184,0.35); border-radius: 999px; overflow: hidden;">
+              <div id="detailProgressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg,#6366f1,#22d3ee);"></div>
+            </div>
+            <div id="detailProgressText" class="text-xs text-slate-500" style="margin-top: 6px;">0%</div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost-button" id="closeDetailModalBottom">Tutup</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/tagihan.js"></script>
+    <script src="/js/pembayaran.js"></script>
+    <script src="/js/keuangan.js"></script>
+  </body>
+</html>

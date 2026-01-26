@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jadwal Saya - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+          </head>
+  <body class="app" data-page="jadwal-siswa">
+    <main class="content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">≡</button>
+          <div>
+            <div class="page-title">Jadwal Saya</div>
+            <div class="page-subtitle">Pantau jadwal aktif dan riwayat absensi.</div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <input id="jadwalSearch" class="input" type="search" placeholder="Cari program..." />
+        </div>
+      </header>
+
+      <section class="panel">
+        <div class="panel-title">Jadwal Aktif</div>
+        <div id="jadwalAktif" class="schedule-grid"></div>
+        <div id="jadwalAktifEmpty" class="table-empty">Belum ada jadwal aktif.</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title">Riwayat Absensi</div>
+        <div class="table">
+          <div class="table-row header">
+            <div>Tanggal</div>
+            <div>Program</div>
+            <div>Mapel</div>
+            <div>Jam</div>
+            <div>Tipe</div>
+          </div>
+          <div id="absensiRows"></div>
+        </div>
+        <div id="absensiEmpty" class="table-empty">Belum ada riwayat absensi.</div>
+      </section>
+    </main>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/jadwal-siswa.js"></script>
+  </body>
+</html>

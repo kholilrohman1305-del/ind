@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kas & Saldo - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+  </head>
+  <body class="app" data-page="kas">
+    <main class="content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">=</button>
+          <div>
+            <div class="page-title">Kas & Saldo</div>
+            <div class="page-subtitle">Pantau arus kas dan saldo cabang per bulan.</div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <input id="kasMonth" class="input" type="month" />
+        </div>
+      </header>
+
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6" id="kasSummary">
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="text-xs uppercase tracking-wider text-slate-400">Saldo Awal</div>
+          <div class="mt-2 text-2xl font-semibold text-slate-800" id="kasSaldoAwal">Rp 0</div>
+          <div class="text-xs text-slate-500">Periode berjalan</div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="text-xs uppercase tracking-wider text-slate-400">Pemasukan</div>
+          <div class="mt-2 text-2xl font-semibold text-slate-800" id="kasPemasukan">Rp 0</div>
+          <div class="text-xs text-slate-500">Pembayaran masuk</div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="text-xs uppercase tracking-wider text-slate-400">Pengeluaran</div>
+          <div class="mt-2 text-2xl font-semibold text-slate-800" id="kasPengeluaran">Rp 0</div>
+          <div class="text-xs text-slate-500">Operasional + gaji</div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="text-xs uppercase tracking-wider text-slate-400">Saldo Akhir</div>
+          <div class="mt-2 text-2xl font-semibold text-slate-800" id="kasSaldoAkhir">Rp 0</div>
+          <div class="text-xs text-slate-500">Perkiraan akhir</div>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section class="panel lg:col-span-1">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Saldo Awal Bulanan</div>
+              <div class="panel-subtitle">Atur saldo awal untuk perhitungan kas.</div>
+            </div>
+          </div>
+          <form id="kasSaldoForm" class="space-y-4">
+            <label class="block">
+              <span class="text-xs font-semibold text-slate-500">Periode</span>
+              <input id="kasSaldoPeriode" type="month" class="input w-full mt-1" />
+            </label>
+            <label class="block">
+              <span class="text-xs font-semibold text-slate-500">Nominal Saldo Awal</span>
+              <input id="kasSaldoNominal" type="number" min="0" class="input w-full mt-1" placeholder="0" />
+            </label>
+            <div class="flex gap-2">
+              <button type="button" id="kasSaldoReset" class="ghost-button">Reset</button>
+              <button type="submit" class="primary-button">Simpan</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel lg:col-span-2">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Cashflow Bulanan</div>
+              <div class="panel-subtitle">Rangkuman pemasukan dan pengeluaran.</div>
+            </div>
+            <div class="topbar-actions">
+              <input id="kasSearch" class="input" type="search" placeholder="Cari transaksi..." />
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="text-xs uppercase text-slate-400 border-b border-slate-100">
+                  <th class="p-4 font-semibold">Tanggal</th>
+                  <th class="p-4 font-semibold">Kategori</th>
+                  <th class="p-4 font-semibold">Keterangan</th>
+                  <th class="p-4 font-semibold text-right">Nominal</th>
+                </tr>
+              </thead>
+              <tbody id="kasRows" class="text-sm text-slate-600"></tbody>
+            </table>
+            <div id="kasEmpty" class="hidden flex flex-col items-center justify-center py-16 text-center">
+              <div class="text-slate-400 text-sm">Belum ada transaksi kas pada periode ini.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/kas.js"></script>
+  </body>
+</html>

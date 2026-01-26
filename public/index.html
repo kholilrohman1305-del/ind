@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+          </head>
+  <body class="app" data-page="dashboard">
+    <div id="notification-container" class="notification-container"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-logo">IL</div>
+        <div class="brand-text">
+          <div class="brand-name">ILHAMI</div>
+          <div class="brand-sub">Bimbel Admin</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a class="nav-link" data-page="dashboard" href="/dashboard"><span class="nav-icon"></span>Dashboard</a>
+        <a class="nav-link" data-page="cabang" href="/cabang"><span class="nav-icon"></span>Cabang</a>
+        <a class="nav-link" data-page="mapel" href="/mapel"><span class="nav-icon"></span>Mapel</a>
+        <a class="nav-link" data-page="siswa" href="/siswa"><span class="nav-icon"></span>Siswa</a>
+        <a class="nav-link" data-page="edukator" href="/edukator"><span class="nav-icon"></span>Edukator</a>
+        <a class="nav-link" data-page="program" href="/program"><span class="nav-icon"></span>Program</a>
+        <a class="nav-link" data-page="jadwal" href="/jadwal"><span class="nav-icon"></span>Jadwal</a>
+        <a class="nav-link" data-page="presensi" href="/presensi"><span class="nav-icon"></span>Presensi</a>
+        <a class="nav-link" data-page="tagihan" href="/tagihan"><span class="nav-icon"></span>Tagihan</a>
+        <a class="nav-link" data-page="pembayaran" href="/pembayaran"><span class="nav-icon"></span>Pembayaran</a>
+        <a class="nav-link" data-page="penggajian" href="/penggajian"><span class="nav-icon"></span>Penggajian</a>
+        <a class="nav-link" data-page="notifikasi" href="/notifikasi"><span class="nav-icon"></span>Notifikasi</a>
+      </nav>
+      <div class="profile-card">
+        <div class="profile-avatar">AD</div>
+        <div class="profile-info">
+          <div class="profile-name">Admin Cabang</div>
+          <div class="profile-email">admin@ilhami.id</div>
+        </div>
+        <button class="profile-action" aria-label="Logout">Log out</button>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">=</button>
+          <div>
+            <div class="page-title">Selamat Datang Kembali</div>
+            <div class="page-subtitle">Ringkasan aktivitas cabang hari ini.</div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="search">
+            <input type="text" placeholder="Cari data" />
+            <span class="search-icon"></span>
+          </div>
+          <button class="icon-button notify" id="notificationBtn" aria-label="Notifikasi">
+            <span class="bell"></span>
+            <span class="notify-dot"></span>
+          </button>
+          <button class="primary-button" id="addBtn">Tambah Baru</button>
+        </div>
+      </header>
+
+      <section class="stats-grid">
+        <article class="stat-card">
+          <div class="stat-head">
+            <div class="stat-icon blue"></div>
+            <div class="stat-trend up">+12%</div>
+          </div>
+          <div class="stat-value">1,248</div>
+          <div class="stat-label">Siswa Aktif</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-head">
+            <div class="stat-icon green"></div>
+            <div class="stat-trend up">+6%</div>
+          </div>
+          <div class="stat-value">312</div>
+          <div class="stat-label">Enrollment Baru</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-head">
+            <div class="stat-icon amber"></div>
+            <div class="stat-trend up">+8%</div>
+          </div>
+          <div class="stat-value">Rp 86,4 Jt</div>
+          <div class="stat-label">Pendapatan Bulan Ini</div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-head">
+            <div class="stat-icon rose"></div>
+            <div class="stat-trend down">-2%</div>
+          </div>
+          <div class="stat-value">18</div>
+          <div class="stat-label">Tagihan Jatuh Tempo</div>
+        </article>
+      </section>
+
+      <section class="grid-two">
+        <div class="panel chart-panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Analisis Pendapatan</div>
+              <div class="panel-subtitle">6 bulan terakhir</div>
+            </div>
+            <div class="panel-actions">
+              <button class="chip active">Bulanan</button>
+              <button class="chip">Tahunan</button>
+            </div>
+          </div>
+          <div class="bar-chart">
+            <div class="bar" style="height: 55%"><span>Jan</span></div>
+            <div class="bar" style="height: 70%"><span>Feb</span></div>
+            <div class="bar" style="height: 42%"><span>Mar</span></div>
+            <div class="bar" style="height: 88%"><span>Apr</span></div>
+            <div class="bar" style="height: 64%"><span>Mei</span></div>
+            <div class="bar accent" style="height: 100%"><span>Jun</span></div>
+          </div>
+        </div>
+        <div class="panel activity-panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Aktivitas Terbaru</div>
+              <div class="panel-subtitle">Update operasional</div>
+            </div>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-avatar blue">RN</div>
+              <div class="activity-text">
+                <div class="activity-title">Rina Novianti menyelesaikan pembayaran</div>
+                <div class="activity-time">2 menit yang lalu</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar purple">AP</div>
+              <div class="activity-text">
+                <div class="activity-title">Andi Pratama bergabung program</div>
+                <div class="activity-time">15 menit yang lalu</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar amber">DM</div>
+              <div class="activity-text">
+                <div class="activity-title">Dewi Maharani update jadwal kelas</div>
+                <div class="activity-time">1 jam yang lalu</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-avatar green">BS</div>
+              <div class="activity-text">
+                <div class="activity-title">Budi Santoso konfirmasi absensi</div>
+                <div class="activity-time">3 jam yang lalu</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid-two">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Tugas Hari Ini</div>
+              <div class="panel-subtitle">5 dari 8 selesai</div>
+            </div>
+          </div>
+          <div class="task-list">
+            <label class="task-item">
+              <input type="checkbox" checked />
+              <span class="task-text done">Review laporan keuangan</span>
+              <span class="task-status done">Selesai</span>
+            </label>
+            <label class="task-item">
+              <input type="checkbox" checked />
+              <span class="task-text done">Konfirmasi pembayaran</span>
+              <span class="task-status done">Selesai</span>
+            </label>
+            <label class="task-item">
+              <input type="checkbox" />
+              <span class="task-text">Update data siswa</span>
+              <span class="task-status progress">Proses</span>
+            </label>
+            <label class="task-item">
+              <input type="checkbox" />
+              <span class="task-text">Rencanakan jadwal baru</span>
+              <span class="task-status">Pending</span>
+            </label>
+          </div>
+          <div class="progress">
+            <div class="progress-header">
+              <span>Progress</span>
+              <span class="progress-value">62%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-bar" style="width: 62%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title">Program Terlaris</div>
+              <div class="panel-subtitle">Paket paling diminati</div>
+            </div>
+          </div>
+          <div class="product-list">
+            <div class="product-item">
+              <div class="product-icon">PR</div>
+              <div class="product-info">
+                <div class="product-title">Privat 8x</div>
+                <div class="product-subtitle">2,847 siswa</div>
+              </div>
+              <div class="product-metric">Rp 142 Jt</div>
+            </div>
+            <div class="product-item">
+              <div class="product-icon">KL</div>
+              <div class="product-info">
+                <div class="product-title">Kelas Reguler</div>
+                <div class="product-subtitle">1,234 siswa</div>
+              </div>
+              <div class="product-metric">Rp 98 Jt</div>
+            </div>
+            <div class="product-item">
+              <div class="product-icon">EX</div>
+              <div class="product-info">
+                <div class="product-title">Try Out Intensif</div>
+                <div class="product-subtitle">5,621 siswa</div>
+              </div>
+              <div class="product-metric">Rp 56 Jt</div>
+            </div>
+            <div class="product-item">
+              <div class="product-icon">AD</div>
+              <div class="product-info">
+                <div class="product-title">Add-on Konsultasi</div>
+                <div class="product-subtitle">892 siswa</div>
+              </div>
+              <div class="product-metric">Rp 27 Jt</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/dashboard.js"></script>
+  </body>
+</html>

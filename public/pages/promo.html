@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Promo & Diskon - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+  </head>
+  <body class="app" data-page="promo">
+    <main class="content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">=</button>
+          <div>
+            <div class="page-title">Promo & Diskon</div>
+            <div class="page-subtitle">Atur promo per program dan periode.</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <section class="panel lg:col-span-1">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Buat Promo</div>
+              <div class="panel-subtitle">Diskon persen atau nominal tetap.</div>
+            </div>
+          </div>
+          <form id="promoForm" class="space-y-4">
+            <input type="hidden" id="promoId" />
+            <label class="block">
+              <span class="text-xs font-semibold text-slate-500">Program</span>
+              <select id="promoProgram" class="input w-full mt-1"></select>
+            </label>
+            <label class="block">
+              <span class="text-xs font-semibold text-slate-500">Nama Promo</span>
+              <input id="promoNama" class="input w-full mt-1" type="text" placeholder="Contoh: Diskon Awal Tahun" />
+            </label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="block">
+                <span class="text-xs font-semibold text-slate-500">Tipe Diskon</span>
+                <select id="promoTipe" class="input w-full mt-1">
+                  <option value="percent">Persen (%)</option>
+                  <option value="fixed">Nominal (Rp)</option>
+                </select>
+              </label>
+              <label class="block">
+                <span class="text-xs font-semibold text-slate-500">Nilai</span>
+                <input id="promoNilai" class="input w-full mt-1" type="number" min="0" placeholder="0" />
+              </label>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="block">
+                <span class="text-xs font-semibold text-slate-500">Mulai</span>
+                <input id="promoMulai" class="input w-full mt-1" type="date" />
+              </label>
+              <label class="block">
+                <span class="text-xs font-semibold text-slate-500">Selesai</span>
+                <input id="promoSelesai" class="input w-full mt-1" type="date" />
+              </label>
+            </div>
+            <label class="flex items-center gap-2 text-sm text-slate-600">
+              <input id="promoActive" type="checkbox" class="h-4 w-4" checked />
+              Aktifkan promo
+            </label>
+            <div class="flex gap-2">
+              <button type="button" id="promoReset" class="ghost-button">Reset</button>
+              <button type="submit" class="primary-button">Simpan</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel lg:col-span-2">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Daftar Promo</div>
+              <div class="panel-subtitle">Kelola promo aktif maupun berakhir.</div>
+            </div>
+            <div class="topbar-actions">
+              <input id="promoSearch" class="input" type="search" placeholder="Cari promo..." />
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="text-xs uppercase text-slate-400 border-b border-slate-100">
+                  <th class="p-4 font-semibold">Promo</th>
+                  <th class="p-4 font-semibold">Program</th>
+                  <th class="p-4 font-semibold">Periode</th>
+                  <th class="p-4 font-semibold">Diskon</th>
+                  <th class="p-4 font-semibold text-center">Status</th>
+                  <th class="p-4 font-semibold text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="promoRows" class="text-sm text-slate-600"></tbody>
+            </table>
+            <div id="promoEmpty" class="hidden flex flex-col items-center justify-center py-16 text-center">
+              <div class="text-slate-400 text-sm">Belum ada promo pada cabang ini.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/promo.js"></script>
+  </body>
+</html>

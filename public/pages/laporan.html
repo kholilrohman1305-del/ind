@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Laporan Cabang - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      .chart-wrap {
+        height: 320px;
+      }
+      @media (max-width: 720px) {
+        .chart-wrap {
+          height: 240px;
+        }
+      }
+    </style>
+  </head>
+  <body class="app" data-page="laporan">
+    <main class="content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">=</button>
+          <div>
+            <div class="page-title">Laporan Cabang</div>
+            <div class="page-subtitle">Ringkasan keuangan dan aktivitas cabang.</div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <select id="reportMode" class="input">
+            <option value="month">Bulanan</option>
+            <option value="year">Tahunan</option>
+          </select>
+          <input id="reportMonth" class="input" type="month" />
+          <input id="reportYear" class="input hidden" type="number" min="2020" max="2100" />
+          <button id="applyReport" class="primary-button">Terapkan</button>
+        </div>
+      </header>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Grafik Keuangan</div>
+            <div class="panel-subtitle">Pemasukan (tagihan + pembayaran) vs pengeluaran.</div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="keuanganChart"></canvas>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Laporan Lanjutan</div>
+            <div class="panel-subtitle">Ringkasan presensi, siswa, dan program favorit.</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="laporanLanjutanCards">
+          <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="text-xs uppercase tracking-wider text-slate-400">Presensi</div>
+            <div class="mt-2 text-2xl font-semibold text-slate-800" id="laporanPresensi">0</div>
+            <div class="text-xs text-slate-500">Bulan berjalan</div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="text-xs uppercase tracking-wider text-slate-400">Siswa Aktif</div>
+            <div class="mt-2 text-2xl font-semibold text-slate-800" id="laporanSiswaAktif">0</div>
+            <div class="text-xs text-slate-500">Total aktif</div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="text-xs uppercase tracking-wider text-slate-400">Siswa Nonaktif</div>
+            <div class="mt-2 text-2xl font-semibold text-slate-800" id="laporanSiswaNonaktif">0</div>
+            <div class="text-xs text-slate-500">Total nonaktif</div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="text-xs uppercase tracking-wider text-slate-400">Program Favorit</div>
+            <div class="mt-2 text-lg font-semibold text-slate-800" id="laporanProgramFavorit">-</div>
+            <div class="text-xs text-slate-500" id="laporanProgramFavoritTotal">0 siswa</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/laporan.js"></script>
+  </body>
+</html>
