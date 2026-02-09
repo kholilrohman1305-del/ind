@@ -11,9 +11,6 @@ node_modules/
 Thumbs.db
 Desktop.ini
 
-# Hostinger Passenger (auto-generated, jangan timpa)
-.htaccess
-
 # Build artifacts
 nul
 
