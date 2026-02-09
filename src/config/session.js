@@ -2,6 +2,7 @@ const session = require("express-session");
 const { SESSION_SECRET } = require("./env");
 
 const oneDayMs = 24 * 60 * 60 * 1000;
+const isProduction = process.env.NODE_ENV === "production";
 
 module.exports = session({
   secret: SESSION_SECRET,
@@ -9,7 +10,8 @@ module.exports = session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false,
+    secure: isProduction,
+    sameSite: isProduction ? "lax" : false,
     maxAge: oneDayMs,
   },
 });

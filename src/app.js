@@ -38,6 +38,10 @@ const analysisRoutes = require("./routes/analysis.routes");
 const feedbackRoutes = require("./routes/feedback.routes");
 
 const app = express();
+
+// Trust proxy untuk Passenger/Apache di shared hosting
+app.set("trust proxy", 1);
+
 const publicDir = path.join(__dirname, "..", "public");
 
 app.use(express.json());
