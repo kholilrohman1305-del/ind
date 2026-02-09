@@ -1,6 +1,0 @@
-# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION
-PassengerAppRoot "/home/u696946132/public_html"
-PassengerBaseURI "/"
-PassengerNodejs "/opt/alt/alt-nodejs22/root/usr/bin/node"
-PassengerAppType node
-PassengerStartupFile src/server.js
