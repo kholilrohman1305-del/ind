@@ -3,9 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dashboard Edukator - ILHAMI</title>
+    <title>Dashboard Edukator - ILHAMI Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
       body { font-family: 'Plus Jakarta Sans', sans-serif; }
       
@@ -19,10 +21,8 @@
         opacity: 0; 
       }
       
-      /* Delay Animation */
       .delay-100 { animation-delay: 0.1s; }
       .delay-200 { animation-delay: 0.2s; }
-      .delay-300 { animation-delay: 0.3s; }
 
       /* Custom Scrollbar */
       ::-webkit-scrollbar { width: 6px; }
@@ -40,108 +40,123 @@
          <div class="absolute -bottom-[10%] -left-[5%] w-[500px] h-[500px] bg-teal-100/40 rounded-full blur-[80px]"></div>
       </div>
 
-      <header class="topbar h-20 flex items-center justify-between px-8 bg-white/70 backdrop-blur-md border-b border-white/50 sticky top-0 z-10">
+      <header class="topbar h-20 flex items-center justify-between px-6 md:px-8 bg-white/70 backdrop-blur-md border-b border-white/50 sticky top-0 z-20">
         <div class="topbar-left flex items-center gap-4">
-          <button class="icon-button p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors" id="sidebarToggle" aria-label="Toggle menu">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          <button class="icon-button p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors md:hidden" id="sidebarToggle" aria-label="Toggle menu">
+            <i class="fa-solid fa-bars text-xl"></i>
           </button>
           <div>
             <div class="page-title text-xl font-bold text-slate-800">Dashboard Edukator</div>
-            <div class="page-subtitle text-xs text-slate-500">Ringkasan aktivitas mengajar bulan ini.</div>
+            <div class="page-subtitle text-xs text-slate-500 font-medium">Ringkasan aktivitas mengajar bulan ini.</div>
           </div>
         </div>
-        <div class="hidden md:flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100 text-xs font-semibold">
+        <div class="hidden md:flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100 text-xs font-semibold shadow-sm">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Siap Mengajar
+            Status: Aktif Mengajar
         </div>
       </header>
 
       <div class="flex-1 overflow-y-auto p-6 md:p-8 relative z-10">
 
         <section class="mb-8 animate-enter">
-            <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-3xl p-8 text-white shadow-xl shadow-emerald-100 relative overflow-hidden">
-                <div class="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+            <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-3xl p-8 text-white shadow-xl shadow-emerald-100 relative overflow-hidden group">
+                <div class="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
                 
-                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                     <div>
-                        <div class="inline-block px-3 py-1 bg-white/20 rounded-lg text-[10px] font-bold uppercase tracking-wider mb-2 backdrop-blur-sm border border-white/10">Selamat Datang</div>
-                        <h2 class="text-3xl font-bold mb-2">Halo, Edukator!</h2>
-                        <p class="text-emerald-50 text-sm max-w-lg">Siap untuk mencerdaskan kehidupan bangsa hari ini? Cek jadwal terbaru Anda di bawah.</p>
+                        <div class="inline-block px-3 py-1 bg-white/20 rounded-lg text-[10px] font-bold uppercase tracking-wider mb-3 backdrop-blur-sm border border-white/10">
+                            <i class="fa-solid fa-chalkboard-user mr-1"></i> Ruang Guru
+                        </div>
+                        <h2 class="text-3xl font-bold mb-2 leading-tight">
+                            Halo, <span id="userName" class="underline decoration-wavy decoration-emerald-300/50 underline-offset-4">Edukator</span>! 👋
+                        </h2>
+                        <p class="text-emerald-50 text-sm max-w-lg leading-relaxed opacity-90">
+                            Siap untuk mencerdaskan kehidupan bangsa hari ini? Cek jadwal terbaru Anda di bawah.
+                        </p>
                     </div>
-                    <div class="flex flex-col items-center justify-center bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-white/20">
-                        <span class="text-xs text-emerald-100 font-medium">Rating Bulan Ini</span>
-                        <div class="text-2xl font-bold">4.9/5.0</div>
+                    
+                    <div class="flex flex-col items-center justify-center bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-white/20 min-w-[140px]">
+                        <span class="text-xs text-emerald-100 font-medium uppercase tracking-wide mb-1">Performa</span>
+                        <div class="text-3xl font-bold">4.9<span class="text-lg text-emerald-200">/5</span></div>
+                        <div class="flex gap-0.5 text-yellow-300 text-xs mt-1">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-enter delay-100">
-            
-            <div class="stat-card emerald bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-enter delay-100">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-all duration-300 group">
                 <div class="flex justify-between items-start mb-4">
-                    <div class="stat-label text-xs font-bold text-slate-400 uppercase">Program Saya</div>
-                    <div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Program Saya</div>
+                    <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg group-hover:bg-emerald-100 transition-colors">
+                        <i class="fa-solid fa-book-open text-lg"></i>
                     </div>
                 </div>
-                <div id="statProgram" class="stat-value text-3xl font-bold text-slate-800">0</div>
+                <div id="statProgram" class="text-3xl font-bold text-slate-800">0</div>
+                <div class="text-xs text-slate-400 mt-1">Kelas aktif</div>
             </div>
 
-            <div class="stat-card blue bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-all duration-300 group">
                 <div class="flex justify-between items-start mb-4">
-                    <div class="stat-label text-xs font-bold text-slate-400 uppercase">Siswa Saya</div>
-                    <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Siswa Saya</div>
+                    <div class="p-2 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-100 transition-colors">
+                        <i class="fa-solid fa-users text-lg"></i>
                     </div>
                 </div>
-                <div id="statSiswa" class="stat-value text-3xl font-bold text-slate-800">0</div>
+                <div id="statSiswa" class="text-3xl font-bold text-slate-800">0</div>
+                <div class="text-xs text-slate-400 mt-1">Total siswa ajar</div>
             </div>
 
-            <div class="stat-card violet bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-all duration-300 group">
                 <div class="flex justify-between items-start mb-4">
-                    <div class="stat-label text-xs font-bold text-slate-400 uppercase">Kehadiran</div>
-                    <div class="p-2 bg-violet-100 text-violet-600 rounded-lg">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Kehadiran</div>
+                    <div class="p-2 bg-violet-50 text-violet-600 rounded-lg group-hover:bg-violet-100 transition-colors">
+                        <i class="fa-solid fa-calendar-check text-lg"></i>
                     </div>
                 </div>
-                <div id="statKehadiran" class="stat-value text-3xl font-bold text-slate-800">0</div>
-                <div class="text-xs text-slate-400 mt-1">Bulan ini</div>
+                <div id="statKehadiran" class="text-3xl font-bold text-slate-800">0</div>
+                <div class="text-xs text-slate-400 mt-1">Sesi bulan ini</div>
             </div>
 
-            <div class="stat-card orange bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="stat-label text-xs font-bold text-slate-400 uppercase">Jadwal Hari Ini</div>
-                    <div class="p-2 bg-orange-100 text-orange-600 rounded-lg">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden">
+                <div class="absolute right-0 top-0 w-20 h-20 bg-orange-50 rounded-full -mr-10 -mt-10 opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
+                <div class="flex justify-between items-start mb-4 relative z-10">
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Jadwal Hari Ini</div>
+                    <div class="p-2 bg-orange-50 text-orange-600 rounded-lg group-hover:bg-orange-100 transition-colors">
+                        <i class="fa-regular fa-clock text-lg"></i>
                     </div>
                 </div>
-                <div id="statJadwalHariIni" class="stat-value text-3xl font-bold text-slate-800">0</div>
-                <div class="text-xs text-orange-500 font-medium mt-1">Kelas Aktif</div>
+                <div id="statJadwalHariIni" class="text-3xl font-bold text-slate-800 relative z-10">0</div>
+                <div class="text-xs text-orange-500 font-bold mt-1 relative z-10">Kelas perlu dihadiri</div>
             </div>
         </section>
 
         <section class="panel mb-8 animate-enter delay-200">
             <div class="bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col overflow-hidden">
-                <div class="panel-head flex items-center justify-between p-6 border-b border-slate-50 bg-white/50 backdrop-blur-sm">
+                <div class="flex items-center justify-between p-6 border-b border-slate-50 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
                     <div>
-                        <h3 class="panel-title font-bold text-lg text-slate-800">Jadwal Saya Hari Ini</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Pastikan presensi diisi tepat waktu.</p>
+                        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-emerald-500"></i> Jadwal Saya Hari Ini
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5 ml-6">Pastikan presensi diisi tepat waktu.</p>
                     </div>
-                    <a href="/jadwal-edukator" class="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-semibold rounded-xl transition-colors border border-slate-200">
-                        Lihat Semua
+                    <a href="/jadwal-edukator" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 hover:text-indigo-600 text-xs font-bold rounded-xl transition-all border border-slate-200 shadow-sm flex items-center gap-2">
+                        Lihat Semua <i class="fa-solid fa-arrow-right"></i>
                     </a>
                 </div>
                 
-                <div class="list p-0">
-                    <div id="jadwalList" class="divide-y divide-slate-50"></div>
+                <div class="p-0 min-h-[200px]">
+                    <div id="jadwalList" class="divide-y divide-slate-50">
+                        </div>
                     
-                    <div id="jadwalEmpty" class="table-empty py-16 flex flex-col items-center justify-center text-slate-400 text-center">
-                         <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                    <div id="jadwalEmpty" class="hidden py-16 flex flex-col items-center justify-center text-center">
+                         <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4 animate-bounce-slow">
+                            <i class="fa-solid fa-mug-hot text-3xl text-slate-300"></i>
                          </div>
-                         <h4 class="text-sm font-semibold text-slate-600">Tidak ada jadwal mengajar</h4>
-                         <p class="text-xs mt-1 max-w-xs">Anda bisa menggunakan waktu ini untuk mempersiapkan materi atau istirahat.</p>
+                         <h4 class="text-sm font-bold text-slate-700">Tidak ada jadwal mengajar</h4>
+                         <p class="text-xs text-slate-400 mt-1 max-w-xs">Hari ini kosong! Gunakan waktu ini untuk istirahat atau persiapan materi.</p>
                     </div>
                 </div>
             </div>
