@@ -3,232 +3,465 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Keuangan Siswa - ILHAMI</title>
+    <title>Keuangan Siswa - ILHAMI Pro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/tailwind.css" />
+
+    <style>
+      :root {
+        --primary: #6366f1; /* Indigo 500 */
+        --bg-app: #f1f5f9;
+      }
+      body { 
+        font-family: 'Plus Jakarta Sans', sans-serif; 
+        background-color: var(--bg-app); 
+        color: #1e293b; 
+        /* Modern subtle mesh background */
+        background-image: 
+          radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+          radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.08) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+        background-attachment: fixed;
+      }
+      
+      /* Smooth Scrolling */
+      .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+      /* Glass Panel Modern */
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+        border-radius: 1.5rem;
+      }
+
+      /* Inputs Modern */
+      .custom-input, .custom-select {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 100%;
+        color: #334155;
+      }
+      .custom-input:focus, .custom-select:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        transform: translateY(-1px);
+      }
+
+      /* Tabs Modern */
+      .tab-btn {
+        padding: 0.6rem 1.25rem;
+        border-radius: 0.875rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .tab-btn.active {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+      }
+      .tab-btn.inactive {
+        background-color: transparent;
+        color: #64748b;
+      }
+      .tab-btn.inactive:hover {
+        background-color: #f8fafc;
+        color: var(--primary);
+      }
+
+      /* Table Modern Styling */
+      .modern-table { border-spacing: 0; width: 100%; }
+      .modern-table thead th {
+        background-color: #f8fafc;
+        color: #64748b;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 1.25rem 1.5rem;
+        font-weight: 700;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      .modern-table tbody tr {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f1f5f9;
+      }
+      .modern-table tbody tr:last-child { border-bottom: none; }
+      .modern-table tbody tr:hover { 
+        background-color: #f8fafc; 
+        transform: scale(1.005);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+      }
+      .modern-table td { padding: 1.25rem 1.5rem; vertical-align: middle; }
+    </style>
   </head>
-  <body class="app" data-page="tagihan">
-    <main class="content">
-      <header class="topbar">
-        <div class="topbar-left">
-          <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">&#8801;</button>
+
+  <body class="app h-screen flex flex-col overflow-hidden" data-page="tagihan">
+    <main class="content flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+      
+      <header class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-6">
+        <div class="flex items-center gap-4">
+          <button class="p-2.5 rounded-xl hover:bg-white shadow-sm md:hidden text-gray-600 transition bg-white/50 backdrop-blur-sm" id="sidebarToggle">
+            <i class="fa-solid fa-bars"></i>
+          </button>
           <div>
-            <div class="page-title">Keuangan Siswa</div>
-            <div class="page-subtitle">Tagihan dan pembayaran dalam satu tampilan.</div>
+            <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
+              <span class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-indigo-200">
+                <i class="fa-solid fa-wallet"></i>
+              </span>
+              Keuangan Siswa
+            </h1>
+            <p class="text-slate-500 mt-1 text-sm font-medium ml-1">Kelola tagihan SPP, cicilan, dan riwayat pembayaran.</p>
           </div>
         </div>
-        <div class="topbar-actions">
-          <div class="search">
-            <input id="tagihanSearch" type="text" placeholder="Cari siswa/program" />
-            <span class="search-icon"></span>
-          </div>
-          <input id="tagihanMonth" type="month" class="icon-button" style="font-size: 13px" />
-          <select id="tagihanFilter" class="icon-button" style="font-size: 13px">
-            <option value="aktif">Tagihan Aktif</option>
-            <option value="">Semua Status</option>
-            <option value="belum_bayar">Belum bayar</option>
-            <option value="cicilan">Cicilan</option>
-            <option value="lunas">Lunas</option>
-          </select>
-          <button id="addTagihanBtn" class="primary-button">Tambah Tagihan</button>
+
+        <div class="flex flex-wrap gap-3 w-full xl:w-auto items-center">
+            <div class="relative flex-grow xl:flex-grow-0 xl:w-72 group">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-3.5 text-gray-400 text-sm group-focus-within:text-indigo-500 transition-colors"></i>
+                <input id="tagihanSearch" type="search" class="custom-input pl-10 shadow-sm" placeholder="Cari siswa atau program..." />
+            </div>
+            
+            <div id="filterContainer" class="flex gap-2 w-full xl:w-auto overflow-x-auto pb-1 xl:pb-0 scrollbar-hide">
+               <input id="tagihanMonth" type="month" class="custom-input w-auto font-semibold text-slate-600 shadow-sm cursor-pointer" />
+               <select id="tagihanFilter" class="custom-select w-auto font-semibold text-slate-600 shadow-sm cursor-pointer">
+                <option value="aktif">Tagihan Aktif</option>
+                <option value="">Semua Status</option>
+                <option value="belum_bayar">Belum Bayar</option>
+                <option value="cicilan">Cicilan</option>
+                <option value="lunas">Lunas</option>
+              </select>
+            </div>
+
+            <button id="addTagihanBtn" class="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-6 py-3 rounded-2xl shadow-lg shadow-indigo-200 transition-all font-bold text-sm flex items-center gap-2 transform active:scale-95 whitespace-nowrap">
+                <i class="fa-solid fa-plus-circle"></i> Tagihan Baru
+            </button>
+            <button id="addPembayaranBtn" class="hidden bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-6 py-3 rounded-2xl shadow-lg shadow-emerald-200 transition-all font-bold text-sm flex items-center gap-2 transform active:scale-95 whitespace-nowrap">
+                <i class="fa-solid fa-money-bill-wave"></i> Bayar
+            </button>
         </div>
       </header>
 
-      <section class="panel">
-        <div class="panel-head">
-          <div class="panel-title">Keuangan Siswa</div>
-          <div class="panel-chip">Auto update</div>
+      <div id="siswaTagihanSummary" class="hidden glass-panel p-4 mb-6 border border-white/60">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Tagihan Aktif</div>
+            <div class="text-2xl font-extrabold text-slate-800 mt-1" id="siswaTagihanTotal">Rp 0</div>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-sm border border-indigo-100">
+            <i class="fa-solid fa-file-invoice"></i>
+          </div>
         </div>
-        <div class="flex gap-2 pb-4">
-          <button id="tabTagihan" class="primary-button" style="padding: 6px 14px">Tagihan</button>
-          <button id="tabPembayaran" class="icon-button" style="padding: 6px 14px; font-size: 12px">
-            Pembayaran
-          </button>
+        <div class="text-xs text-slate-400 mt-2">Total kewajiban tagihan yang masih aktif.</div>
+      </div>
+
+      <div id="adminTagihanSummary" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div class="glass-panel p-5 border border-white/60">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-xs text-emerald-600 font-semibold uppercase tracking-wide">Tagihan Lunas</div>
+              <div class="text-2xl font-extrabold text-slate-800 mt-1" id="tagihanLunasCount">0</div>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-sm border border-emerald-100">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+          </div>
+          <div class="text-xs text-slate-400 mt-2">Jumlah tagihan yang sudah lunas.</div>
+        </div>
+        <div class="glass-panel p-5 border border-white/60">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-xs text-rose-600 font-semibold uppercase tracking-wide">Belum Lunas</div>
+              <div class="text-2xl font-extrabold text-slate-800 mt-1" id="tagihanBelumLunasCount">0</div>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shadow-sm border border-rose-100">
+              <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+          </div>
+          <div class="text-xs text-slate-400 mt-2">Tagihan aktif dan cicilan.</div>
+        </div>
+      </div>
+
+      <section class="glass-panel overflow-hidden flex flex-col min-h-[600px] border border-white/50">
+        
+        <div class="p-5 border-b border-slate-100 bg-white/60 flex flex-col sm:flex-row justify-between items-center gap-4">
+           <div class="flex bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200">
+              <button id="tabTagihan" class="tab-btn active">Daftar Tagihan</button>
+              <button id="tabPembayaran" class="tab-btn inactive">Riwayat Pembayaran</button>
+           </div>
+           
+           <div class="text-xs text-slate-500 font-semibold flex items-center gap-2 bg-white px-3 py-1.5 rounded-full border border-slate-100 shadow-sm">
+              <span class="flex h-2.5 w-2.5 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              Data diperbarui otomatis
+           </div>
         </div>
 
-        <div id="tagihanSection">
-          <div class="overflow-auto">
-            <table class="min-w-full text-sm">
-              <thead class="text-left text-slate-500">
+        <div id="tagihanSection" class="flex-1 flex flex-col relative">
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left border-collapse modern-table">
+              <thead>
                 <tr>
-                  <th class="py-3 pr-4">Siswa</th>
-                  <th class="py-3 pr-4">Program</th>
-                  <th class="py-3 pr-4">Tagihan</th>
-                  <th class="py-3 pr-4">Dibayar</th>
-                  <th class="py-3 pr-4">Sisa</th>
-                  <th class="py-3 pr-4">Progres</th>
-                  <th class="py-3 pr-4">Jatuh Tempo</th>
-                  <th class="py-3 pr-4">Status</th>
-                  <th class="py-3">Aksi</th>
+                  <th>Siswa & Program</th>
+                  <th>Tagihan</th>
+                  <th>Terbayar</th>
+                  <th>Sisa</th>
+                  <th class="w-32">Progres</th>
+                  <th>Jatuh Tempo</th>
+                  <th>Status</th>
+                  <th class="text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody id="tagihanBody" class="text-slate-800"></tbody>
+              <tbody id="tagihanBody" class="text-sm font-medium text-slate-600">
+                </tbody>
             </table>
-            <div id="tagihanEmpty" class="table-empty">Belum ada tagihan.</div>
+            
+            <div id="tagihanEmpty" class="hidden flex flex-col items-center justify-center py-24 text-center">
+                <div class="bg-indigo-50 p-6 rounded-full mb-6 ring-8 ring-indigo-50/50">
+                    <i class="fa-solid fa-file-invoice text-5xl text-indigo-300"></i>
+                </div>
+                <h4 class="text-slate-700 font-bold text-lg">Tidak ada tagihan ditemukan</h4>
+                <p class="text-slate-400 text-sm mt-2 max-w-xs mx-auto">Coba ubah filter pencarian atau buat tagihan baru untuk memulai.</p>
+            </div>
           </div>
+          <div id="tagihanPager" class="p-4 border-t border-slate-100 bg-white/70"></div>
         </div>
 
-        <div id="pembayaranSection" class="hidden">
-          <div class="flex flex-wrap gap-3 items-end pb-4">
-            <label class="modal-label" style="min-width: 220px">
-              Cari siswa/program
-              <input id="pembayaranSearch" type="text" placeholder="Cari siswa/program" />
-            </label>
-            <label class="modal-label">
-              Dari tanggal
-              <input id="pembayaranDateStart" type="date" />
-            </label>
-            <label class="modal-label">
-              Sampai tanggal
-              <input id="pembayaranDateEnd" type="date" />
-            </label>
-            <label class="modal-label">
-              Bulan
-              <input id="pembayaranMonth" type="month" />
-            </label>
-            <label class="modal-label" style="min-width: 160px">
-              Metode bayar
-              <select id="pembayaranMethod">
-                <option value="">Semua</option>
-                <option value="cash">Cash</option>
-                <option value="transfer">Transfer</option>
-              </select>
-            </label>
-          </div>
-          <div class="overflow-auto">
-            <table class="min-w-full text-sm">
-              <thead class="text-left text-slate-500">
-                <tr>
-                  <th class="py-3 pr-4">Siswa</th>
-                  <th class="py-3 pr-4">Program</th>
-                  <th class="py-3 pr-4">Nominal</th>
-                  <th class="py-3 pr-4">Metode</th>
-                  <th class="py-3 pr-4">Tanggal</th>
-                  <th class="py-3 pr-4">Status Tagihan</th>
-                  <th class="py-3">Catatan</th>
-                </tr>
-              </thead>
-              <tbody id="pembayaranBody" class="text-slate-800"></tbody>
-            </table>
-            <div id="pembayaranEmpty" class="table-empty">Belum ada pembayaran.</div>
-          </div>
+        <div id="pembayaranSection" class="hidden flex-1 flex flex-col">
+            <div class="p-5 bg-slate-50/50 border-b border-slate-100 flex flex-wrap gap-4 items-end">
+                <div class="w-full sm:w-auto flex-grow max-w-xs">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Pencarian</label>
+                    <div class="relative group">
+                        <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400 text-xs"></i>
+                        <input id="pembayaranSearch" type="text" class="custom-input pl-9 py-2 text-xs rounded-xl" placeholder="Siswa / Program..." />
+                    </div>
+                </div>
+                <div class="w-1/2 sm:w-auto">
+                      <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Dari Tanggal</label>
+                      <input id="pembayaranDateStart" type="date" class="custom-input py-2 text-xs rounded-xl cursor-pointer" />
+                </div>
+                <div class="w-1/2 sm:w-auto">
+                      <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Sampai Tanggal</label>
+                      <input id="pembayaranDateEnd" type="date" class="custom-input py-2 text-xs rounded-xl cursor-pointer" />
+                </div>
+                <div class="w-1/2 sm:w-auto">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Bulan</label>
+                    <input id="pembayaranMonth" type="month" class="custom-input py-2 text-xs rounded-xl cursor-pointer" />
+               </div>
+                <div class="w-1/2 sm:w-auto">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Metode</label>
+                    <select id="pembayaranMethod" class="custom-select py-2 text-xs rounded-xl cursor-pointer">
+                        <option value="">Semua</option>
+                        <option value="cash">Cash</option>
+                        <option value="transfer">Transfer</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto custom-scrollbar">
+                <table class="w-full text-left border-collapse modern-table">
+                  <thead>
+                    <tr>
+                      <th>Siswa</th>
+                      <th>Program</th>
+                      <th>Nominal Bayar</th>
+                      <th>Metode</th>
+                      <th>Tanggal Bayar</th>
+                      <th>Status Akhir</th>
+                      <th>Catatan</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pembayaranBody" class="text-sm font-medium"></tbody>
+                </table>
+                <div id="pembayaranEmpty" class="hidden flex flex-col items-center justify-center py-24 text-center">
+                    <div class="bg-emerald-50 p-6 rounded-full mb-6 ring-8 ring-emerald-50/50">
+                        <i class="fa-solid fa-receipt text-5xl text-emerald-300"></i>
+                    </div>
+                    <h4 class="text-slate-700 font-bold text-lg">Belum ada riwayat pembayaran</h4>
+                    <p class="text-slate-400 text-sm mt-2">Semua transaksi pembayaran yang terekam akan muncul di sini.</p>
+                </div>
+            </div>
+            <div id="pembayaranPager" class="p-4 border-t border-slate-100 bg-white/70"></div>
         </div>
+
       </section>
     </main>
 
-    <div id="tagihanModal" class="modal hidden">
-      <div class="modal-card" style="width: min(520px, 94vw)">
-        <div class="modal-header">
-          <div>
-            <div class="modal-title">Tambah Tagihan</div>
-            <div class="modal-subtitle">Tagihan baru akan tercatat untuk siswa.</div>
-          </div>
-          <button class="icon-button" id="closeTagihanModal">x</button>
-        </div>
-        <div class="modal-body">
-          <label class="modal-label">
-            Siswa & Program
-            <select id="enrollmentSelect"></select>
-          </label>
-          <label class="modal-label">
-            Jenis Tagihan
-            <select id="jenisTagihan">
-              <option value="program">Program</option>
-              <option value="bulanan">Bulanan</option>
-            </select>
-          </label>
-          <label class="modal-label">
-            Nominal
-            <input id="tagihanNominal" type="number" min="0" placeholder="Masukkan nominal" />
-          </label>
-          <label class="modal-label">
-            Tanggal Jatuh Tempo
-            <input id="tagihanTanggal" type="date" />
-          </label>
-          <div id="tagihanError" class="form-error"></div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="ghost-button" id="cancelTagihanModal">Batal</button>
-          <button type="button" class="primary-button" id="saveTagihanBtn">Simpan</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="pembayaranModal" class="modal hidden">
-      <div class="modal-card" style="width: min(520px, 94vw)">
-        <div class="modal-header">
-          <div>
-            <div class="modal-title">Tambah Pembayaran</div>
-            <div class="modal-subtitle">Input pembayaran untuk tagihan terpilih.</div>
-          </div>
-          <button class="icon-button" id="closePembayaranModal">x</button>
-        </div>
-        <div class="modal-body">
-          <label class="modal-label">
-            Tagihan
-            <select id="tagihanSelect"></select>
-          </label>
-          <label class="modal-label">
-            Nominal
-            <input id="pembayaranNominal" type="number" min="0" placeholder="Masukkan nominal" />
-          </label>
-          <label class="modal-label">
-            Metode Pembayaran
-            <select id="pembayaranMetode">
-              <option value="cash">Cash</option>
-              <option value="transfer">Transfer</option>
-            </select>
-          </label>
-          <label class="modal-label">
-            Tanggal Pembayaran
-            <input id="pembayaranTanggal" type="date" />
-          </label>
-          <label class="modal-label">
-            Catatan
-            <input id="pembayaranCatatan" type="text" placeholder="Opsional" />
-          </label>
-          <div id="pembayaranError" class="form-error"></div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="ghost-button" id="cancelPembayaranModal">Batal</button>
-          <button type="button" class="primary-button" id="savePembayaranBtn">Simpan</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="tagihanDetailModal" class="modal hidden">
-      <div class="modal-card" style="width: min(560px, 94vw)">
-        <div class="modal-header">
-          <div>
-            <div class="modal-title">Detail Tagihan</div>
-            <div id="tagihanDetailSubtitle" class="modal-subtitle">Ringkasan tagihan siswa.</div>
-          </div>
-          <button class="icon-button" id="closeDetailModal">x</button>
-        </div>
-        <div class="modal-body">
-          <div class="grid gap-3 text-sm text-slate-700">
-            <div><strong>Program:</strong> <span id="detailProgram">-</span></div>
-            <div><strong>Tagihan:</strong> <span id="detailNominal">-</span></div>
-            <div><strong>Total Dibayar:</strong> <span id="detailPaid">-</span></div>
-            <div><strong>Kekurangan:</strong> <span id="detailRemaining">-</span></div>
-            <div><strong>Status:</strong> <span id="detailStatus">-</span></div>
-          </div>
-          <div style="margin-top: 16px">
-            <div class="text-xs text-slate-500">Progres pembayaran</div>
-            <div style="height: 8px; background: rgba(148,163,184,0.35); border-radius: 999px; overflow: hidden;">
-              <div id="detailProgressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg,#6366f1,#22d3ee);"></div>
+    <div id="tagihanModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/40 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none p-4">
+      <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl transform scale-95 transition-transform duration-300 modal-card flex flex-col max-h-[90vh]">
+         <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 rounded-t-3xl">
+            <div>
+              <h3 class="text-xl font-bold text-slate-800">Buat Tagihan Baru</h3>
+              <p class="text-xs text-slate-500 mt-1">Pilih siswa yang terdaftar dalam program.</p>
             </div>
-            <div id="detailProgressText" class="text-xs text-slate-500" style="margin-top: 6px;">0%</div>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="ghost-button" id="closeDetailModalBottom">Tutup</button>
+            <button id="closeTagihanModal" class="w-8 h-8 flex items-center justify-center rounded-full bg-white text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition shadow-sm border border-slate-100"><i class="fa-solid fa-xmark"></i></button>
+         </div>
+         
+         <div class="p-8 space-y-6 overflow-y-auto custom-scrollbar">
+            <div>
+               <label class="block text-slate-700 font-bold text-xs uppercase tracking-wide mb-2">Siswa & Program <span class="text-rose-500">*</span></label>
+               <select id="enrollmentSelect" class="custom-select shadow-sm"></select>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-slate-700 font-bold text-xs uppercase tracking-wide mb-2">Jenis Tagihan</label>
+                    <select id="jenisTagihan" class="custom-select shadow-sm">
+                        <option value="program">Program (Paket)</option>
+                        <option value="bulanan">Bulanan (SPP)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-700 font-bold text-xs uppercase tracking-wide mb-2">Jatuh Tempo</label>
+                    <input id="tagihanTanggal" type="date" class="custom-input shadow-sm cursor-pointer" />
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 p-5 rounded-2xl border border-indigo-100">
+                <label class="block text-indigo-900 font-bold text-xs uppercase tracking-wide mb-2">Nominal Tagihan (Rp) <span class="text-rose-500">*</span></label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400 font-bold">Rp</span>
+                    <input id="tagihanNominal" type="number" min="0" class="w-full bg-white border-none rounded-xl py-3 pl-12 pr-4 text-xl font-extrabold text-indigo-700 focus:ring-2 focus:ring-indigo-500 placeholder-indigo-200" placeholder="0" />
+                </div>
+            </div>
+
+            <div id="tagihanError" class="text-rose-500 text-sm hidden bg-rose-50 p-3 rounded-xl border border-rose-100 font-medium flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation"></i> <span></span>
+            </div>
+         </div>
+
+         <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 rounded-b-3xl">
+             <button id="cancelTagihanModal" class="px-5 py-2.5 text-slate-500 hover:bg-white hover:text-slate-700 rounded-xl transition font-bold text-sm border border-transparent hover:border-slate-200 hover:shadow-sm">Batal</button>
+             <button id="saveTagihanBtn" class="px-8 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white rounded-xl shadow-lg shadow-indigo-200 transition font-bold text-sm transform active:scale-95">Simpan</button>
+         </div>
+      </div>
+    </div>
+
+    <div id="pembayaranModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/40 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none p-4">
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl transform scale-95 transition-transform duration-300 modal-card">
+           <div class="px-8 py-6 border-b border-emerald-50 flex justify-between items-center bg-emerald-50/50 rounded-t-3xl">
+              <div>
+                <h3 class="text-xl font-bold text-emerald-900">Input Pembayaran</h3>
+                <p class="text-xs text-emerald-600 mt-1">Catat pembayaran masuk dari siswa.</p>
+              </div>
+              <button id="closePembayaranModal" class="w-8 h-8 flex items-center justify-center rounded-full bg-white text-emerald-300 hover:text-rose-500 hover:bg-rose-50 transition shadow-sm border border-emerald-100"><i class="fa-solid fa-xmark"></i></button>
+           </div>
+           
+           <div class="p-8 space-y-5">
+              <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                 <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tagihan Tujuan</label>
+                 <select id="tagihanSelect" class="w-full bg-transparent border-none p-0 font-bold text-slate-800 focus:ring-0 text-sm"></select>
+              </div>
+              
+              <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
+                  <label class="block text-emerald-900 font-bold text-xs uppercase tracking-wide mb-2">Nominal Bayar (Rp) <span class="text-rose-500">*</span></label>
+                  <div class="relative">
+                      <span class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-400 font-bold">Rp</span>
+                      <input id="pembayaranNominal" type="number" min="0" class="w-full bg-white border-none rounded-xl py-3 pl-12 pr-4 text-xl font-extrabold text-emerald-700 focus:ring-2 focus:ring-emerald-500 placeholder-emerald-200" placeholder="0" />
+                  </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-5">
+                  <div>
+                    <label class="block text-slate-700 font-bold text-xs uppercase tracking-wide mb-2">Metode</label>
+                    <select id="pembayaranMetode" class="custom-select shadow-sm cursor-pointer">
+                        <option value="cash">Tunai (Cash)</option>
+                        <option value="transfer">Transfer Bank</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-slate-700 font-bold text-xs uppercase tracking-wide mb-2">Tanggal Bayar</label>
+                    <input id="pembayaranTanggal" type="date" class="custom-input shadow-sm cursor-pointer" />
+                  </div>
+              </div>
+
+              <div>
+                  <label class="block text-slate-700 font-bold text-xs uppercase tracking-wide mb-2">Catatan (Opsional)</label>
+                  <input id="pembayaranCatatan" type="text" class="custom-input shadow-sm" placeholder="Contoh: Titip ke admin..." />
+              </div>
+              
+              <div id="pembayaranError" class="text-rose-500 text-sm hidden bg-rose-50 p-3 rounded-xl border border-rose-100 font-medium flex items-center gap-2">
+                 <i class="fa-solid fa-circle-exclamation"></i> <span></span>
+              </div>
+           </div>
+
+           <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 rounded-b-3xl">
+               <button id="cancelPembayaranModal" class="px-5 py-2.5 text-slate-500 hover:bg-white hover:text-slate-700 rounded-xl transition font-bold text-sm border border-transparent hover:border-slate-200 hover:shadow-sm">Batal</button>
+               <button id="savePembayaranBtn" class="px-8 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl shadow-lg shadow-emerald-200 transition font-bold text-sm transform active:scale-95">Simpan</button>
+           </div>
         </div>
       </div>
+
+    <div id="tagihanDetailModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/40 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl transform scale-95 transition-transform duration-300 modal-card">
+            <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-indigo-50/50 rounded-t-3xl">
+                <div>
+                  <h3 class="text-xl font-bold text-slate-800">Detail Tagihan</h3>
+                  <div id="tagihanDetailSubtitle" class="text-xs text-indigo-500 font-bold uppercase tracking-wider mt-1">-</div>
+                </div>
+                <button id="closeDetailModal" class="w-8 h-8 flex items-center justify-center rounded-full bg-white text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 transition shadow-sm border border-slate-100"><i class="fa-solid fa-xmark"></i></button>
+             </div>
+             
+             <div class="p-8">
+                <div class="space-y-4 mb-8">
+                    <div class="flex justify-between items-center text-sm py-3 border-b border-slate-50 border-dashed">
+                        <span class="text-slate-500 font-medium">Program</span>
+                        <span id="detailProgram" class="font-bold text-slate-800 text-right bg-slate-50 px-3 py-1 rounded-lg">-</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm py-3 border-b border-slate-50 border-dashed">
+                        <span class="text-slate-500 font-medium">Total Tagihan</span>
+                        <span id="detailNominal" class="font-bold text-slate-800 text-lg">-</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm py-3 border-b border-slate-50 border-dashed">
+                        <span class="text-slate-500 font-medium">Sudah Dibayar</span>
+                        <span id="detailPaid" class="font-bold text-emerald-600">-</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm py-3 border-b border-slate-50 border-dashed">
+                        <span class="text-slate-500 font-medium">Sisa Kekurangan</span>
+                        <span id="detailRemaining" class="font-bold text-rose-600">-</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm py-3">
+                        <span class="text-slate-500 font-medium">Status</span>
+                        <span id="detailStatus" class="px-3 py-1 rounded-full text-xs font-bold uppercase shadow-sm">-</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <div class="flex justify-between text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">
+                        <span>Progres Pelunasan</span>
+                        <span id="detailProgressText" class="text-indigo-600">0%</span>
+                    </div>
+                    <div class="h-3 bg-white rounded-full overflow-hidden shadow-inner border border-slate-100">
+                        <div id="detailProgressBar" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(99,102,241,0.5)]" style="width: 0%"></div>
+                    </div>
+                </div>
+             </div>
+
+             <div class="p-6 bg-slate-50/50 rounded-b-3xl border-t border-slate-100 flex justify-end">
+                <button id="closeDetailModalBottom" class="px-6 py-2.5 bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-800 rounded-xl shadow-sm text-sm font-bold transition">Tutup</button>
+             </div>
+        </div>
     </div>
 
     <script src="/js/sidebar.js"></script>
+    <script src="/js/keuangan.js"></script>
     <script src="/js/tagihan.js"></script>
     <script src="/js/pembayaran.js"></script>
-    <script src="/js/keuangan.js"></script>
   </body>
 </html>

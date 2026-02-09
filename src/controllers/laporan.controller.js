@@ -1,51 +1,43 @@
 const laporanService = require("../services/laporan.service");
+const { ROLES } = require("../config/constants");
 
-const keuangan = async (req, res) => {
+const getKeuangan = async (req, res) => {
   try {
-    const user = req.session?.user;
-    const cabangId = user?.cabang_id;
-    if (!cabangId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Cabang tidak ditemukan." });
+    const { mode, year, month } = req.query;
+    const cabangId = req.session.user.role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : (req.query.cabang_id || null);
+    
+    let data;
+    if (mode === 'year') {
+      data = await laporanService.getKeuanganTahunan({ cabangId, year });
+    } else {
+      data = await laporanService.getKeuanganBulanan({ cabangId, year, month });
     }
-
-    const mode = (req.query.mode || "month").toLowerCase();
-    const now = new Date();
-    const year = Number(req.query.year || now.getFullYear());
-    const month = Number(req.query.month || now.getMonth() + 1);
-
-    const data =
-      mode === "year"
-        ? await laporanService.getKeuanganTahunan({ cabangId, year })
-        : await laporanService.getKeuanganBulanan({ cabangId, year, month });
-
-    return res.json({ success: true, data });
+    res.json({ success: true, data });
   } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
-const lanjutan = async (req, res) => {
+const getLanjutan = async (req, res) => {
   try {
-    const user = req.session?.user;
-    const cabangId = user?.cabang_id;
-    if (!cabangId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Cabang tidak ditemukan." });
-    }
-    const now = new Date();
-    const year = Number(req.query.year || now.getFullYear());
-    const month = Number(req.query.month || now.getMonth() + 1);
+    const { year, month } = req.query;
+    const cabangId = req.session.user.role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : (req.query.cabang_id || null);
     const data = await laporanService.getLanjutanSummary({ cabangId, year, month });
-    return res.json({ success: true, data });
+    res.json({ success: true, data });
   } catch (err) {
-    return res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
-module.exports = {
-  keuangan,
-  lanjutan,
+const getDetail = async (req, res) => {
+  try {
+    const { year, month, category } = req.query;
+    const cabangId = req.session.user.role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : (req.query.cabang_id || null);
+    const data = await laporanService.getDetailPengeluaran({ cabangId, year, month, category });
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
 };
+
+module.exports = { getKeuangan, getLanjutan, getDetail };

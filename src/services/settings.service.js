@@ -1,12 +1,13 @@
 const bcrypt = require("bcryptjs");
 const db = require("../db");
+const { ROLES } = require("../config/constants");
 
 const getCabangProfile = async (cabangId) => {
   const [rows] = await db.query(
     `SELECT c.id, c.kode, c.nama, c.alamat, c.telepon, c.tanggal_jatuh_tempo, c.is_active,
             u.id AS admin_user_id, u.email AS admin_email, u.is_active AS admin_is_active
      FROM cabang c
-     LEFT JOIN users u ON u.cabang_id = c.id AND u.role = 'admin_cabang'
+     LEFT JOIN users u ON u.cabang_id = c.id AND u.role = '${ROLES.ADMIN_CABANG}'
      WHERE c.id = ?
      LIMIT 1`,
     [cabangId]
@@ -62,7 +63,7 @@ const updateCabangProfile = async (cabangId, payload, { allowKode }) => {
     }
 
     const [adminRows] = await conn.query(
-      "SELECT id, email FROM users WHERE role = 'admin_cabang' AND cabang_id = ? LIMIT 1",
+      `SELECT id, email FROM users WHERE role = '${ROLES.ADMIN_CABANG}' AND cabang_id = ? LIMIT 1`,
       [cabangId]
     );
     const admin = adminRows[0] || null;
@@ -88,7 +89,7 @@ const updateCabangProfile = async (cabangId, payload, { allowKode }) => {
         const hashed = await bcrypt.hash(String(adminPassword), 10);
         await conn.query(
           `INSERT INTO users (email, password, role, cabang_id, is_active)
-           VALUES (?, ?, 'admin_cabang', ?, ?)`,
+           VALUES (?, ?, '${ROLES.ADMIN_CABANG}', ?, ?)`,
           [adminEmail, hashed, cabangId, payload.admin_is_active ? 1 : 0]
         );
       }

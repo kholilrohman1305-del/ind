@@ -1,22 +1,23 @@
 const express = require("express");
 const userManagementController = require("../controllers/user-management.controller");
 const { requireRole } = require("../middlewares/auth.middleware");
+const { ROLES } = require("../config/constants");
 
 const router = express.Router();
 
 router.get(
   "/admin-cabang",
-  requireRole("super_admin"),
+  requireRole(ROLES.SUPER_ADMIN),
   userManagementController.listAdminCabang
 );
 router.patch(
   "/:id/reset-password",
-  requireRole("super_admin"),
+  requireRole(ROLES.SUPER_ADMIN),
   userManagementController.resetPassword
 );
 router.patch(
   "/:id/status",
-  requireRole("super_admin"),
+  requireRole(ROLES.SUPER_ADMIN),
   userManagementController.updateStatus
 );
 

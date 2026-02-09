@@ -1,27 +1,33 @@
 const express = require("express");
 const dashboardController = require("../controllers/dashboard.controller");
 const { requireAnyRole } = require("../middlewares/auth.middleware");
+const { ROLES } = require("../config/constants");
 
 const router = express.Router();
 
 router.get(
   "/summary",
-  requireAnyRole(["super_admin", "admin_cabang"]),
+  requireAnyRole([ROLES.SUPER_ADMIN, ROLES.ADMIN_CABANG]),
   dashboardController.summary
 );
 router.get(
   "/performance",
-  requireAnyRole(["super_admin"]),
+  requireAnyRole([ROLES.SUPER_ADMIN]),
   dashboardController.performanceCabang
 );
 router.get(
+  "/cabang-analytics",
+  requireAnyRole([ROLES.SUPER_ADMIN]),
+  dashboardController.cabangAnalytics
+);
+router.get(
   "/siswa",
-  requireAnyRole(["siswa"]),
+  requireAnyRole([ROLES.SISWA]),
   dashboardController.summarySiswa
 );
 router.get(
   "/edukator",
-  requireAnyRole(["edukator"]),
+  requireAnyRole([ROLES.EDUKATOR]),
   dashboardController.summaryEdukator
 );
 

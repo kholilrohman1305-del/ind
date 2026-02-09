@@ -1,13 +1,14 @@
 const pembayaranService = require("../services/pembayaran.service");
+const { ROLES } = require("../config/constants");
 
 const list = async (req, res) => {
   try {
     const user = req.session.user;
     let cabangId = null;
     let siswaId = null;
-    if (user.role === "admin_cabang") {
+    if (user.role === ROLES.ADMIN_CABANG) {
       cabangId = user.cabang_id;
-    } else if (user.role === "siswa") {
+    } else if (user.role === ROLES.SISWA) {
       siswaId = await pembayaranService.getSiswaIdByUserId(user.id);
     }
 

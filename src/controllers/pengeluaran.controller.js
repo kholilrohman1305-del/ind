@@ -1,10 +1,11 @@
 const pengeluaranService = require("../services/pengeluaran.service");
+const { ROLES } = require("../config/constants");
 
 const list = async (req, res) => {
   try {
     const role = req.session.user.role;
     const cabangId =
-      role === "admin_cabang" ? req.session.user.cabang_id : req.query.cabang_id || null;
+      role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : req.query.cabang_id || null;
     const month = req.query.month ? Number(req.query.month) : null;
     const year = req.query.year ? Number(req.query.year) : null;
     const rows = await pengeluaranService.listPengeluaran({ cabangId, month, year });
@@ -18,7 +19,7 @@ const create = async (req, res) => {
   try {
     const role = req.session.user.role;
     const cabangId =
-      role === "admin_cabang" ? req.session.user.cabang_id : req.body.cabang_id || null;
+      role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : req.body.cabang_id || null;
     const result = await pengeluaranService.createPengeluaran({
       cabangId,
       kategori: req.body.kategori,
@@ -36,7 +37,7 @@ const remove = async (req, res) => {
   try {
     const role = req.session.user.role;
     const cabangId =
-      role === "admin_cabang" ? req.session.user.cabang_id : req.query.cabang_id || null;
+      role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : req.query.cabang_id || null;
     await pengeluaranService.deletePengeluaran({ id: req.params.id, cabangId });
     res.json({ success: true });
   } catch (err) {

@@ -1,5 +1,6 @@
 (() => {
   // --- HELPERS ---
+  const requester = window.api?.request || fetch;
   const formatNumber = (value) => new Intl.NumberFormat("id-ID").format(value || 0);
   const formatCurrency = (value) => `Rp ${new Intl.NumberFormat("id-ID").format(value || 0)}`;
 
@@ -58,11 +59,13 @@
       "jadwalList",
       "jadwalEmpty",
       (row) => {
-        const name = row.siswa_nama || row.program_nama || "?";
+        const name = row.siswa_nama || row.kelas_nama || row.program_nama || "?";
         const colors = stringToColor(name);
         const initials = name.substring(0, 2).toUpperCase();
         const timeStart = row.jam_mulai ? row.jam_mulai.slice(0,5) : "-";
         const timeEnd = row.jam_selesai ? row.jam_selesai.slice(0,5) : "";
+        const programName = row.program_nama || "-";
+        const educatorName = row.edukator_nama || row.pengajar_nama || "-";
         
         return `
         <div class="group flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all cursor-default">
@@ -74,10 +77,11 @@
                 <h4 class="text-sm font-bold text-slate-800 truncate">${name}</h4>
                 <div class="flex items-center gap-2 mt-0.5">
                     <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 font-medium truncate max-w-[120px]">
-                        ${row.program_nama || "-"}
+                        ${programName}
                     </span>
                     <span class="text-[10px] text-slate-400 capitalize">${row.tipe_les || "Umum"}</span>
                 </div>
+                <div class="text-[10px] text-slate-400 mt-1 truncate">Edukator: ${educatorName}</div>
             </div>
             <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></div>
         </div>
@@ -186,11 +190,108 @@
     );
   };
 
+  // --- CHATBOT UI ---
+  const renderChatbotUI = () => {
+    const mainContent = document.querySelector('main');
+    if (!mainContent || document.getElementById('chatbotInput')) return;
+
+    const container = document.createElement('div');
+    container.className = "mb-6 relative z-20"; // High z-index
+    container.innerHTML = `
+        <div class="relative group">
+            <input type="text" id="chatbotInput" placeholder="✨ Tanya data... (Contoh: Berapa omzet bulan ini?)" 
+                class="w-full pl-12 pr-12 py-3.5 rounded-2xl border-none shadow-sm focus:shadow-md focus:ring-2 focus:ring-indigo-500/50 text-sm bg-white/90 backdrop-blur-sm transition-all">
+            <div class="absolute left-4 top-3.5 text-indigo-500 animate-pulse">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <button id="chatbotBtn" class="absolute right-2 top-2 p-1.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all">
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+        <div id="chatbotResult" class="hidden mt-2 p-4 bg-white rounded-2xl shadow-xl border border-indigo-50 animate-fade-in absolute w-full z-30">
+            <!-- Result here -->
+        </div>
+    `;
+    
+    // Insert at the very top of main content
+    mainContent.insertBefore(container, mainContent.firstChild);
+
+    const input = document.getElementById('chatbotInput');
+    const btn = document.getElementById('chatbotBtn');
+    const resultBox = document.getElementById('chatbotResult');
+
+    const handleQuery = async () => {
+        const query = input.value.trim();
+        if (!query) return;
+
+        resultBox.classList.remove('hidden');
+        resultBox.innerHTML = `<div class="flex items-center gap-2 text-gray-500 text-sm"><i class="fa-solid fa-circle-notch fa-spin text-indigo-500"></i> Sedang menganalisis data...</div>`;
+
+        try {
+            const res = await requester('/api/chatbot/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query })
+            });
+            const json = await res.json();
+            
+            if (json.success) {
+                const data = json.data;
+                let content = '';
+                
+                if (data.type === 'currency') {
+                    content = `
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">${data.label}</div>
+                            <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="text-gray-300 hover:text-gray-500"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600 mt-1">${formatCurrency(data.value)}</div>
+                    `;
+                } else if (data.type === 'number') {
+                    content = `
+                        <div class="flex items-center justify-between">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">${data.label}</div>
+                            <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="text-gray-300 hover:text-gray-500"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="text-3xl font-extrabold text-slate-800 mt-1">${formatNumber(data.value)}</div>
+                    `;
+                } else {
+                    content = `
+                        <div class="flex items-start gap-3">
+                            <div class="text-2xl">🤖</div>
+                            <div class="text-sm text-gray-600 leading-relaxed pt-1">${data.value}</div>
+                            <button onclick="this.parentElement.parentElement.classList.add('hidden')" class="ml-auto text-gray-300 hover:text-gray-500"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    `;
+                }
+                
+                resultBox.innerHTML = content;
+            } else {
+                resultBox.innerHTML = `<div class="text-rose-500 text-sm font-medium"><i class="fa-solid fa-circle-exclamation mr-1"></i> ${json.message}</div>`;
+            }
+        } catch (e) {
+            resultBox.innerHTML = `<div class="text-rose-500 text-sm font-medium">Gagal memproses pertanyaan.</div>`;
+        }
+    };
+
+    btn.addEventListener('click', handleQuery);
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleQuery();
+    });
+    
+    // Close on click outside
+    document.addEventListener('click', (e) => {
+        if (!container.contains(e.target)) {
+            resultBox.classList.add('hidden');
+        }
+    });
+  };
+
   const init = async () => {
     try {
       const [summaryRes, performanceRes] = await Promise.all([
-        fetch("/api/dashboard/summary", { credentials: "same-origin" }),
-        fetch("/api/dashboard/performance", { credentials: "same-origin" }),
+        requester("/api/dashboard/summary", { credentials: "same-origin" }),
+        requester("/api/dashboard/performance", { credentials: "same-origin" }),
       ]);
       const summaryData = await summaryRes.json();
       if (summaryData && summaryData.success) {
@@ -200,6 +301,9 @@
       if (performanceData && performanceData.success) {
         renderPerformance(performanceData.data);
       }
+      
+      // Init Chatbot
+      renderChatbotUI();
     } catch (err) {
       console.error("Dashboard Load Error:", err);
     }

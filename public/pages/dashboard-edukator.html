@@ -4,168 +4,140 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dashboard Edukator - ILHAMI Pro</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind.css" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
       body { font-family: 'Plus Jakarta Sans', sans-serif; }
-      
-      /* Animasi Masuk */
-      @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
+
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+      @keyframes slide-up {
+        from { opacity: 0; transform: translateY(16px); }
         to { opacity: 1; transform: translateY(0); }
       }
-      .animate-enter { 
-        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
-        opacity: 0; 
+      .animate-slide-up {
+        animation: slide-up 0.4s ease-out forwards;
       }
-      
-      .delay-100 { animation-delay: 0.1s; }
-      .delay-200 { animation-delay: 0.2s; }
+      .card-hover { transition: all 0.3s ease; }
+      .card-hover:active { transform: scale(0.97); }
 
-      /* Custom Scrollbar */
+      /* Custom Scrollbar (non hidden areas) */
       ::-webkit-scrollbar { width: 6px; }
       ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
   </head>
   
-  <body class="bg-[#F8FAFC] flex h-screen overflow-hidden text-slate-800" data-page="dashboard">
-    
-    <main class="content flex-1 flex flex-col relative h-full overflow-hidden bg-[#F8FAFC]">
-      
-      <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-         <div class="absolute -top-[10%] -right-[5%] w-[600px] h-[600px] bg-emerald-100/40 rounded-full blur-[80px]"></div>
-         <div class="absolute -bottom-[10%] -left-[5%] w-[500px] h-[500px] bg-teal-100/40 rounded-full blur-[80px]"></div>
-      </div>
+  <body class="h-full" data-page="dashboard" data-view="dashboard-edukator">
 
-      <header class="topbar h-20 flex items-center justify-between px-6 md:px-8 bg-white/70 backdrop-blur-md border-b border-white/50 sticky top-0 z-20">
-        <div class="topbar-left flex items-center gap-4">
-          <button class="icon-button p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors md:hidden" id="sidebarToggle" aria-label="Toggle menu">
-            <i class="fa-solid fa-bars text-xl"></i>
-          </button>
-          <div>
-            <div class="page-title text-xl font-bold text-slate-800">Dashboard Edukator</div>
-            <div class="page-subtitle text-xs text-slate-500 font-medium">Ringkasan aktivitas mengajar bulan ini.</div>
+    <div class="h-full w-full overflow-auto hide-scrollbar" style="background: linear-gradient(180deg, #00A6B4 0%, #008891 100%);">
+      <div class="max-w-md mx-auto h-full flex flex-col bg-[#F5F7FA]">
+        <header class="topbar px-5 pt-5 pb-6" style="background: linear-gradient(135deg, #00A6B4 0%, #008891 100%);">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <p class="text-white/80 text-sm">Halo, Selamat Mengajar!</p>
+              <h1 class="text-white text-xl font-bold mt-1">
+                <span id="userName">Edukator</span>
+              </h1>
+            </div>
+            <div class="edukator-header-actions">
+              <button class="relative p-2 bg-white/20 rounded-full card-hover" aria-label="Notifikasi">
+                <i class="fa-regular fa-bell text-white text-lg"></i>
+              </button>
+              <a href="/profil-edukator" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden card-hover" aria-label="Profil">
+                <i class="fa-solid fa-user text-white"></i>
+              </a>
+            </div>
           </div>
-        </div>
-        <div class="hidden md:flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-100 text-xs font-semibold shadow-sm">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Status: Aktif Mengajar
-        </div>
-      </header>
 
-      <div class="flex-1 overflow-y-auto p-6 md:p-8 relative z-10">
+          <div class="relative">
+            <input id="dashboardSearch" type="text" placeholder="Cari jadwal, siswa, atau program..." class="w-full py-3 px-4 pl-11 bg-white rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg" style="color: #374151;">
+            <i class="fa-solid fa-magnifying-glass w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
+        </header>
 
-        <section class="mb-8 animate-enter">
-            <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-3xl p-8 text-white shadow-xl shadow-emerald-100 relative overflow-hidden group">
-                <div class="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-110 transition-transform duration-700"></div>
-                
-                <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                    <div>
-                        <div class="inline-block px-3 py-1 bg-white/20 rounded-lg text-[10px] font-bold uppercase tracking-wider mb-3 backdrop-blur-sm border border-white/10">
-                            <i class="fa-solid fa-chalkboard-user mr-1"></i> Ruang Guru
-                        </div>
-                        <h2 class="text-3xl font-bold mb-2 leading-tight">
-                            Halo, <span id="userName" class="underline decoration-wavy decoration-emerald-300/50 underline-offset-4">Edukator</span>! 👋
-                        </h2>
-                        <p class="text-emerald-50 text-sm max-w-lg leading-relaxed opacity-90">
-                            Siap untuk mencerdaskan kehidupan bangsa hari ini? Cek jadwal terbaru Anda di bawah.
-                        </p>
-                    </div>
-                    
-                    <div class="flex flex-col items-center justify-center bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-white/20 min-w-[140px]">
-                        <span class="text-xs text-emerald-100 font-medium uppercase tracking-wide mb-1">Performa</span>
-                        <div class="text-3xl font-bold">4.9<span class="text-lg text-emerald-200">/5</span></div>
-                        <div class="flex gap-0.5 text-yellow-300 text-xs mt-1">
-                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i>
-                        </div>
-                    </div>
+        <main class="content flex-1 px-5 -mt-2 pb-24 overflow-auto hide-scrollbar">
+          <section class="bg-white rounded-3xl p-4 shadow-lg mb-4 animate-slide-up">
+            <div class="grid grid-cols-4 gap-3">
+              <a href="/jadwal-edukator" class="flex flex-col items-center gap-2 card-hover">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #4ECDC4 0%, #7EDDD6 100%);">
+                  <i class="fa-solid fa-calendar-days text-white text-lg"></i>
                 </div>
+                <span class="text-xs font-medium text-gray-700">Jadwal</span>
+              </a>
+              <a href="/presensi-edukator" class="flex flex-col items-center gap-2 card-hover">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #A78BFA 0%, #C4B5FD 100%);">
+                  <i class="fa-solid fa-clipboard-check text-white text-lg"></i>
+                </div>
+                <span class="text-xs font-medium text-gray-700">Presensi</span>
+              </a>
+              <a href="/rekap-presensi-edukator" class="flex flex-col items-center gap-2 card-hover">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);">
+                  <i class="fa-solid fa-chart-line text-white text-lg"></i>
+                </div>
+                <span class="text-xs font-medium text-gray-700">Rekap</span>
+              </a>
+              <a href="/rincian-gaji-edukator" class="flex flex-col items-center gap-2 card-hover">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);">
+                  <i class="fa-solid fa-wallet text-white text-lg"></i>
+                </div>
+                <span class="text-xs font-medium text-gray-700">Gaji</span>
+              </a>
             </div>
-        </section>
+          </section>
 
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-enter delay-100">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-all duration-300 group">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Program Saya</div>
-                    <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg group-hover:bg-emerald-100 transition-colors">
-                        <i class="fa-solid fa-book-open text-lg"></i>
-                    </div>
-                </div>
-                <div id="statProgram" class="text-3xl font-bold text-slate-800">0</div>
-                <div class="text-xs text-slate-400 mt-1">Kelas aktif</div>
+          <section class="bg-white rounded-3xl p-5 shadow-lg mb-4 animate-slide-up" style="animation-delay: 0.1s;">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="font-bold text-gray-900">Ringkasan Aktivitas</h3>
+              <span class="text-xs font-medium px-3 py-1 rounded-full" style="background: #E0F7FA; color: #00838F;">Bulan ini</span>
             </div>
-
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-all duration-300 group">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Siswa Saya</div>
-                    <div class="p-2 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-100 transition-colors">
-                        <i class="fa-solid fa-users text-lg"></i>
-                    </div>
-                </div>
-                <div id="statSiswa" class="text-3xl font-bold text-slate-800">0</div>
-                <div class="text-xs text-slate-400 mt-1">Total siswa ajar</div>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <div class="bg-slate-50 rounded-2xl p-4">
+                <div class="text-xs text-slate-500">Program Aktif</div>
+                <div id="statProgram" class="text-2xl font-bold text-slate-800 mt-1">0</div>
+              </div>
+              <div class="bg-slate-50 rounded-2xl p-4">
+                <div class="text-xs text-slate-500">Total Siswa</div>
+                <div id="statSiswa" class="text-2xl font-bold text-slate-800 mt-1">0</div>
+              </div>
+              <div class="bg-slate-50 rounded-2xl p-4">
+                <div class="text-xs text-slate-500">Kehadiran</div>
+                <div id="statKehadiran" class="text-2xl font-bold text-slate-800 mt-1">0</div>
+              </div>
+              <div class="bg-slate-50 rounded-2xl p-4">
+                <div class="text-xs text-slate-500">Jadwal Hari Ini</div>
+                <div id="statJadwalHariIni" class="text-2xl font-bold text-slate-800 mt-1">0</div>
+              </div>
             </div>
+          </section>
 
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-all duration-300 group">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Kehadiran</div>
-                    <div class="p-2 bg-violet-50 text-violet-600 rounded-lg group-hover:bg-violet-100 transition-colors">
-                        <i class="fa-solid fa-calendar-check text-lg"></i>
-                    </div>
-                </div>
-                <div id="statKehadiran" class="text-3xl font-bold text-slate-800">0</div>
-                <div class="text-xs text-slate-400 mt-1">Sesi bulan ini</div>
+          <section class="mb-4 animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="font-bold text-gray-900">Jadwal Hari Ini</h3>
+              <a href="/jadwal-edukator" class="text-sm font-medium" style="color: #00A6B4;">Lihat Semua</a>
             </div>
-
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden">
-                <div class="absolute right-0 top-0 w-20 h-20 bg-orange-50 rounded-full -mr-10 -mt-10 opacity-50 group-hover:scale-150 transition-transform duration-500"></div>
-                <div class="flex justify-between items-start mb-4 relative z-10">
-                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Jadwal Hari Ini</div>
-                    <div class="p-2 bg-orange-50 text-orange-600 rounded-lg group-hover:bg-orange-100 transition-colors">
-                        <i class="fa-regular fa-clock text-lg"></i>
-                    </div>
+            <div class="bg-white rounded-3xl p-4 shadow-lg">
+              <div id="jadwalList" class="divide-y divide-slate-100"></div>
+              <div id="jadwalEmpty" class="hidden py-8 text-center text-slate-400">
+                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <i class="fa-solid fa-mug-hot text-2xl text-slate-300"></i>
                 </div>
-                <div id="statJadwalHariIni" class="text-3xl font-bold text-slate-800 relative z-10">0</div>
-                <div class="text-xs text-orange-500 font-bold mt-1 relative z-10">Kelas perlu dihadiri</div>
+                <p class="text-sm font-semibold text-slate-600">Tidak ada jadwal mengajar</p>
+                <p class="text-xs text-slate-400 mt-1">Gunakan waktu ini untuk persiapan materi.</p>
+              </div>
             </div>
-        </section>
+          </section>
+        </main>
 
-        <section class="panel mb-8 animate-enter delay-200">
-            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col overflow-hidden">
-                <div class="flex items-center justify-between p-6 border-b border-slate-50 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-                    <div>
-                        <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
-                            <i class="fa-solid fa-list-check text-emerald-500"></i> Jadwal Saya Hari Ini
-                        </h3>
-                        <p class="text-xs text-slate-500 mt-0.5 ml-6">Pastikan presensi diisi tepat waktu.</p>
-                    </div>
-                    <a href="/jadwal-edukator" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-600 hover:text-indigo-600 text-xs font-bold rounded-xl transition-all border border-slate-200 shadow-sm flex items-center gap-2">
-                        Lihat Semua <i class="fa-solid fa-arrow-right"></i>
-                    </a>
-                </div>
-                
-                <div class="p-0 min-h-[200px]">
-                    <div id="jadwalList" class="divide-y divide-slate-50">
-                        </div>
-                    
-                    <div id="jadwalEmpty" class="hidden py-16 flex flex-col items-center justify-center text-center">
-                         <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4 animate-bounce-slow">
-                            <i class="fa-solid fa-mug-hot text-3xl text-slate-300"></i>
-                         </div>
-                         <h4 class="text-sm font-bold text-slate-700">Tidak ada jadwal mengajar</h4>
-                         <p class="text-xs text-slate-400 mt-1 max-w-xs">Hari ini kosong! Gunakan waktu ini untuk istirahat atau persiapan materi.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+        <footer class="edukator-footer" id="edukatorFooterNav" aria-label="Navigasi Edukator"></footer>
       </div>
-    </main>
+    </div>
 
     <script src="/js/sidebar.js"></script>
+    <script src="/js/edukator-footer.js"></script>
     <script src="/js/dashboard-edukator.js"></script>
   </body>
 </html>

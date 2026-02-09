@@ -9,10 +9,13 @@
     method: "",
     month: "",
     pendingTagihanId: null,
+    page: 1,
+    pageSize: 10,
   };
 
-  const fetchJson = async (url, options) => {
-    const res = await fetch(url, options);
+  const fetchJson = async (url, options = {}) => {
+    const requester = window.api?.request || fetch;
+    const res = await requester(url, { credentials: "same-origin", ...options });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.message || "Permintaan gagal.");
     return data && data.success ? data.data : data;
@@ -42,6 +45,7 @@
   const render = () => {
     const body = document.getElementById("pembayaranBody");
     const empty = document.getElementById("pembayaranEmpty");
+    const pager = document.getElementById("pembayaranPager");
     if (!body) return;
     body.innerHTML = "";
 
@@ -65,7 +69,48 @@
       return matchSearch && matchMethod && matchDate;
     });
 
-    filtered.forEach((item) => {
+    const totalPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
+    if (state.page > totalPages) state.page = totalPages;
+    const start = (state.page - 1) * state.pageSize;
+    const pageRows = filtered.slice(start, start + state.pageSize);
+
+    if (pager) {
+      if (filtered.length <= state.pageSize) {
+        pager.classList.add("hidden");
+      } else {
+        pager.classList.remove("hidden");
+        pager.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-slate-500 font-semibold">Halaman ${state.page} dari ${totalPages}</span>
+            <div class="flex gap-2">
+              <button class="w-8 h-8 flex items-center justify-center rounded-lg border ${
+                state.page === 1
+                  ? "bg-gray-50 text-gray-300 cursor-not-allowed"
+                  : "bg-white text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200"
+              } transition" type="button" data-page="prev" ${state.page === 1 ? "disabled" : ""}>
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+              </button>
+              <button class="w-8 h-8 flex items-center justify-center rounded-lg border ${
+                state.page === totalPages
+                  ? "bg-gray-50 text-gray-300 cursor-not-allowed"
+                  : "bg-white text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200"
+              } transition" type="button" data-page="next" ${state.page === totalPages ? "disabled" : ""}>
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+        `;
+        pager.querySelectorAll("button").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            if (btn.disabled) return;
+            state.page = btn.dataset.page === "prev" ? state.page - 1 : state.page + 1;
+            render();
+          });
+        });
+      }
+    }
+
+    pageRows.forEach((item) => {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td class="py-3 pr-4">${item.siswa_nama}</td>
@@ -119,14 +164,32 @@
     }
   };
 
+  // --- Modal Helpers ---
+  const toggleModal = (modalId, show) => {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    const card = modal.querySelector('.modal-card');
+    if (show) {
+      modal.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+      if (card) {
+        card.classList.remove('scale-95');
+        card.classList.add('scale-100');
+      }
+    } else {
+      modal.classList.add('hidden', 'opacity-0', 'pointer-events-none');
+      if (card) {
+        card.classList.add('scale-95');
+        card.classList.remove('scale-100');
+      }
+    }
+  };
+
   const openModal = () => {
-    const modal = document.getElementById("pembayaranModal");
-    if (modal) modal.classList.remove("hidden");
+    toggleModal("pembayaranModal", true);
   };
 
   const closeModal = () => {
-    const modal = document.getElementById("pembayaranModal");
-    if (modal) modal.classList.add("hidden");
+    toggleModal("pembayaranModal", false);
   };
 
   const init = async () => {
@@ -157,6 +220,7 @@
         state.dateEnd = updated.end;
         if (dateStart) dateStart.value = updated.start;
         if (dateEnd) dateEnd.value = updated.end;
+        state.page = 1;
         load();
       });
     }
@@ -170,6 +234,7 @@
     if (searchInput) {
       searchInput.addEventListener("input", (event) => {
         state.search = event.target.value;
+        state.page = 1;
         render();
       });
     }
@@ -177,6 +242,7 @@
     if (dateStart) {
       dateStart.addEventListener("change", (event) => {
         state.dateStart = event.target.value;
+        state.page = 1;
         render();
       });
     }
@@ -184,6 +250,7 @@
     if (dateEnd) {
       dateEnd.addEventListener("change", (event) => {
         state.dateEnd = event.target.value;
+        state.page = 1;
         render();
       });
     }
@@ -192,6 +259,7 @@
     if (methodSelect) {
       methodSelect.addEventListener("change", (event) => {
         state.method = event.target.value;
+        state.page = 1;
         render();
       });
     }
@@ -276,15 +344,24 @@
   };
 
   window.openPembayaranModal = async (tagihan) => {
-    const modal = document.getElementById("pembayaranModal");
-    if (!modal) return;
     if (!state.tagihan.length) {
       await loadTagihan();
     }
     if (tagihan?.id) {
-      setTagihanSelection(tagihan.id, tagihan.nominal);
+      // Calculate remaining amount
+      const totalBayar = Number(tagihan.total_bayar || 0);
+      const nominal = Number(tagihan.nominal || 0);
+      const sisa = Math.max(nominal - totalBayar, 0);
+      setTagihanSelection(tagihan.id, sisa);
     }
-    modal.classList.remove("hidden");
+
+    // Set default date to today
+    const tanggalInput = document.getElementById("pembayaranTanggal");
+    if (tanggalInput && !tanggalInput.value) {
+      tanggalInput.value = new Date().toISOString().split('T')[0];
+    }
+
+    toggleModal("pembayaranModal", true);
   };
 
   init();

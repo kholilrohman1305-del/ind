@@ -1,4 +1,7 @@
 (() => {
+  const { TIPE_LES } = window.APP_CONSTANTS;
+  const requester = window.api?.request || fetch;
+
   // --- Helpers ---
   const formatNumber = (value) => new Intl.NumberFormat("id-ID").format(value || 0);
   const formatCurrency = (value) =>
@@ -57,9 +60,11 @@
       "jadwalList",
       "jadwalEmpty",
       (row) => {
-        // Logika Judul (Siswa/Kelas) & Subjudul (Program/Mapel)
-        const title = row.siswa_nama || row.program_nama || "Tanpa Nama";
-        const subtitle = row.mapel_nama || row.tipe_les || "Umum";
+        // Logika Judul (Siswa/Kelas) & Detail (Program + Edukator)
+        const title = row.siswa_nama || row.kelas_nama || row.program_nama || "Tanpa Nama";
+        const programName = row.program_nama || "-";
+        const educatorName = row.edukator_nama || row.pengajar_nama || "-";
+        const mapelName = row.mapel_nama || row.tipe_les || "Umum";
         const time = row.jam_mulai ? row.jam_mulai.substring(0, 5) : "--:--";
 
         // HTML Template Modern (Tailwind)
@@ -78,8 +83,12 @@
                     </h4>
                 </div>
                 <div class="flex items-center gap-2 text-xs text-slate-500">
-                    <span class="truncate">${subtitle}</span>
-                    ${row.pengajar_nama ? `<span class="w-1 h-1 bg-slate-300 rounded-full"></span><span class="truncate">${row.pengajar_nama}</span>` : ''}
+                    <span class="truncate">${mapelName}</span>
+                    <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+                    <span class="truncate">Program: ${programName}</span>
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1 truncate">
+                    Edukator: ${educatorName}
                 </div>
             </div>
 
@@ -133,12 +142,59 @@
         </div>
       `
     );
+
+    // 5. Render Siswa Menunggu Jadwal (show only if count > 0)
+    const menungguCount = data.siswa_menunggu_jadwal || 0;
+    const menungguCard = document.getElementById("statMenungguJadwalCard");
+    const menungguPanel = document.getElementById("menungguJadwalPanel");
+
+    if (menungguCount > 0) {
+      setText("statMenungguJadwal", formatNumber(menungguCount));
+      if (menungguCard) menungguCard.classList.remove("hidden");
+      if (menungguPanel) menungguPanel.classList.remove("hidden");
+
+      renderList(
+        data.siswa_menunggu_jadwal_list || [],
+        "menungguJadwalList",
+        "menungguJadwalEmpty",
+        (row) => {
+          const tipeBadge = row.tipe_les === TIPE_LES.KELAS
+            ? `<span class="px-1.5 py-0.5 bg-purple-100 text-purple-600 text-[9px] font-bold rounded">Kelas</span>`
+            : `<span class="px-1.5 py-0.5 bg-blue-100 text-blue-600 text-[9px] font-bold rounded">Privat</span>`;
+
+          return `
+            <a href="/jadwal" class="flex items-center justify-between p-4 border-b border-slate-50 last:border-0 hover:bg-orange-50/50 transition-colors cursor-pointer">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold">
+                        ${(row.siswa_nama || "S")[0]}
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-slate-700">${row.siswa_nama || "-"}</div>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="text-[10px] text-slate-400">${row.program_nama || "-"}</span>
+                            ${tipeBadge}
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-shrink-0">
+                    <span class="px-2 py-1 bg-orange-100 text-orange-600 text-[10px] font-bold rounded-lg border border-orange-200">
+                        Atur Jadwal
+                    </span>
+                </div>
+            </a>
+          `;
+        }
+      );
+    } else {
+      if (menungguCard) menungguCard.classList.add("hidden");
+      if (menungguPanel) menungguPanel.classList.add("hidden");
+    }
   };
 
   // --- Data Fetching ---
   const init = async () => {
     try {
-      const res = await fetch("/api/dashboard/summary", { credentials: "same-origin" });
+      const res = await requester("/api/dashboard/summary", { credentials: "same-origin" });
       const data = await res.json();
       if (data && data.success) {
         render(data.data);

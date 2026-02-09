@@ -21,6 +21,14 @@ const iconMap = {
   "user-management": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 19a4 4 0 0 0-8 0" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="8" r="4" stroke-width="1.5"/><path d="M20 14v6" stroke-width="1.5" stroke-linecap="round"/><path d="M17 17h6" stroke-width="1.5" stroke-linecap="round"/></svg>',
   notifikasi: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 17h5l-1.5-1.5A2 2 0 0 1 18 14.1V11a6 6 0 1 0-12 0v3.1c0 .4-.2.8-.5 1.1L4 17h5" stroke-width="1.5" stroke-linecap="round"/><path d="M10 21a2 2 0 0 0 4 0" stroke-width="1.5" stroke-linecap="round"/></svg>',
   setting: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" stroke-width="1.5"/><path d="M19.4 15a1.9 1.9 0 0 0 .4 2.1l.1.1a2 2 0 0 1-2.8 2.8l-.1-.1a1.9 1.9 0 0 0-2.1-.4 1.9 1.9 0 0 0-1.1 1.7V21a2 2 0 0 1-4 0v-.1a1.9 1.9 0 0 0-1.1-1.7 1.9 1.9 0 0 0-2.1.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.9 1.9 0 0 0 .4-2.1 1.9 1.9 0 0 0-1.7-1.1H3a2 2 0 0 1 0-4h.1a1.9 1.9 0 0 0 1.7-1.1 1.9 1.9 0 0 0-.4-2.1l-.1-.1A2 2 0 1 1 7.1 3l.1.1a1.9 1.9 0 0 0 2.1.4 1.9 1.9 0 0 0 1.1-1.7V1a2 2 0 0 1 4 0v.1a1.9 1.9 0 0 0 1.1 1.7 1.9 1.9 0 0 0 2.1-.4l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.9 1.9 0 0 0-.4 2.1 1.9 1.9 0 0 0 1.7 1.1H21a2 2 0 0 1 0 4h-.1a1.9 1.9 0 0 0-1.7 1.1z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  "rekap-kehadiran": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="16" rx="2" stroke-width="1.5"/><path d="M16 3v4M8 3v4M3 11h18" stroke-width="1.5" stroke-linecap="round"/><path d="m9 15 2 2 4-4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  "pengajuan-jadwal": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="5" width="18" height="16" rx="2" stroke-width="1.5"/><path d="M16 3v4M8 3v4M3 11h18" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="15" r="2" stroke-width="1.5"/><path d="m14 15 3 3" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  "rincian-gaji": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="6" width="18" height="12" rx="2" stroke-width="1.5"/><path d="M7 12h10" stroke-width="1.5" stroke-linecap="round"/><path d="M12 9v6" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  profil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4" stroke-width="1.5"/><path d="M4 21a8 8 0 0 1 16 0" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  feedback: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  "analisis-sentimen": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-width="1.5" stroke-linecap="round"/><path d="M22 4 12 14.01l-3-3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  "analisa-cabang": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18" stroke-width="1.5" stroke-linecap="round"/><path d="M7 15l3-3 3 2 4-5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  "pemetaan-cabang": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z" stroke-width="1.5"/><circle cx="12" cy="9" r="2.5" stroke-width="1.5"/></svg>',
 };
 
 const labelMap = {
@@ -42,6 +50,14 @@ const labelMap = {
   "user-management": "Manajemen User",
   notifikasi: "Notifikasi",
   setting: "Setting",
+  "rekap-kehadiran": "Rekap Kehadiran",
+  "pengajuan-jadwal": "Pengajuan Jadwal",
+  "rincian-gaji": "Rincian Gaji",
+  profil: "Profil",
+  feedback: "Feedback",
+  "analisis-sentimen": "Analisis Sentimen",
+  "analisa-cabang": "Analisa Cabang",
+  "pemetaan-cabang": "Pemetaan Cabang",
 };
 
 const groupOrder = ["general", "akademik", "keuangan", "manajemen", "lainnya"];
@@ -74,6 +90,14 @@ const groupMap = {
   "user-management": "manajemen",
   notifikasi: "lainnya",
   setting: "manajemen",
+  "rekap-kehadiran": "akademik",
+  "pengajuan-jadwal": "akademik",
+  "rincian-gaji": "keuangan",
+  profil: "lainnya",
+  feedback: "akademik",
+  "analisis-sentimen": "manajemen",
+  "analisa-cabang": "manajemen",
+  "pemetaan-cabang": "manajemen",
 };
 
 const roleLabelMap = {
@@ -163,16 +187,26 @@ const buildSidebar = ({ role, user }) => {
             <div class="brand-sub">${brandSub}</div>
           </div>
         </div>
-        <nav class="nav-list">
+        <nav class="nav nav-scroll">
           ${groupedHtml}
         </nav>
         <div class="profile-card">
-          <div class="profile-avatar">${userInitials}</div>
-          <div class="profile-info">
-            <div class="profile-name">${displayRole}</div>
-            <div class="profile-email">${displayEmail}</div>
+          <div class="profile-main">
+            <div class="profile-avatar">${userInitials}</div>
+            <div class="profile-info">
+              <div class="profile-name">${displayRole}</div>
+              <div class="profile-email">${displayEmail}</div>
+            </div>
           </div>
-          <button class="profile-action" aria-label="Logout">Log out</button>
+          <button class="profile-action" aria-label="Logout">
+            <span class="profile-action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M12 3v9" stroke-width="1.6" stroke-linecap="round" />
+                <path d="M7 6a8 8 0 1 0 10 0" stroke-width="1.6" stroke-linecap="round" />
+              </svg>
+            </span>
+            <span class="profile-action-label">Keluar</span>
+          </button>
         </div>
       </aside>`;
   }

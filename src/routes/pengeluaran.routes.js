@@ -1,14 +1,15 @@
 const express = require("express");
 const pengeluaranController = require("../controllers/pengeluaran.controller");
 const { requireAnyRole } = require("../middlewares/auth.middleware");
+const { ROLES } = require("../config/constants");
 
 const router = express.Router();
 
-router.get("/", requireAnyRole(["super_admin", "admin_cabang"]), pengeluaranController.list);
-router.post("/", requireAnyRole(["super_admin", "admin_cabang"]), pengeluaranController.create);
+router.get("/", requireAnyRole([ROLES.SUPER_ADMIN, ROLES.ADMIN_CABANG]), pengeluaranController.list);
+router.post("/", requireAnyRole([ROLES.SUPER_ADMIN, ROLES.ADMIN_CABANG]), pengeluaranController.create);
 router.delete(
   "/:id",
-  requireAnyRole(["super_admin", "admin_cabang"]),
+  requireAnyRole([ROLES.SUPER_ADMIN, ROLES.ADMIN_CABANG]),
   pengeluaranController.remove
 );
 

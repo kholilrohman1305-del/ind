@@ -4,227 +4,410 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Penggajian - ILHAMI Pro</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    
+    <link rel="stylesheet" href="/css/tailwind.css" />
+
     <style>
       :root {
         --primary: #4F46E5;
-        --secondary: #EC4899;
-        --bg-app: #F3F4F6;
+        --bg-app: #F8FAFC;
       }
-      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-app); color: #1F2937; }
-      
-      .glass-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.5);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-app); color: #334155; }
+
+      .glass-panel {
+        background: #ffffff;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         border-radius: 1rem;
       }
 
-      /* Tab Button Styles */
+      .custom-input {
+        background-color: #fff;
+        border: 1px solid #E2E8F0;
+        border-radius: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        width: 100%;
+      }
+      .custom-input:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      }
+
       .tab-btn {
-        transition: all 0.3s ease;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #64748B;
         border-bottom: 2px solid transparent;
-        color: #6B7280;
-        cursor: pointer;
+        transition: all 0.2s;
       }
       .tab-btn:hover { color: var(--primary); }
       .tab-btn.active {
         color: var(--primary);
         border-bottom-color: var(--primary);
-        background-color: rgba(79, 70, 229, 0.05);
-      }
-      
-      /* Logic Show/Hide Tab - Penting! */
-      .tab-content { display: none; } 
-      .tab-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-      
-      @keyframes fadeIn { 
-        from { opacity: 0; transform: translateY(5px); } 
-        to { opacity: 1; transform: translateY(0); } 
+        background: linear-gradient(to top, #EEF2FF, transparent);
       }
 
-      .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-      .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
-      .custom-scrollbar::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 10px; }
+      .modern-table thead th {
+        background-color: #F8FAFC;
+        color: #64748B;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        text-align: left;
+        border-bottom: 1px solid #E2E8F0;
+      }
+      .modern-table tbody tr {
+        border-bottom: 1px solid #F1F5F9;
+        transition: background-color 0.2s;
+      }
+      .modern-table tbody tr:hover { background-color: #F8FAFC; }
+      .modern-table td { padding: 1rem 1.5rem; vertical-align: middle; }
+
+      /* Tarif Table Styling */
+      .tarif-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+      }
+      .tarif-table th {
+        padding: 0.75rem 1rem;
+        font-weight: 700;
+        text-align: center;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .tarif-table td {
+        padding: 0.5rem;
+        border: 1px solid #E2E8F0;
+      }
+      .tarif-table .jenjang-cell {
+        font-weight: 700;
+        text-align: center;
+        width: 120px;
+      }
+      .tarif-table input {
+        text-align: right;
+        font-weight: 600;
+      }
+
+      .tab-content { display: none; }
+      .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+      /* Gradient colors for tarif cards */
+      .tarif-gradient-1 { background: linear-gradient(135deg, #3B82F6, #1D4ED8); }
+      .tarif-gradient-2 { background: linear-gradient(135deg, #10B981, #047857); }
+      .tarif-gradient-3 { background: linear-gradient(135deg, #8B5CF6, #6D28D9); }
+      .tarif-gradient-4 { background: linear-gradient(135deg, #F59E0B, #D97706); }
+      .tarif-gradient-5 { background: linear-gradient(135deg, #EC4899, #BE185D); }
+      .tarif-gradient-6 { background: linear-gradient(135deg, #06B6D4, #0891B2); }
     </style>
   </head>
 
   <body class="app h-screen flex flex-col overflow-hidden" data-page="penggajian">
-    <main class="content flex-1 overflow-y-auto p-4 md:p-8 w-full">
-      
-      <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <main class="content flex-1 overflow-y-auto p-4 md:p-8">
+
+      <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
         <div class="flex items-center gap-4">
           <button class="p-2 rounded-lg hover:bg-white shadow-sm md:hidden text-gray-600 transition" id="sidebarToggle">
             <i class="fa-solid fa-bars"></i>
           </button>
           <div>
-            <h1 class="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-2">
-              <span class="bg-green-100 text-green-600 p-2 rounded-lg text-xl shadow-sm"><i class="fa-solid fa-file-invoice-dollar"></i></span>
-              Penggajian
+            <h1 class="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3">
+              <span class="bg-gradient-to-br from-indigo-500 to-blue-600 text-white p-2.5 rounded-xl text-xl shadow-lg shadow-indigo-200">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+              </span>
+              Payroll & Gaji
             </h1>
-            <p class="text-gray-500 mt-1 text-sm font-medium">Kelola tarif standar dan slip gaji edukator.</p>
+            <p class="text-gray-500 mt-1 text-sm font-medium ml-1">Manajemen tarif dan pencairan gaji edukator.</p>
           </div>
         </div>
       </header>
 
-      <div>
-        <div class="mb-6 border-b border-gray-200">
-          <nav class="flex gap-6">
-            <button class="tab-btn active px-4 py-3 font-semibold text-sm flex items-center gap-2 rounded-t-lg outline-none" data-target="setting-gaji">
-              <i class="fa-solid fa-sliders text-indigo-500"></i> Setting Tarif
-            </button>
-            <button class="tab-btn px-4 py-3 font-semibold text-sm flex items-center gap-2 rounded-t-lg outline-none" data-target="slip-gaji">
-              <i class="fa-solid fa-receipt text-emerald-500"></i> Daftar Gaji
-            </button>
-          </nav>
+      <div class="mb-6 border-b border-gray-200">
+        <nav class="flex gap-4">
+          <button class="tab-btn active flex items-center gap-2" data-target="slip-gaji">
+            <i class="fa-solid fa-receipt"></i> Daftar Gaji
+          </button>
+          <button class="tab-btn flex items-center gap-2" data-target="setting-gaji">
+            <i class="fa-solid fa-sliders"></i> Setting Tarif
+          </button>
+        </nav>
+      </div>
+
+      <section id="setting-gaji" class="tab-content hidden">
+
+        <!-- Header dengan tombol tambah tarif -->
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-gray-800">Kelola Tarif Les</h2>
+            <p class="text-sm text-gray-500">Atur tarif per pertemuan berdasarkan jenjang dan klasifikasi edukator</p>
+          </div>
+          <button id="addTarifBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl shadow-lg shadow-indigo-200 transition flex items-center gap-2 text-sm font-bold">
+            <i class="fa-solid fa-plus"></i> Tambah Tarif
+          </button>
         </div>
 
-        <section id="setting-gaji" class="tab-content active">
-           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
-              <div class="lg:col-span-1">
-                 <div class="glass-card p-6 border-t-4 border-indigo-500">
-                    <div class="mb-5">
-                        <h3 class="font-bold text-gray-800 text-lg">Tarif Dasar</h3>
-                        <p class="text-xs text-gray-500">Nilai gaji per pertemuan berdasarkan jenjang.</p>
+        <!-- Container untuk tarif cards (dinamis) -->
+        <div id="tarifCardsContainer" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <!-- Cards akan di-render oleh JavaScript -->
+        </div>
+
+        <!-- INFO BOX -->
+        <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <p class="text-sm text-amber-700">
+                <i class="fa-solid fa-info-circle mr-2"></i>
+                <strong>Keterangan Klasifikasi:</strong><br>
+                <span class="ml-5">• <strong>Mahasiswa</strong> = Edukator berstatus mahasiswa aktif</span><br>
+                <span class="ml-5">• <strong>Sarjana</strong> = Edukator lulusan S1/S2 tanpa jabatan manajemen</span><br>
+                <span class="ml-5">• <strong>Sarjana + Manajemen</strong> = Edukator lulusan S1/S2 dengan jabatan manajemen</span>
+            </p>
+        </div>
+
+        <!-- TABLE TARIF AKTIF -->
+        <div class="glass-panel overflow-hidden mt-6">
+            <div class="p-6 border-b border-gray-100 bg-white">
+                <h3 class="font-bold text-gray-800 text-lg">Tarif Aktif Saat Ini</h3>
+                <p class="text-xs text-gray-400">Digunakan untuk kalkulasi gaji bulan berjalan.</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse modern-table">
+                    <thead>
+                        <tr>
+                            <th>Nama Tarif</th>
+                            <th>Kategori</th>
+                            <th>Jenjang</th>
+                            <th>Klasifikasi</th>
+                            <th>Nominal (Rp)</th>
+                            <th>Terakhir Diupdate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salarySettingRows" class="text-sm"></tbody>
+                </table>
+                <div id="salarySettingEmpty" class="hidden flex-col items-center justify-center py-16 text-center">
+                    <div class="bg-gray-50 p-4 rounded-full mb-3"><i class="fa-solid fa-folder-open text-2xl text-gray-300"></i></div>
+                    <p class="text-gray-500 font-medium">Belum ada data tarif.</p>
+                </div>
+            </div>
+        </div>
+      </section>
+
+      <section id="slip-gaji" class="tab-content active">
+
+        <div id="slipSummary" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            </div>
+
+        <div class="glass-panel p-4 mb-6 flex flex-col md:flex-row gap-4 justify-between items-center">
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="bg-gray-50 border border-gray-200 rounded-xl flex items-center px-3 py-1.5 shadow-sm">
+                    <span class="text-xs font-bold text-gray-400 uppercase mr-2">Periode:</span>
+                    <input id="slipMonth" type="month" class="bg-transparent text-sm font-bold text-gray-700 outline-none cursor-pointer">
+                </div>
+                <button id="generateSlip" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-emerald-200 transition flex items-center gap-2 transform active:scale-95">
+                    <i class="fa-solid fa-rotate"></i> Load Data
+                </button>
+                <button id="openInfaqMassal" class="bg-rose-50 text-rose-600 border border-rose-200 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:bg-rose-100 transition flex items-center gap-2">
+                    <i class="fa-solid fa-hand-holding-heart"></i> Infaq Massal
+                </button>
+            </div>
+
+            <div class="relative w-full md:w-72">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-sm"></i>
+                <input id="slipSearch" type="search" placeholder="Cari nama edukator..." class="custom-input pl-10 py-2.5">
+            </div>
+        </div>
+
+        <div class="glass-panel overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse modern-table">
+                    <thead>
+                        <tr>
+                            <th>Edukator</th>
+                            <th>Klasifikasi</th>
+                            <th>Jabatan</th>
+                            <th>Periode</th>
+                            <th class="text-right">Gaji Mengajar</th>
+                            <th class="text-right">Gaji Tambahan</th>
+                            <th class="text-right">Total Infaq</th>
+                            <th class="text-right">Total Terima</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="slipRows" class="text-sm"></tbody>
+                </table>
+
+                <div id="slipEmpty" class="hidden flex flex-col items-center justify-center py-20 text-center">
+                    <div class="bg-indigo-50 p-6 rounded-full mb-4 animate-bounce-slow">
+                        <i class="fa-solid fa-file-invoice-dollar text-4xl text-indigo-300"></i>
                     </div>
-                    
-                    <form id="salarySettingForm" class="space-y-4">
-                        <div class="space-y-3">
-                            <div>
-                                <label class="text-xs font-semibold text-gray-500 uppercase">PAUD / TK</label>
-                                <div class="relative mt-1">
-                                    <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
-                                    <input id="salaryPaud" type="number" min="0" placeholder="0" class="w-full pl-9 p-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-xs font-semibold text-gray-500 uppercase">SD</label>
-                                <div class="relative mt-1">
-                                    <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
-                                    <input id="salarySd" type="number" min="0" placeholder="0" class="w-full pl-9 p-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-xs font-semibold text-gray-500 uppercase">SMP</label>
-                                <div class="relative mt-1">
-                                    <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
-                                    <input id="salarySmp" type="number" min="0" placeholder="0" class="w-full pl-9 p-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-xs font-semibold text-gray-500 uppercase">SMA</label>
-                                <div class="relative mt-1">
-                                    <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
-                                    <input id="salarySma" type="number" min="0" placeholder="0" class="w-full pl-9 p-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-xs font-semibold text-gray-500 uppercase">ALUMNI / UMUM</label>
-                                <div class="relative mt-1">
-                                    <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
-                                    <input id="salaryAlumni" type="number" min="0" placeholder="0" class="w-full pl-9 p-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-medium">
-                                </div>
-                            </div>
-                        </div>
+                    <h4 class="text-gray-600 font-bold text-lg">Belum ada data gaji</h4>
+                    <p class="text-gray-400 text-sm mt-1">Pilih periode bulan dan klik tombol "Load Data".</p>
+                </div>
+            </div>
 
-                        <div class="flex gap-3 pt-4 border-t border-gray-100">
-                            <button type="button" id="resetSalaryForm" class="flex-1 py-2 text-sm text-gray-500 bg-gray-50 hover:bg-gray-100 rounded-lg transition">Reset</button>
-                            <button type="submit" class="flex-1 py-2 text-sm text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-md transition font-bold">Simpan</button>
-                        </div>
-                    </form>
-                 </div>
-              </div>
+            <div id="slipPagination" class="bg-white border-t border-gray-100 p-4 flex justify-between items-center">
+                </div>
+        </div>
+      </section>
 
-              <div class="lg:col-span-2">
-                 <div class="glass-card flex flex-col h-full min-h-[400px]">
-                    <div class="p-5 border-b border-gray-100">
-                        <h3 class="font-bold text-gray-800 text-sm">Daftar Tarif Aktif</h3>
-                    </div>
-                    <div class="flex-1 overflow-x-auto p-2">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-gray-50 text-xs text-gray-500 uppercase font-semibold">
-                                <tr>
-                                    <th class="p-3 rounded-l-lg">Jenjang</th>
-                                    <th class="p-3">Nominal (Rp)</th>
-                                    <th class="p-3 rounded-r-lg">Terakhir Update</th>
-                                </tr>
-                            </thead>
-                            <tbody id="salarySettingRows" class="text-sm text-gray-600">
-                                </tbody>
-                        </table>
-                        <div id="salarySettingEmpty" class="hidden flex flex-col items-center justify-center py-12 text-center text-gray-400">
-                            <i class="fa-regular fa-folder-open text-3xl mb-2"></i>
-                            <p class="text-xs">Belum ada setting tarif.</p>
-                        </div>
-                    </div>
-                 </div>
-              </div>
-           </div>
-        </section>
-
-        <section id="slip-gaji" class="tab-content hidden">
-           
-           <div id="slipSummary" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              </div>
-
-           <div class="glass-card p-4 mb-6 flex flex-col md:flex-row gap-4 justify-between items-center">
-              <div class="flex items-center gap-3 w-full md:w-auto">
-                  <div class="relative">
-                      <i class="fa-regular fa-calendar absolute left-3 top-2.5 text-gray-400"></i>
-                      <input id="slipMonth" type="month" class="pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white cursor-pointer">
-                  </div>
-                  <button id="generateSlip" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md hover:bg-indigo-700 transition flex items-center gap-2">
-                      <i class="fa-solid fa-sync"></i> Load Data
-                  </button>
-              </div>
-              
-              <div class="relative w-full md:w-64">
-                  <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400"></i>
-                  <input id="slipSearch" type="search" placeholder="Cari nama edukator..." class="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-              </div>
-           </div>
-
-           <div class="glass-card overflow-hidden">
-              <div class="overflow-x-auto">
-                  <table class="w-full text-left">
-                      <thead class="bg-gray-50 text-xs text-gray-500 uppercase font-semibold border-b border-gray-100">
-                          <tr>
-                              <th class="px-6 py-4">Edukator</th>
-                              <th class="px-6 py-4">Periode</th>
-                              <th class="px-6 py-4 text-right">Gaji Privat</th>
-                              <th class="px-6 py-4 text-right">Gaji Kelas</th>
-                              <th class="px-6 py-4 text-right">Tunjangan</th>
-                              <th class="px-6 py-4 text-right">Total Terima</th>
-                              <th class="px-6 py-4 text-center">Aksi</th>
-                          </tr>
-                      </thead>
-                      <tbody id="slipRows" class="divide-y divide-gray-50 text-sm text-gray-700">
-                          </tbody>
-                  </table>
-                  
-                  <div id="slipEmpty" class="hidden flex flex-col items-center justify-center py-16 text-center text-gray-400">
-                      <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-3">
-                          <i class="fa-solid fa-file-invoice-dollar text-2xl text-gray-300"></i>
-                      </div>
-                      <p class="font-medium text-gray-600">Tidak ada data gaji</p>
-                      <p class="text-xs">Pilih bulan dan klik Load Data.</p>
-                  </div>
-              </div>
-              
-              <div id="slipPagination" class="bg-white border-t border-gray-100 p-4 flex justify-between items-center">
-                  </div>
-           </div>
-        </section>
-
-      </div>
     </main>
-    
+
+    <!-- Modal Tambah Tarif -->
+    <div id="addTarifModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+      <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 p-0 overflow-hidden modal-card">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <div>
+            <h3 class="text-lg font-bold text-gray-800">Tambah Tarif Baru</h3>
+            <p class="text-xs text-gray-500">Buat tarif untuk kategori les tertentu</p>
+          </div>
+          <button id="closeTarifModal" class="text-gray-400 hover:text-red-500 transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+        <form id="addTarifForm" class="p-6 space-y-4">
+          <div>
+            <span class="text-gray-700 font-medium text-sm mb-2 block">Kategori Les <span class="text-red-500">*</span></span>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="relative cursor-pointer">
+                <input type="radio" name="kategori_les" value="privat" class="peer sr-only" checked />
+                <div class="p-4 border-2 border-gray-200 rounded-xl text-center peer-checked:border-blue-500 peer-checked:bg-blue-50 transition">
+                  <i class="fa-solid fa-user text-2xl text-blue-500 mb-2"></i>
+                  <div class="font-semibold text-gray-700">Privat</div>
+                  <div class="text-xs text-gray-500">Les individual</div>
+                </div>
+              </label>
+              <label class="relative cursor-pointer">
+                <input type="radio" name="kategori_les" value="kelas" class="peer sr-only" />
+                <div class="p-4 border-2 border-gray-200 rounded-xl text-center peer-checked:border-emerald-500 peer-checked:bg-emerald-50 transition">
+                  <i class="fa-solid fa-users text-2xl text-emerald-500 mb-2"></i>
+                  <div class="font-semibold text-gray-700">Kelas</div>
+                  <div class="text-xs text-gray-500">Les kelompok</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          <label class="block">
+            <span class="text-gray-700 font-medium text-sm mb-1.5 block">Nama Tarif <span class="text-red-500">*</span></span>
+            <input id="tarif_nama" type="text" required class="custom-input" placeholder="Contoh: SNBT, TOEFL, Reguler, Olimpiade" />
+            <p class="text-xs text-gray-400 mt-1">Nama tarif untuk membedakan rate (misal: Reguler, SNBT, TOEFL)</p>
+          </label>
+          <div id="tarifFormError" class="text-red-600 text-sm font-medium hidden"></div>
+          <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <button type="button" id="cancelTarifModal" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 rounded-xl transition text-sm font-medium">Batal</button>
+            <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg transition text-sm font-bold">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Infaq -->
+    <div id="infaqModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+      <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 p-0 overflow-hidden modal-card">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-emerald-50">
+          <div>
+            <h3 class="text-lg font-bold text-emerald-700">Tambah Infaq</h3>
+            <p class="text-xs text-emerald-600" id="infaqNamaEdukator">Edukator</p>
+          </div>
+          <button id="closeInfaqModal" class="text-gray-400 hover:text-red-500 transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+        <form id="infaqForm" class="p-6 space-y-4">
+          <input type="hidden" id="infaqEdukatorId" />
+          <input type="hidden" id="infaqCabangId" />
+          <input type="hidden" id="infaqEditId" />
+          <div>
+            <label class="block text-gray-700 font-medium text-sm mb-1.5">Jenis Infaq <span class="text-red-500">*</span></label>
+            <input id="infaqJenis" type="text" class="custom-input" placeholder="Contoh: Keterlambatan / Alpha / Lainnya" />
+          </div>
+          <div>
+            <label class="block text-gray-700 font-medium text-sm mb-1.5">Nominal (Rp) <span class="text-red-500">*</span></label>
+            <input id="infaqNominal" type="number" min="0" class="custom-input" placeholder="0" />
+          </div>
+          <div>
+            <label class="block text-gray-700 font-medium text-sm mb-1.5">Tanggal <span class="text-red-500">*</span></label>
+            <input id="infaqTanggal" type="date" class="custom-input" />
+          </div>
+          <div>
+            <label class="block text-gray-700 font-medium text-sm mb-1.5">Catatan (Opsional)</label>
+            <input id="infaqKeterangan" type="text" class="custom-input" placeholder="Keterangan singkat" />
+          </div>
+          <div id="infaqFormError" class="text-red-600 text-sm font-medium hidden"></div>
+          <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <button type="button" id="cancelInfaqModal" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 rounded-xl transition text-sm font-medium">Batal</button>
+            <button type="button" id="resetInfaqForm" class="px-5 py-2.5 text-amber-600 hover:bg-amber-50 rounded-xl transition text-sm font-medium hidden">Reset</button>
+            <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg transition text-sm font-bold">Simpan</button>
+          </div>
+
+          <div class="pt-4 border-t border-gray-100">
+            <h4 class="text-sm font-bold text-gray-700 mb-2">Riwayat Infaq</h4>
+            <div id="infaqListEmpty" class="text-xs text-gray-400 py-3">Belum ada infaq.</div>
+            <div class="overflow-x-auto hidden" id="infaqListWrap">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="border-b border-gray-100 text-gray-400 uppercase">
+                    <th class="text-left py-2">Tanggal</th>
+                    <th class="text-left py-2">Jenis</th>
+                    <th class="text-right py-2">Nominal</th>
+                    <th class="text-left py-2">Catatan</th>
+                    <th class="text-right py-2">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="infaqListBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Infaq Massal -->
+    <div id="infaqMassalModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+      <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 p-0 overflow-hidden modal-card">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-rose-50">
+          <div>
+            <h3 class="text-lg font-bold text-rose-700">Infaq Massal</h3>
+            <p class="text-xs text-rose-600">Potongan infaq untuk seluruh edukator cabang.</p>
+          </div>
+          <button id="closeInfaqMassalModal" class="text-gray-400 hover:text-red-500 transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+        <form id="infaqMassalForm" class="p-6 space-y-4">
+          <div>
+            <label class="block text-gray-700 font-medium text-sm mb-1.5">Jenis Infaq <span class="text-red-500">*</span></label>
+            <input id="infaqMassalJenis" type="text" class="custom-input" placeholder="Contoh: Keterlambatan / Alpha / Lainnya" />
+          </div>
+          <div>
+            <label class="block text-gray-700 font-medium text-sm mb-1.5">Nominal (Rp) <span class="text-red-500">*</span></label>
+            <input id="infaqMassalNominal" type="number" min="0" class="custom-input" placeholder="0" />
+          </div>
+          <div>
+            <label class="block text-gray-700 font-medium text-sm mb-1.5">Tanggal <span class="text-red-500">*</span></label>
+            <input id="infaqMassalTanggal" type="date" class="custom-input" />
+          </div>
+          <div>
+            <label class="block text-gray-700 font-medium text-sm mb-1.5">Catatan (Opsional)</label>
+            <input id="infaqMassalKeterangan" type="text" class="custom-input" placeholder="Keterangan singkat" />
+          </div>
+          <div id="infaqMassalFormError" class="text-red-600 text-sm font-medium hidden"></div>
+          <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+            <button type="button" id="cancelInfaqMassalModal" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 rounded-xl transition text-sm font-medium">Batal</button>
+            <button type="submit" class="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-lg transition text-sm font-bold">Simpan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script src="/js/sidebar.js"></script>
     <script src="/js/penggajian.js"></script>
   </body>

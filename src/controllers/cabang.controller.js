@@ -48,6 +48,17 @@ const remove = async (req, res) => {
 
 module.exports = {
   getAll,
+  getRecommendations: async (req, res) => {
+    try {
+      const months = req.query.months ? Number(req.query.months) : 6;
+      const k = req.query.k ? Number(req.query.k) : 3;
+      const radiusKm = req.query.radius_km ? Number(req.query.radius_km) : 3;
+      const rows = await cabangService.getCabangRecommendations({ months, k, radiusKm });
+      return res.json({ success: true, data: rows });
+    } catch (err) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+  },
   create,
   update,
   remove,

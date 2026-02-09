@@ -1,5 +1,6 @@
 const db = require("../db");
 const notifikasiService = require("./notifikasi.service");
+const { ROLES } = require("../config/constants");
 
 const getSiswaIdByUserId = async (userId) => {
   const [rows] = await db.query("SELECT id FROM siswa WHERE user_id = ? LIMIT 1", [userId]);
@@ -118,7 +119,7 @@ const createPembayaran = async (payload, cabangId, userId) => {
 
       const [adminRows] = await conn.query(
         `SELECT id FROM users
-         WHERE role = 'admin_cabang' AND cabang_id = ? AND is_active = 1`,
+         WHERE role = '${ROLES.ADMIN_CABANG}' AND cabang_id = ? AND is_active = 1`,
         [detail.cabang_id]
       );
       for (const admin of adminRows) {

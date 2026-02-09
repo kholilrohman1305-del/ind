@@ -1,11 +1,12 @@
 const settingsService = require("../services/settings.service");
+const { ROLES } = require("../config/constants");
 
 const getCabangSetting = async (req, res) => {
   try {
     const user = req.session?.user;
     const role = user?.role;
     const cabangId =
-      role === "super_admin"
+      role === ROLES.SUPER_ADMIN
         ? Number(req.query.cabang_id || user?.cabang_id)
         : user?.cabang_id;
 
@@ -32,7 +33,7 @@ const updateCabangSetting = async (req, res) => {
     const user = req.session?.user;
     const role = user?.role;
     const cabangId =
-      role === "super_admin"
+      role === ROLES.SUPER_ADMIN
         ? Number(req.body.cabang_id || req.query.cabang_id || user?.cabang_id)
         : user?.cabang_id;
 
@@ -43,11 +44,11 @@ const updateCabangSetting = async (req, res) => {
     }
 
     const payload = { ...(req.body || {}) };
-    if (role !== "super_admin") {
+    if (role !== ROLES.SUPER_ADMIN) {
       delete payload.kode;
     }
     const data = await settingsService.updateCabangProfile(cabangId, payload, {
-      allowKode: role === "super_admin",
+      allowKode: role === ROLES.SUPER_ADMIN,
     });
     return res.json({ success: true, data });
   } catch (err) {

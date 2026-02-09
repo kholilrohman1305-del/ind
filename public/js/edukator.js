@@ -1,4 +1,13 @@
-﻿(() => {
+(() => {
+  const { ROLES } = window.APP_CONSTANTS;
+  const requester = window.api?.request || fetch;
+  const unwrapData = (payload) => {
+    if (payload && typeof payload === "object" && "data" in payload) {
+      return payload.data;
+    }
+    return payload;
+  };
+
   // --- 1. DOM ELEMENTS ---
   
   // Containers & Empty States
@@ -10,12 +19,17 @@
   // Counters (Badges di Tab)
   const countActiveEl = document.getElementById("edukatorCountActive");
   const countInactiveEl = document.getElementById("edukatorCountInactive");
+
+  // Riwayat Edukator
+  const historyRowsEl = document.getElementById("edukatorHistoryRows");
+  const historyEmptyEl = document.getElementById("edukatorHistoryEmpty");
+  const historyMonthInput = document.getElementById("edukatorHistoryMonth");
   
   // Search & Filter (Desktop)
   const searchInput = document.getElementById("searchInput");
   const filterMapel = document.getElementById("filterMapel");
   
-  // Search & Filter (Mobile - jika ada di HTML)
+  // Search & Filter (Mobile)
   const searchInputMobile = document.getElementById("searchInputMobile");
   const filterMapelMobile = document.getElementById("filterMapelMobile");
   
@@ -31,7 +45,7 @@
   // Views Wrappers
   const adminPanelWrapper = document.getElementById("adminPanelWrapper");
   const schedulePanel = document.getElementById("edukatorSchedulePanel");
-  // Toolbar wrapper (untuk disembunyikan jika login sebagai edukator)
+  // Toolbar wrapper
   const topbarActions = document.querySelector(".topbar-actions"); 
 
   // Form Fields Mapping
@@ -58,7 +72,10 @@
     mode: "create",    // Mode Modal (create/edit)
     role: null,        // Role User Login
     searchQuery: "",   // Query pencarian saat ini
-    filterMapelId: ""  // ID Mapel filter saat ini
+    filterMapelId: "", // ID Mapel filter saat ini
+    pageActive: 1,     // Halaman aktif tab Aktif
+    pageInactive: 1,   // Halaman aktif tab Nonaktif
+    pageSize: 10       // Jumlah item per halaman (Table View biasanya lebih banyak)
   };
 
   // --- 3. HELPER FUNCTIONS ---
@@ -83,6 +100,22 @@
     return `linear-gradient(135deg, hsl(${hue}, 70%, 60%), hsl(${(hue + 40) % 360}, 80%, 50%))`;
   };
 
+  const formatCurrency = (value) => {
+    const amount = Number(value || 0);
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatHours = (value) => {
+    const hours = Number(value || 0);
+    if (!Number.isFinite(hours)) return "0 jam";
+    return `${hours.toFixed(2)} jam`;
+  };
+
   // --- 4. FILTER LOGIC (SEARCH & DROPDOWN) ---
 
   const applyFilters = () => {
@@ -102,135 +135,305 @@
     if (state.filterMapelId) {
       data = data.filter(item => {
         if (!item.mapel_ids) return false;
-        // Konversi ke array string agar aman
         const ids = Array.isArray(item.mapel_ids) 
-           ? item.mapel_ids.map(String) 
-           : String(item.mapel_ids).split(',');
+            ? item.mapel_ids.map(String) 
+            : String(item.mapel_ids).split(',');
         return ids.includes(String(state.filterMapelId));
       });
     }
 
     state.filteredRows = data;
+    // Reset halaman ke 1 saat filter berubah
+    state.pageActive = 1;
+    state.pageInactive = 1;
     render(state.filteredRows);
   };
 
-  // --- 5. RENDER LOGIC (GRID CARDS) ---
+  // --- 5. RENDER LOGIC (TABLE LIST) ---
 
-  const renderSection = (data, container, emptyEl) => {
+  const renderPager = (container, totalPages, pageKey) => {
+    // Cari container pager khusus yang ada di luar tabel
+    const pagerContainerId = pageKey === 'pageActive' ? 'pager-container-active' : 'pager-container-inactive';
+    const pagerContainer = document.getElementById(pagerContainerId);
+    
+    if (!pagerContainer) return;
+    pagerContainer.innerHTML = ""; 
+
+    if (totalPages <= 1) {
+      pagerContainer.classList.add("hidden");
+      return;
+    }
+    pagerContainer.classList.remove("hidden");
+
+    const current = state[pageKey];
+    
+    // Create Pager UI (Flexbox Layout: Info Kiri, Tombol Kanan)
+    const wrapper = document.createElement("div");
+    wrapper.className = "flex justify-between items-center w-full";
+    
+    wrapper.innerHTML = `
+      <span class="text-xs text-gray-500 font-medium">
+        Halaman ${current} dari ${totalPages}
+      </span>
+      <div class="flex gap-2">
+         <button class="w-8 h-8 flex items-center justify-center rounded-lg border ${current === 1 ? 'bg-gray-50 text-gray-300 cursor-not-allowed' : 'bg-white text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200'} transition" 
+            type="button" data-action="prev" ${current === 1 ? 'disabled' : ''}>
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+         </button>
+         <button class="w-8 h-8 flex items-center justify-center rounded-lg border ${current === totalPages ? 'bg-gray-50 text-gray-300 cursor-not-allowed' : 'bg-white text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200'} transition" 
+            type="button" data-action="next" ${current === totalPages ? 'disabled' : ''}>
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+         </button>
+      </div>
+    `;
+
+    wrapper.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (btn.disabled) return;
+        if (btn.dataset.action === "prev") state[pageKey]--;
+        if (btn.dataset.action === "next") state[pageKey]++;
+        
+        // Scroll to top of table
+        const tableWrapper = container.closest('.overflow-hidden');
+        if(tableWrapper) tableWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        render(state.filteredRows);
+      });
+    });
+
+    pagerContainer.appendChild(wrapper);
+  };
+
+  const renderSection = (data, container, emptyEl, pageKey) => {
     if (!container) return;
     container.innerHTML = "";
     
-    if (!data.length) {
+    const totalPages = Math.ceil(data.length / state.pageSize);
+    if (state[pageKey] > totalPages && totalPages > 0) state[pageKey] = Math.max(1, totalPages);
+    if (totalPages === 0) state[pageKey] = 1;
+
+    const start = (state[pageKey] - 1) * state.pageSize;
+    const end = start + state.pageSize;
+    const pageData = data.slice(start, end);
+
+    // Toggle Empty State Visibility
+    // Kita perlu menyembunyikan wrapper tabel induknya jika kosong
+    const parentCard = container.closest('.bg-white'); // Wrapper kartu putih
+    
+    if (!pageData.length) {
       if (emptyEl) emptyEl.classList.remove("hidden");
+      if (parentCard) parentCard.classList.add("hidden");
+      renderPager(container, 0, pageKey); // Clear pager
       return;
     }
+    
     if (emptyEl) emptyEl.classList.add("hidden");
+    if (parentCard) parentCard.classList.remove("hidden");
 
-    data.forEach((item) => {
-      const card = document.createElement("div");
-      // Style Card: Putih, Rounded, Shadow halus
-      card.className = "bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 relative group flex flex-col h-full";
+    pageData.forEach((item) => {
+      const tr = document.createElement("tr");
+      tr.className = "hover:bg-gray-50 transition-colors group border-b border-gray-50 last:border-none";
       
       const nikLabel = item.nik || "-";
       const telLabel = item.telepon || "-";
-      const pendidikan = item.pendidikan_terakhir || "N/A";
+      const pendidikan = item.pendidikan_terakhir || "-";
       
-      // Logic Badge Mapel (Max 2, sisanya +X)
+      // Logic Badge Mapel (Pills Style)
       let mapelHtml = '<span class="text-xs text-gray-400 italic">Tidak ada mapel</span>';
       if (item.mapel_nama) {
           const mapelList = item.mapel_nama.split(',').map(m => m.trim());
-          const displayMapel = mapelList.slice(0, 2);
+          const displayMapel = mapelList.slice(0, 2); 
           const remaining = mapelList.length - 2;
           
           mapelHtml = displayMapel.map(m => 
-            `<span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] font-semibold border border-indigo-100 truncate max-w-[80px] inline-block" title="${m}">${m}</span>`
-          ).join(" ");
+            `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 mr-1 mb-1">
+              ${m}
+             </span>`
+          ).join("");
           
           if (remaining > 0) {
-              mapelHtml += `<span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-semibold inline-block">+${remaining}</span>`;
+              mapelHtml += `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-600 border border-gray-200" title="${mapelList.slice(2).join(', ')}">+${remaining}</span>`;
           }
       }
 
-      card.innerHTML = `
-        <div class="flex items-start justify-between mb-4">
-          <div class="flex items-center gap-3">
-             <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shadow-sm ring-2 ring-white" 
+      tr.innerHTML = `
+        <td class="p-4 align-middle">
+           <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm ring-2 ring-white shrink-0" 
                   style="background:${avatarGradient(item.nama)}">
                 ${initials(item.nama)}
-             </div>
-             <div class="overflow-hidden">
-                <h3 class="font-bold text-gray-800 text-base leading-tight truncate w-32 md:w-40" title="${item.nama}">${item.nama || "-"}</h3>
-                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded mt-1 inline-block">${pendidikan}</span>
-             </div>
-          </div>
-          <div class="flex flex-col items-end gap-1">
-             <span class="${item.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'} text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
-                ${item.is_active ? 'Aktif' : 'Off'}
+              </div>
+              <div class="min-w-0">
+                 <h4 class="font-bold text-gray-900 text-sm leading-tight truncate w-32 md:w-48" title="${item.nama}">${item.nama}</h4>
+                 <div class="text-xs text-gray-500 mt-0.5 truncate">${item.email || "No Email"}</div>
+              </div>
+           </div>
+        </td>
+
+        <td class="p-4 align-middle">
+           <div class="flex flex-col gap-1">
+             <span class="text-xs text-gray-600 flex items-center gap-2">
+                <i class="fa-solid fa-phone text-gray-300 w-3 text-center"></i> ${telLabel}
              </span>
-          </div>
-        </div>
+             <span class="text-xs text-gray-500 flex items-center gap-2 font-mono">
+                <i class="fa-solid fa-id-card text-gray-300 w-3 text-center"></i> ${nikLabel}
+             </span>
+           </div>
+        </td>
 
-        <div class="bg-gray-50 rounded-lg p-3 space-y-2 border border-gray-100 mb-4 flex-1">
-           <div class="flex items-center gap-2 text-xs text-gray-600">
-              <i class="fa-solid fa-phone w-4 text-center text-gray-400"></i> ${telLabel}
-           </div>
-           <div class="flex items-center gap-2 text-xs text-gray-600">
-              <i class="fa-solid fa-id-card w-4 text-center text-gray-400"></i> ${nikLabel}
-           </div>
-           <div class="pt-2 border-t border-gray-200 mt-2 flex flex-wrap gap-1">
-              ${mapelHtml}
-           </div>
-        </div>
+        <td class="p-4 align-middle">
+            <span class="inline-block px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-50 text-gray-600 border border-gray-200">
+              ${pendidikan}
+            </span>
+        </td>
 
-        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-gray-100 mt-auto">
-          <button class="flex items-center justify-center p-2 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition" 
+        <td class="p-4 align-middle">
+           <div class="flex flex-wrap max-w-[200px]">
+             ${mapelHtml}
+           </div>
+        </td>
+
+        <td class="p-4 align-middle text-center">
+             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${
+               item.is_active 
+               ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+               : 'bg-gray-100 text-gray-500 border-gray-200'
+             }">
+               <span class="w-1.5 h-1.5 rounded-full mr-1.5 ${item.is_active ? 'bg-emerald-500' : 'bg-gray-400'}"></span>
+               ${item.is_active ? 'Aktif' : 'Nonaktif'}
+             </span>
+        </td>
+
+        <td class="p-4 align-middle text-center">
+           <div class="flex items-center justify-center gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+              <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition" 
                   data-action="edit" data-id="${item.id}" title="Edit Data">
-             <i class="fa-regular fa-pen-to-square"></i>
-          </button>
-          
-          <button class="flex items-center justify-center p-2 rounded-lg hover:bg-amber-50 text-gray-400 hover:text-amber-600 transition" 
+                 <i class="fa-regular fa-pen-to-square"></i>
+              </button>
+              
+              <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-amber-50 text-gray-400 hover:text-amber-600 transition" 
                   data-action="toggle" data-id="${item.id}" title="${item.is_active ? 'Nonaktifkan' : 'Aktifkan'}">
-             <i class="fa-solid ${item.is_active ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>
-          </button>
-          
-          <button class="flex items-center justify-center p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition" 
+                 <i class="fa-solid ${item.is_active ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>
+              </button>
+              
+              <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition" 
                   data-action="delete" data-id="${item.id}" title="Hapus Data">
-             <i class="fa-regular fa-trash-can"></i>
-          </button>
-        </div>
+                 <i class="fa-regular fa-trash-can"></i>
+              </button>
+           </div>
+        </td>
       `;
-      container.appendChild(card);
+      container.appendChild(tr);
     });
+
+    renderPager(container, totalPages, pageKey);
   };
 
   const render = (data) => {
     const active = data.filter((item) => item.is_active);
     const inactive = data.filter((item) => !item.is_active);
     
-    renderSection(active, rowsActiveEl, emptyActiveEl);
-    renderSection(inactive, rowsInactiveEl, emptyInactiveEl);
+    renderSection(active, rowsActiveEl, emptyActiveEl, 'pageActive');
+    renderSection(inactive, rowsInactiveEl, emptyInactiveEl, 'pageInactive');
     
     // Update Badge Counter
     if (countActiveEl) countActiveEl.textContent = `${active.length}`;
     if (countInactiveEl) countInactiveEl.textContent = `${inactive.length}`;
   };
 
+  const renderHistory = (rows) => {
+    if (!historyRowsEl) return;
+    historyRowsEl.innerHTML = "";
+
+    if (!rows.length) {
+      if (historyEmptyEl) historyEmptyEl.classList.remove("hidden");
+      return;
+    }
+    if (historyEmptyEl) historyEmptyEl.classList.add("hidden");
+
+    rows.forEach((row, idx) => {
+      const tr = document.createElement("tr");
+      const rankBadge =
+        idx === 0
+          ? "bg-yellow-100 text-yellow-700"
+          : idx === 1
+          ? "bg-slate-100 text-slate-600"
+          : idx === 2
+          ? "bg-amber-100 text-amber-700"
+          : "bg-gray-100 text-gray-600";
+
+      tr.innerHTML = `
+        <td class="p-4 align-middle">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm ring-2 ring-white shrink-0"
+                style="background:${avatarGradient(row.nama)}">
+              ${initials(row.nama)}
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-gray-900 text-sm truncate">${row.nama || "-"}</h4>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${rankBadge}">#${idx + 1}</span>
+              </div>
+              <div class="text-xs text-gray-500">${row.email || "No Email"}</div>
+            </div>
+          </div>
+        </td>
+        <td class="p-4 align-middle text-sm text-gray-600">${row.cabang_nama || "-"}</td>
+        <td class="p-4 align-middle text-sm font-semibold text-indigo-600">${formatHours(row.total_jam)}</td>
+        <td class="p-4 align-middle text-sm font-semibold text-emerald-600">${formatCurrency(row.total_gaji)}</td>
+        <td class="p-4 align-middle text-sm font-semibold text-gray-700">${Number(row.total_kehadiran || 0)}</td>
+      `;
+      historyRowsEl.appendChild(tr);
+    });
+  };
+
   // --- 6. API FETCHING ---
 
   const fetchEdukator = async () => {
     try {
-      const res = await fetch("/api/edukator", { credentials: "same-origin" });
+      const res = await requester("/api/edukator", { credentials: "same-origin" });
       if (!res.ok) {
         state.rows = [];
       } else {
-        const data = await res.json();
+        const payload = await res.json();
+        const data = unwrapData(payload);
         state.rows = Array.isArray(data) ? data : [];
       }
-      // Panggil applyFilters, bukan render langsung, agar search/filter diterapkan
       applyFilters();
     } catch (err) {
       state.rows = [];
       applyFilters();
+    }
+  };
+
+  const fetchHistory = async () => {
+    if (!historyRowsEl) return;
+
+    const now = new Date();
+    if (historyMonthInput && !historyMonthInput.value) {
+      const monthValue = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+      historyMonthInput.value = monthValue;
+    }
+
+    const [year, month] = (historyMonthInput?.value || "").split("-");
+    const query = new URLSearchParams({
+      year: year || String(now.getFullYear()),
+      month: month || String(now.getMonth() + 1),
+    });
+
+    try {
+      const res = await requester(`/api/edukator/top-history?${query.toString()}`, {
+        credentials: "same-origin",
+      });
+      const payload = await res.json();
+      if (!res.ok || payload?.success === false) {
+        throw new Error(payload?.message || "Gagal memuat riwayat");
+      }
+      const data = unwrapData(payload);
+      renderHistory(Array.isArray(data) ? data : []);
+    } catch (err) {
+      renderHistory([]);
     }
   };
 
@@ -243,23 +446,49 @@
 
     state.mapel.forEach((item) => {
       const wrapper = document.createElement("label");
-      wrapper.className = "flex items-center gap-2 p-2 rounded border border-gray-200 cursor-pointer hover:bg-gray-50 transition bg-white";
-      
       const isChecked = selected.includes(String(item.id));
       
+      wrapper.className = `flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200 group select-none ${
+          isChecked 
+          ? "bg-indigo-50 border-indigo-200 shadow-sm" 
+          : "bg-white border-gray-200 hover:bg-gray-50"
+      }`;
+      
       wrapper.innerHTML = `
-         <input type="checkbox" value="${item.id}" ${isChecked ? 'checked' : ''} class="peer sr-only">
-         <div class="w-full flex items-center gap-2 peer-checked:text-indigo-600">
-            <div class="w-4 h-4 rounded border border-gray-300 peer-checked:bg-indigo-600 peer-checked:border-indigo-600 flex items-center justify-center text-white text-[10px] transition-colors"><i class="fa-solid fa-check"></i></div>
-            <span class="text-sm select-none">${item.nama}</span>
-         </div>
+          <input type="checkbox" value="${item.id}" ${isChecked ? 'checked' : ''} class="sr-only">
+          
+          <div class="w-5 h-5 rounded border-2 flex items-center justify-center transition-colors duration-200 shrink-0
+              ${isChecked ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-gray-300 group-hover:border-indigo-300'}">
+             <i class="fa-solid fa-check text-white text-xs ${isChecked ? '' : 'hidden'}"></i>
+          </div>
+          
+          <span class="text-sm ${isChecked ? 'text-indigo-700 font-semibold' : 'text-gray-600 group-hover:text-gray-800'}">${item.nama}</span>
       `;
+
+      wrapper.addEventListener('change', (e) => {
+          const checkbox = e.target;
+          const box = wrapper.querySelector('div');
+          const icon = wrapper.querySelector('i');
+          const text = wrapper.querySelector('span');
+          
+          if (checkbox.checked) {
+              wrapper.className = "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200 group select-none bg-indigo-50 border-indigo-200 shadow-sm";
+              box.className = "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors duration-200 shrink-0 bg-indigo-600 border-indigo-600";
+              icon.classList.remove('hidden');
+              text.className = "text-sm text-indigo-700 font-semibold";
+          } else {
+              wrapper.className = "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200 group select-none bg-white border-gray-200 hover:bg-gray-50";
+              box.className = "w-5 h-5 rounded border-2 flex items-center justify-center transition-colors duration-200 shrink-0 bg-white border-gray-300 group-hover:border-indigo-300";
+              icon.classList.add('hidden');
+              text.className = "text-sm text-gray-600 group-hover:text-gray-800";
+          }
+      });
+
       container.appendChild(wrapper);
     });
   };
 
   const renderFilterOptions = () => {
-    // Render untuk Desktop Dropdown
     if (filterMapel) {
         let options = '<option value="">Semua Mapel</option>';
         state.mapel.forEach(item => {
@@ -268,7 +497,6 @@
         filterMapel.innerHTML = options;
     }
 
-    // Render untuk Mobile Dropdown (Sync)
     if (filterMapelMobile) {
         let options = '<option value="">Semua Mapel</option>';
         state.mapel.forEach(item => {
@@ -280,15 +508,16 @@
 
   const fetchMapel = async () => {
     try {
-      const res = await fetch("/api/mapel", { credentials: "same-origin" });
+      const res = await requester("/api/mapel", { credentials: "same-origin" });
       if (!res.ok) {
         state.mapel = [];
       } else {
-        const data = await res.json();
+        const payload = await res.json();
+        const data = unwrapData(payload);
         state.mapel = Array.isArray(data) ? data : [];
       }
       renderMapelChecklist();
-      renderFilterOptions(); // Populate dropdown filter
+      renderFilterOptions();
     } catch (err) {
       state.mapel = [];
       renderMapelChecklist();
@@ -301,6 +530,14 @@
     if (!targetModal) return;
     const card = targetModal.querySelector(".modal-card");
     if (isVisible) {
+      targetModal.classList.remove("justify-end");
+      targetModal.classList.add("justify-center", "items-center", "flex");
+      
+      if (card) {
+          card.classList.remove("h-full", "max-w-md", "rounded-l-2xl", "rounded-none");
+          card.classList.add("max-w-2xl", "w-full", "rounded-2xl", "max-h-[90vh]", "overflow-y-auto");
+      }
+
       targetModal.classList.remove("hidden", "opacity-0", "pointer-events-none");
       if (card) {
         card.classList.remove("scale-95");
@@ -375,7 +612,7 @@
   const saveEdukator = async (payload, id) => {
     const url = id ? `/api/edukator/${id}` : "/api/edukator";
     const method = id ? "PUT" : "POST";
-    const res = await fetch(url, {
+    const res = await requester(url, {
       method,
       headers: { "Content-Type": "application/json" },
       credentials: "same-origin",
@@ -386,7 +623,7 @@
   };
 
   const deleteEdukator = async (id) => {
-    const res = await fetch(`/api/edukator/${id}`, {
+    const res = await requester(`/api/edukator/${id}`, {
       method: "DELETE",
       credentials: "same-origin",
     });
@@ -400,7 +637,6 @@
   if (searchInput) {
     searchInput.addEventListener("input", (e) => {
       state.searchQuery = e.target.value;
-      // Sync ke mobile jika ada
       if (searchInputMobile) searchInputMobile.value = e.target.value;
       applyFilters();
     });
@@ -410,13 +646,12 @@
   if (filterMapel) {
     filterMapel.addEventListener("change", (e) => {
       state.filterMapelId = e.target.value;
-      // Sync ke mobile jika ada
       if (filterMapelMobile) filterMapelMobile.value = e.target.value;
       applyFilters();
     });
   }
 
-  // Search Mobile (Sync ke Desktop)
+  // Search Mobile
   if (searchInputMobile) {
       searchInputMobile.addEventListener("input", (e) => {
           state.searchQuery = e.target.value;
@@ -425,7 +660,7 @@
       });
   }
 
-  // Filter Mobile (Sync ke Desktop)
+  // Filter Mobile
   if (filterMapelMobile) {
       filterMapelMobile.addEventListener("change", (e) => {
           state.filterMapelId = e.target.value;
@@ -434,15 +669,19 @@
       });
   }
 
+  if (historyMonthInput) {
+    historyMonthInput.addEventListener("change", fetchHistory);
+  }
+
   // Modal Triggers
   if (addButton) addButton.addEventListener("click", () => openModal("create"));
   if (closeModal) closeModal.addEventListener("click", close);
   if (cancelModal) cancelModal.addEventListener("click", close);
 
-  // Row Action Delegation (Edit/Delete/Toggle)
+  // Row Action Delegation (Table Body)
   const handleRowClick = async (event) => {
     const target = event.target;
-    // Cari tombol terdekat karena bisa jadi klik icon
+    // Cari tombol terdekat
     const button = target.closest("button[data-action]");
     if (!button) return;
     
@@ -510,7 +749,6 @@
   }
 
   // --- 10. EDUKATOR SCHEDULE VIEW (ROLE BASED) ---
-
   const renderEdukatorSchedule = (privat, kelas) => {
     const privatEl = document.getElementById("edukatorJadwalPrivat");
     const kelasEl = document.getElementById("edukatorJadwalKelas");
@@ -571,31 +809,48 @@
 
   // --- 11. INITIALIZATION ---
 
+  const initFormOptions = () => {
+    let el = fields.pendidikan_terakhir;
+    if (!el) return;
+
+    if (el.tagName !== "SELECT") {
+      const select = document.createElement("select");
+      select.id = el.id;
+      select.className = el.className.replace("custom-input", "custom-select");
+      if (!select.classList.contains("custom-select")) select.classList.add("custom-select");
+      el.parentNode.replaceChild(select, el);
+      fields.pendidikan_terakhir = select;
+      el = select;
+    }
+
+    const options = ["Mahasiswa", "S1", "S2"];
+    el.innerHTML = `<option value="">-- Pilih Pendidikan --</option>` + 
+      options.map(opt => `<option value="${opt}">${opt}</option>`).join("");
+  };
+
   const init = async () => {
     try {
-      // Cek Session User
-      const sessionRes = await fetch("/api/auth/session", { credentials: "same-origin" });
+      const sessionRes = await requester("/api/auth/session", { credentials: "same-origin" });
       const session = await sessionRes.json();
       state.role = session && session.loggedIn ? session.user.role : null;
     } catch (err) {
       state.role = null;
     }
 
+    initFormOptions();
+
     // A. Tampilan Khusus jika login sebagai Edukator
-    if (state.role === "edukator") {
-      // Sembunyikan elemen Admin
+    if (state.role === ROLES.EDUKATOR) {
       if (addButton) addButton.style.display = "none";
       if (modal) modal.classList.add("hidden");
       if (adminPanelWrapper) adminPanelWrapper.style.display = "none";
-      if (topbarActions) topbarActions.style.display = "none"; // Sembunyikan tombol tambah & search
+      if (topbarActions) topbarActions.style.display = "none";
 
-      // Tampilkan Panel Jadwal
       if (schedulePanel) schedulePanel.classList.remove("hidden");
 
-      // Fetch Jadwal
       const [privatRes, kelasRes] = await Promise.all([
-        fetch("/api/jadwal?tipe=privat", { credentials: "same-origin" }),
-        fetch("/api/jadwal?tipe=kelas", { credentials: "same-origin" }),
+        requester("/api/jadwal?tipe=privat", { credentials: "same-origin" }),
+        requester("/api/jadwal?tipe=kelas", { credentials: "same-origin" }),
       ]);
       const privatData = await privatRes.json();
       const kelasData = await kelasRes.json();
@@ -609,7 +864,10 @@
     // B. Tampilan Default (Admin)
     fetchEdukator();
     fetchMapel();
+    fetchHistory();
   };
 
   init();
 })();
+
+

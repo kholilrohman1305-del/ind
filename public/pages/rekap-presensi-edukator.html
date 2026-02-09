@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rekap Kehadiran - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+      /* Animasi Masuk */
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-enter {
+        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+      }
+
+      /* Delay Animation */
+      .delay-100 { animation-delay: 0.1s; }
+      .delay-200 { animation-delay: 0.2s; }
+      .delay-300 { animation-delay: 0.3s; }
+      .delay-400 { animation-delay: 0.4s; }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+      /* Loading State */
+      .loading {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+
+  <body class="h-full" data-page="rekap-kehadiran" data-view="edukator-mobile">
+    <div class="h-full w-full overflow-auto hide-scrollbar" style="background: linear-gradient(180deg, #00A6B4 0%, #008891 100%);">
+      <div class="max-w-md mx-auto h-full flex flex-col bg-[#F5F7FA]">
+        <header class="topbar px-5 pt-5 pb-6" style="background: linear-gradient(135deg, #00A6B4 0%, #008891 100%);">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <p class="text-white/80 text-sm">Rekap Kehadiran</p>
+              <h1 class="text-white text-xl font-bold mt-1">Ringkasan Presensi</h1>
+            </div>
+            <div class="edukator-header-actions">
+              <input
+                type="month"
+                id="monthSelector"
+                class="px-3 py-2 bg-white/90 border border-white/40 rounded-xl text-sm focus:ring-2 focus:ring-white/60 focus:border-transparent transition-all"
+              >
+              <a href="/profil-edukator" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden card-hover" aria-label="Profil">
+                <i class="fa-solid fa-user text-white"></i>
+              </a>
+            </div>
+          </div>
+          <div class="relative">
+            <input id="rekapSearch" type="text" placeholder="Cari periode atau kelas..." class="w-full py-3 px-4 pl-11 bg-white rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg" style="color: #374151;">
+            <i class="fa-solid fa-magnifying-glass w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
+        </header>
+
+        <main class="content flex-1 px-5 -mt-2 pb-24 overflow-auto hide-scrollbar">
+
+          <!-- Summary Cards -->
+        <section class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-enter">
+
+          <div class="stat-card bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+            <div class="flex justify-between items-start mb-4">
+              <div class="stat-label text-xs font-bold text-slate-400 uppercase">Total Jadwal</div>
+              <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
+                <i class="fas fa-calendar-alt"></i>
+              </div>
+            </div>
+            <div id="totalJadwal" class="stat-value text-3xl font-bold text-slate-800">0</div>
+            <div class="text-xs text-slate-500 mt-1">Terjadwal bulan ini</div>
+          </div>
+
+          <div class="stat-card bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+            <div class="flex justify-between items-start mb-4">
+              <div class="stat-label text-xs font-bold text-slate-400 uppercase">Jadwal Selesai</div>
+              <div class="p-2 bg-green-100 text-green-600 rounded-lg">
+                <i class="fas fa-check-circle"></i>
+              </div>
+            </div>
+            <div id="totalSelesai" class="stat-value text-3xl font-bold text-slate-800">0</div>
+            <div class="text-xs text-slate-500 mt-1">Sudah dilaksanakan</div>
+          </div>
+
+          <div class="stat-card bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+            <div class="flex justify-between items-start mb-4">
+              <div class="stat-label text-xs font-bold text-slate-400 uppercase">Total Presensi</div>
+              <div class="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
+                <i class="fas fa-clipboard-check"></i>
+              </div>
+            </div>
+            <div id="totalPresensi" class="stat-value text-3xl font-bold text-slate-800">0</div>
+            <div class="text-xs text-slate-500 mt-1">Absensi tercatat</div>
+          </div>
+
+          <div class="stat-card bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+            <div class="flex justify-between items-start mb-4">
+              <div class="stat-label text-xs font-bold text-slate-400 uppercase">Kehadiran</div>
+              <div class="p-2 bg-purple-100 text-purple-600 rounded-lg">
+                <i class="fas fa-chart-pie"></i>
+              </div>
+            </div>
+            <div id="persentaseKehadiran" class="stat-value text-3xl font-bold text-slate-800">0%</div>
+            <div class="text-xs text-slate-500 mt-1">Persentase kehadiran</div>
+          </div>
+
+          </section>
+
+          <!-- Breakdown Section -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+
+          <!-- Week Breakdown -->
+          <div class="bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 animate-enter delay-200">
+            <h3 class="font-bold text-lg mb-4 text-slate-800 flex items-center gap-2">
+              <i class="fas fa-calendar-week text-blue-600"></i>
+              Breakdown Per Minggu
+            </h3>
+            <div id="weekBreakdownContainer" class="overflow-x-auto">
+              <div id="weekBreakdownEmpty" class="text-center py-12 text-slate-400">
+                <i class="fas fa-calendar text-4xl mb-3 opacity-50"></i>
+                <p class="text-sm">Tidak ada data untuk bulan ini</p>
+              </div>
+              <table id="weekBreakdownTable" class="w-full text-sm hidden">
+                <thead>
+                  <tr class="border-b border-slate-200">
+                    <th class="text-left py-3 px-2 text-slate-600 font-semibold">Minggu</th>
+                    <th class="text-right py-3 px-2 text-slate-600 font-semibold">Jadwal</th>
+                    <th class="text-right py-3 px-2 text-slate-600 font-semibold">Presensi</th>
+                    <th class="text-right py-3 px-2 text-slate-600 font-semibold">%</th>
+                  </tr>
+                </thead>
+                <tbody id="weekBreakdownBody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Program Breakdown -->
+          <div class="bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-100 animate-enter delay-300">
+            <h3 class="font-bold text-lg mb-4 text-slate-800 flex items-center gap-2">
+              <i class="fas fa-book text-green-600"></i>
+              Breakdown Per Program
+            </h3>
+            <div id="programBreakdownContainer" class="overflow-x-auto">
+              <div id="programBreakdownEmpty" class="text-center py-12 text-slate-400">
+                <i class="fas fa-book text-4xl mb-3 opacity-50"></i>
+                <p class="text-sm">Tidak ada data untuk bulan ini</p>
+              </div>
+              <table id="programBreakdownTable" class="w-full text-sm hidden">
+                <thead>
+                  <tr class="border-b border-slate-200">
+                    <th class="text-left py-3 px-2 text-slate-600 font-semibold">Program</th>
+                    <th class="text-right py-3 px-2 text-slate-600 font-semibold">Jadwal</th>
+                    <th class="text-right py-3 px-2 text-slate-600 font-semibold">Presensi</th>
+                    <th class="text-right py-3 px-2 text-slate-600 font-semibold">%</th>
+                  </tr>
+                </thead>
+                <tbody id="programBreakdownBody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          </div>
+
+        <!-- Missing Presensi -->
+        <div class="bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-red-100 animate-enter delay-400">
+          <h3 class="font-bold text-lg mb-4 text-red-600 flex items-center gap-2">
+            <i class="fas fa-exclamation-triangle"></i>
+            Jadwal Belum Diabsen
+          </h3>
+          <div id="missingPresensiContainer">
+            <div id="missingPresensiEmpty" class="text-center py-12 text-slate-400">
+              <i class="fas fa-check-double text-4xl mb-3 text-green-400"></i>
+              <p class="text-sm">Semua jadwal sudah diabsen! 🎉</p>
+            </div>
+            <div id="missingPresensiList" class="space-y-3 hidden"></div>
+          </div>
+        </div>
+
+        </div>
+        </main>
+
+        <footer class="edukator-footer" id="edukatorFooterNav" aria-label="Navigasi Edukator"></footer>
+      </div>
+    </div>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/edukator-footer.js"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/rekap-presensi.js"></script>
+  </body>
+</html>

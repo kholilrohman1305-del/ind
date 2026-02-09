@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Feedback - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      body { font-family: 'Plus Jakarta Sans', sans-serif; }
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .card-hover { transition: all 0.3s ease; }
+      .card-hover:active { transform: scale(0.97); }
+      .rating-stars {
+        display: flex;
+        gap: 6px;
+      }
+      .rating-stars button {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 28px;
+        line-height: 1;
+        color: #e2e8f0;
+        transition: color 0.2s ease, transform 0.2s ease;
+      }
+      .rating-stars button.active {
+        color: #fbbf24;
+      }
+      .rating-stars button:hover {
+        transform: translateY(-1px);
+      }
+    </style>
+  </head>
+
+  <body class="h-full" data-page="feedback" data-view="siswa-mobile">
+    <div class="h-full w-full overflow-auto hide-scrollbar" style="background: linear-gradient(180deg, #0ea5e9 0%, #2563eb 100%);">
+      <div class="max-w-md mx-auto h-full flex flex-col bg-[#F5F7FA]">
+        <header class="topbar px-5 pt-5 pb-6" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <p class="text-white/80 text-sm">Feedback</p>
+              <h1 class="text-white text-xl font-bold mt-1">Berikan Penilaian</h1>
+            </div>
+            <div class="edukator-header-actions">
+              <button class="relative p-2 bg-white/20 rounded-full card-hover" aria-label="Notifikasi">
+                <i class="fa-regular fa-bell text-white text-lg"></i>
+              </button>
+              <a href="/profil-siswa" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden card-hover" aria-label="Profil">
+                <i class="fa-solid fa-user text-white"></i>
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <main class="content flex-1 px-5 -mt-2 pb-24 overflow-auto hide-scrollbar space-y-4">
+          <section class="panel bg-white rounded-3xl p-5 shadow-lg">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h2 class="text-base font-bold text-slate-800">Program Anda</h2>
+                <p class="text-xs text-slate-500">Pilih program aktif atau selesai untuk memberikan penilaian.</p>
+              </div>
+            </div>
+
+            <div id="programFeedbackList" class="space-y-3"></div>
+            <div id="programFeedbackEmpty" class="hidden text-center text-slate-400 text-sm py-8">
+              Belum ada program untuk dinilai.
+            </div>
+          </section>
+        </main>
+
+        <div id="feedbackModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 px-5">
+          <div class="bg-white rounded-3xl w-full max-w-md p-5 shadow-xl">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <p class="text-xs text-slate-500">Penilaian Program</p>
+                <h3 id="feedbackProgramName" class="text-lg font-bold text-slate-800">Program</h3>
+                <span id="feedbackProgramStatus" class="text-[10px] font-semibold uppercase text-slate-500"></span>
+              </div>
+              <button id="closeFeedbackModal" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <form id="feedbackForm" class="space-y-4">
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">Kualitas Materi</label>
+                  <div class="rating-stars" data-aspect="materi"></div>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">Kemampuan Edukator</label>
+                  <div class="rating-stars" data-aspect="edukator"></div>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">Fasilitas</label>
+                  <div class="rating-stars" data-aspect="fasilitas"></div>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">Pelayanan</label>
+                  <div class="rating-stars" data-aspect="pelayanan"></div>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Komentar Singkat (Opsional)</label>
+                <textarea id="feedbackComment" rows="3" class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" placeholder="Tulis pengalaman Anda..."></textarea>
+              </div>
+
+              <button type="submit" id="submitFeedbackBtn" class="w-full py-3 rounded-2xl font-semibold text-white shadow-lg" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);">
+                <span id="submitText">Kirim Penilaian</span>
+                <i id="submitSpinner" class="fa-solid fa-spinner fa-spin ml-2 hidden"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <footer class="siswa-footer" id="siswaFooterNav" aria-label="Navigasi Siswa"></footer>
+      </div>
+    </div>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/siswa-footer.js"></script>
+    <script src="/js/feedback-form.js"></script>
+  </body>
+</html>

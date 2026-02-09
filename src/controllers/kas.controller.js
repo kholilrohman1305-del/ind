@@ -1,4 +1,5 @@
 const kasService = require("../services/kas.service");
+const { parsePagination, paginatedResponse } = require("../utils/pagination");
 
 const summary = async (req, res) => {
   try {
@@ -25,8 +26,9 @@ const entries = async (req, res) => {
     }
     const year = req.query.year ? Number(req.query.year) : null;
     const month = req.query.month ? Number(req.query.month) : null;
-    const rows = await kasService.listEntries({ cabangId, year, month });
-    res.json({ success: true, data: rows });
+    const { page, limit, offset } = parsePagination(req.query);
+    const { rows, total } = await kasService.listEntries({ cabangId, year, month }, { limit, offset });
+    res.json(paginatedResponse(rows, total, { page, limit }));
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

@@ -1,10 +1,11 @@
 const manajemenService = require("../services/manajemen.service");
+const { ROLES } = require("../config/constants");
 
 const list = async (req, res) => {
   try {
     const role = req.session.user.role;
     const cabangId =
-      role === "admin_cabang" ? req.session.user.cabang_id : req.query.cabang_id || null;
+      role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : req.query.cabang_id || null;
     const rows = await manajemenService.listManajemen(cabangId);
     res.json(rows);
   } catch (err) {
@@ -16,7 +17,7 @@ const create = async (req, res) => {
   try {
     const role = req.session.user.role;
     const cabangId =
-      role === "admin_cabang" ? req.session.user.cabang_id : req.body.cabang_id || null;
+      role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : req.body.cabang_id || null;
     const result = await manajemenService.createManajemen({
       nama: req.body.nama,
       cabangId,
@@ -31,7 +32,7 @@ const remove = async (req, res) => {
   try {
     const role = req.session.user.role;
     const cabangId =
-      role === "admin_cabang" ? req.session.user.cabang_id : req.query.cabang_id || null;
+      role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : req.query.cabang_id || null;
     await manajemenService.deleteManajemen({ id: req.params.id, cabangId });
     res.json({ success: true });
   } catch (err) {

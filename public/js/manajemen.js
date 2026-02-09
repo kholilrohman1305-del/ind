@@ -14,15 +14,32 @@
   
   const assignRowsEl = document.getElementById("manajemenAssignRows");
   const assignEmptyEl = document.getElementById("manajemenAssignEmpty");
+  const filterCabang = document.getElementById("filterCabang");
+  const pageInfo = document.getElementById("manajemenPageInfo");
+  const pagePrev = document.getElementById("manajemenPrev");
+  const pageNext = document.getElementById("manajemenNext");
+
+  const jabatanModal = document.getElementById("jabatanModal");
+  const assignModal = document.getElementById("assignModal");
+  const openJabatanModal = document.getElementById("openJabatanModal");
+  const openAssignModal = document.getElementById("openAssignModal");
+  const closeJabatanModal = document.getElementById("closeJabatanModal");
+  const closeAssignModal = document.getElementById("closeAssignModal");
+  const cancelJabatanModal = document.getElementById("cancelJabatanModal");
+  const cancelAssignModal = document.getElementById("cancelAssignModal");
+
+  const role = document.body?.dataset?.role || "";
 
   // --- HELPERS ---
   const fetchJson = async (url, options = {}) => {
-    const res = await fetch(url, { credentials: "same-origin", ...options });
+    const requester = window.api?.request || fetch;
+    const res = await requester(url, { credentials: "same-origin", ...options });
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
+      const err = data || {};
       throw new Error(err.message || "Request gagal.");
     }
-    return res.json();
+    return data && data.success ? data.data : data;
   };
 
   const formatRupiah = (value) => new Intl.NumberFormat("id-ID").format(Number(value || 0));
@@ -45,6 +62,25 @@
   };
 
   const getInitials = (name) => (name || "?").substring(0, 2).toUpperCase();
+
+  const state = {
+    edukatorRows: [],
+    filteredRows: [],
+    page: 1,
+    pageSize: 10,
+  };
+
+  const openModal = (modal) => {
+    if (!modal) return;
+    modal.classList.remove("hidden");
+    setTimeout(() => modal.classList.add("show"), 10);
+  };
+
+  const closeModal = (modal) => {
+    if (!modal) return;
+    modal.classList.remove("show");
+    setTimeout(() => modal.classList.add("hidden"), 150);
+  };
 
   // --- RENDER FUNCTIONS ---
 
@@ -79,7 +115,12 @@
   // 2. Render Assign Table (Main Content) - UPDATED with Edit/Delete Actions
   const renderAssignTable = (rows) => {
     // Sort: Edukator yang punya jabatan ditaruh paling atas
-    const sortedRows = rows.sort((a, b) => (b.manajemen_id ? 1 : 0) - (a.manajemen_id ? 1 : 0));
+    const sortedRows = [...rows].sort((a, b) => {
+      const rankA = a.manajemen_id ? 1 : 0;
+      const rankB = b.manajemen_id ? 1 : 0;
+      if (rankB !== rankA) return rankB - rankA;
+      return String(a.nama || "").localeCompare(String(b.nama || ""));
+    });
 
     if (!sortedRows.length) {
       assignRowsEl.innerHTML = "";
@@ -137,12 +178,37 @@
                  ${hasRole ? '<i class="fa-solid fa-certificate text-[10px]"></i>' : ''} ${roleName}
                </span>
             </td>
+            <td class="px-6 py-4">${row.pendidikan_terakhir || "-"}</td>
+            <td class="px-6 py-4">${row.cabang_nama || "-"}</td>
             <td class="px-6 py-4 text-right">
                 ${actionButtons}
             </td>
         </tr>
         `;
     }).join("");
+  };
+
+  const renderPagination = () => {
+    if (!pageInfo || !pagePrev || !pageNext) return;
+    const total = state.filteredRows.length;
+    const totalPages = Math.max(1, Math.ceil(total / state.pageSize));
+    if (state.page > totalPages) state.page = totalPages;
+    pageInfo.textContent = `Halaman ${state.page} / ${totalPages}`;
+    pagePrev.disabled = state.page <= 1;
+    pageNext.disabled = state.page >= totalPages;
+  };
+
+  const applyFilters = () => {
+    const cabangId = filterCabang?.value || "";
+    let rows = [...state.edukatorRows];
+    if (cabangId) {
+      rows = rows.filter((row) => String(row.cabang_utama_id) === String(cabangId));
+    }
+    state.filteredRows = rows;
+    const start = (state.page - 1) * state.pageSize;
+    const pageRows = rows.slice(start, start + state.pageSize);
+    renderAssignTable(pageRows);
+    renderPagination();
   };
 
   // --- DATA LOADING ---
@@ -170,7 +236,7 @@
   const loadEdukator = async () => {
     try {
         const rows = await fetchJson("/api/edukator");
-        
+        state.edukatorRows = rows || [];
         // Update Select Option untuk Edukator di Form Assign
         if (assignEdukator) {
             // Simpan value saat ini jika ada
@@ -189,9 +255,26 @@
             if(currentVal) assignEdukator.value = currentVal;
         }
         
-        renderAssignTable(rows);
+        applyFilters();
     } catch (err) {
         console.error("Gagal memuat data edukator", err);
+    }
+  };
+
+  const loadCabangOptions = async () => {
+    if (role !== "super_admin") {
+      if (filterCabang) filterCabang.classList.add("hidden");
+      return;
+    }
+    if (!filterCabang) return;
+    try {
+      const res = await fetchJson("/api/cabang");
+      const rows = res?.data || res || [];
+      if (!Array.isArray(rows)) return;
+      filterCabang.innerHTML = `<option value="">Semua Cabang</option>` +
+        rows.map((row) => `<option value="${row.id}">${row.nama}</option>`).join("");
+    } catch (err) {
+      console.error("Gagal memuat cabang", err);
     }
   };
 
@@ -232,6 +315,7 @@
           inputNama.value = "";
           if (inputGaji) inputGaji.value = "";
           await loadRows(); 
+          closeModal(jabatanModal);
           
       } catch(err) {
           if(window.notifyError) window.notifyError("Gagal", err.message);
@@ -275,7 +359,11 @@
               const jabatanId = button.dataset.jabatanId;
               
               // Scroll ke form (UX)
-              assignForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              if (assignForm && !assignModal) {
+                assignForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              } else {
+                openModal(assignModal);
+              }
               
               // Set value dropdown
               if(assignEdukator) assignEdukator.value = edukatorId;
@@ -336,6 +424,7 @@
           assignManajemen.value = "";
           
           await loadEdukator(); 
+          closeModal(assignModal);
           
       } catch(err) {
           if(window.notifyError) window.notifyError("Gagal Update", err.message);
@@ -343,7 +432,47 @@
     });
   }
 
+  if (openJabatanModal) openJabatanModal.addEventListener("click", () => openModal(jabatanModal));
+  if (openAssignModal) openAssignModal.addEventListener("click", () => openModal(assignModal));
+  if (closeJabatanModal) closeJabatanModal.addEventListener("click", () => closeModal(jabatanModal));
+  if (closeAssignModal) closeAssignModal.addEventListener("click", () => closeModal(assignModal));
+  if (cancelJabatanModal) cancelJabatanModal.addEventListener("click", () => closeModal(jabatanModal));
+  if (cancelAssignModal) cancelAssignModal.addEventListener("click", () => closeModal(assignModal));
+
+  if (jabatanModal) {
+    jabatanModal.addEventListener("click", (event) => {
+      if (event.target === jabatanModal) closeModal(jabatanModal);
+    });
+  }
+  if (assignModal) {
+    assignModal.addEventListener("click", (event) => {
+      if (event.target === assignModal) closeModal(assignModal);
+    });
+  }
+
+  if (filterCabang) {
+    filterCabang.addEventListener("change", () => {
+      state.page = 1;
+      applyFilters();
+    });
+  }
+  if (pagePrev) {
+    pagePrev.addEventListener("click", () => {
+      if (state.page > 1) {
+        state.page -= 1;
+        applyFilters();
+      }
+    });
+  }
+  if (pageNext) {
+    pageNext.addEventListener("click", () => {
+      state.page += 1;
+      applyFilters();
+    });
+  }
+
   // Init
   loadRows().catch(() => {});
+  loadCabangOptions().catch(() => {});
   loadEdukator().catch(() => {});
 })();

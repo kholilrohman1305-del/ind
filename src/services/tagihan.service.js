@@ -1,5 +1,6 @@
 const db = require("../db");
 const notifikasiService = require("./notifikasi.service");
+const { ROLES, ENROLLMENT_STATUS } = require("../config/constants");
 
 const getSiswaIdByUserId = async (userId) => {
   const [rows] = await db.query("SELECT id FROM siswa WHERE user_id = ? LIMIT 1", [userId]);
@@ -34,7 +35,7 @@ const applyPromo = (nominal, promo) => {
   return base;
 };
 
-const listTagihan = async ({ cabangId, siswaId, year, month }) => {
+const listTagihan = async ({ cabangId, siswaId, year, month }, { limit, offset } = {}) => {
   const params = [];
   let where = "WHERE 1=1";
 
@@ -51,8 +52,12 @@ const listTagihan = async ({ cabangId, siswaId, year, month }) => {
     params.push(year, month);
   }
 
-  const [rows] = await db.query(
-    `SELECT t.id, t.cabang_id, t.siswa_id, t.enrollment_id, t.jenis_tagihan,
+  const [[{ total }]] = await db.query(
+    `SELECT COUNT(*) AS total FROM tagihan t ${where}`,
+    [...params]
+  );
+
+  let dataQuery = `SELECT t.id, t.cabang_id, t.siswa_id, t.enrollment_id, t.jenis_tagihan,
             t.nominal, t.tanggal_jatuh_tempo, t.status_tagihan, t.created_at,
             s.nama AS siswa_nama, p.nama AS program_nama,
             IFNULL(SUM(pb.nominal), 0) AS total_bayar
@@ -63,15 +68,19 @@ const listTagihan = async ({ cabangId, siswaId, year, month }) => {
      LEFT JOIN pembayaran pb ON pb.tagihan_id = t.id
      ${where}
      GROUP BY t.id
-     ORDER BY t.created_at DESC`,
-    params
-  );
-  return rows;
+     ORDER BY t.created_at DESC`;
+  const dataParams = [...params];
+  if (limit !== undefined) {
+    dataQuery += " LIMIT ? OFFSET ?";
+    dataParams.push(limit, offset || 0);
+  }
+  const [rows] = await db.query(dataQuery, dataParams);
+  return { rows, total };
 };
 
 const listEnrollments = async (cabangId) => {
   const params = [];
-  let where = "WHERE en.status_enrollment = 'aktif'";
+  let where = `WHERE en.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'`;
   if (cabangId) {
     where += " AND s.cabang_id = ?";
     params.push(cabangId);
@@ -158,7 +167,7 @@ const createTagihan = async (payload, cabangId) => {
 
   const [adminRows] = await db.query(
     `SELECT id FROM users
-     WHERE role = 'admin_cabang' AND cabang_id = ? AND is_active = 1`,
+     WHERE role = '${ROLES.ADMIN_CABANG}' AND cabang_id = ? AND is_active = 1`,
     [enrollment.cabang_id]
   );
   for (const admin of adminRows) {
@@ -249,7 +258,7 @@ const createTagihanForEnrollment = async (conn, enrollmentId, cabangId) => {
 
   const [adminRows] = await conn.query(
     `SELECT id FROM users
-     WHERE role = 'admin_cabang' AND cabang_id = ? AND is_active = 1`,
+     WHERE role = '${ROLES.ADMIN_CABANG}' AND cabang_id = ? AND is_active = 1`,
     [enrollment.cabang_id]
   );
   for (const admin of adminRows) {

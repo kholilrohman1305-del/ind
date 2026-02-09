@@ -1,17 +1,20 @@
 const jadwalService = require("../services/jadwal.service");
+const { ROLES, TIPE_LES } = require("../config/constants");
+const { parsePagination, paginatedResponse } = require("../utils/pagination");
 
 const list = async (req, res) => {
   try {
-    const tipe = req.query.tipe === "kelas" ? "kelas" : "privat";
+    const tipe = req.query.tipe === TIPE_LES.KELAS ? TIPE_LES.KELAS : TIPE_LES.PRIVAT;
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
-    const rows = await jadwalService.listJadwal({
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
+    const { page, limit, offset } = parsePagination(req.query);
+    const { rows, total } = await jadwalService.listJadwal({
       tipe,
       role,
       cabangId,
       userId: req.session.user.id,
-    });
-    return res.json({ success: true, data: rows });
+    }, { limit, offset });
+    return res.json(paginatedResponse(rows, total, { page, limit }));
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
@@ -20,7 +23,7 @@ const list = async (req, res) => {
 const listPrivatSummary = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const rows = await jadwalService.listPrivatSummary(cabangId);
     return res.json({ success: true, data: rows });
   } catch (err) {
@@ -31,7 +34,7 @@ const listPrivatSummary = async (req, res) => {
 const listPrivatSlots = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const rows = await jadwalService.listPrivatSlots(req.params.enrollmentId, cabangId);
     return res.json({ success: true, data: rows });
   } catch (err) {
@@ -44,7 +47,7 @@ const listPrivatSlots = async (req, res) => {
 const listKelasGroups = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const rows = await jadwalService.listKelasGroups(cabangId);
     return res.json({ success: true, data: rows });
   } catch (err) {
@@ -55,7 +58,7 @@ const listKelasGroups = async (req, res) => {
 const listKelasSiswaByPrograms = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const raw = req.query.program_ids || "";
     const programIds = raw
       .split(",")
@@ -70,7 +73,7 @@ const listKelasSiswaByPrograms = async (req, res) => {
 const listKelasSummary = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const rows = await jadwalService.listKelasSummary(cabangId);
     return res.json({ success: true, data: rows });
   } catch (err) {
@@ -81,7 +84,7 @@ const listKelasSummary = async (req, res) => {
 const listKelasSlots = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const rows = await jadwalService.listKelasSlots(req.params.kelasId, cabangId);
     return res.json({ success: true, data: rows });
   } catch (err) {
@@ -92,7 +95,7 @@ const listKelasSlots = async (req, res) => {
 const listPrivatSiswa = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const rows = await jadwalService.listPrivatSiswa(cabangId);
     return res.json({ success: true, data: rows });
   } catch (err) {
@@ -103,7 +106,7 @@ const listPrivatSiswa = async (req, res) => {
 const listKelasSiswa = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const rows = await jadwalService.listKelasSiswa(req.params.kelasId, cabangId);
     return res.json({ success: true, data: rows });
   } catch (err) {
@@ -114,7 +117,7 @@ const listKelasSiswa = async (req, res) => {
 const createPrivat = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const result = await jadwalService.createPrivatJadwal(req.body, cabangId);
     return res.json({ success: true, data: result });
   } catch (err) {
@@ -125,7 +128,7 @@ const createPrivat = async (req, res) => {
 const createKelas = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const result = await jadwalService.createKelasJadwal(req.body, cabangId);
     return res.json({ success: true, data: result });
   } catch (err) {
@@ -136,7 +139,7 @@ const createKelas = async (req, res) => {
 const update = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const result = await jadwalService.updateJadwal(req.params.id, req.body, cabangId);
     return res.json({ success: true, data: result });
   } catch (err) {
@@ -147,7 +150,7 @@ const update = async (req, res) => {
 const removePrivat = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     await jadwalService.deletePrivatByEnrollment(req.params.enrollmentId, cabangId);
     return res.json({ success: true });
   } catch (err) {
@@ -158,7 +161,7 @@ const removePrivat = async (req, res) => {
 const removeKelas = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     await jadwalService.deleteKelasByKelas(req.params.kelasId, cabangId);
     return res.json({ success: true });
   } catch (err) {

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tagihan Siswa - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      body { font-family: 'Plus Jakarta Sans', sans-serif; }
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .card-hover { transition: all 0.3s ease; }
+      .card-hover:active { transform: scale(0.97); }
+    </style>
+  </head>
+
+  <body class="h-full" data-page="tagihan" data-view="siswa-mobile">
+    <div class="h-full w-full overflow-auto hide-scrollbar" style="background: linear-gradient(180deg, #0ea5e9 0%, #2563eb 100%);">
+      <div class="max-w-md mx-auto h-full flex flex-col bg-[#F5F7FA]">
+        <header class="topbar px-5 pt-5 pb-6" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <p class="text-white/80 text-sm">Tagihan Siswa</p>
+              <h1 class="text-white text-xl font-bold mt-1">Keuangan</h1>
+            </div>
+            <div class="edukator-header-actions">
+              <button class="relative p-2 bg-white/20 rounded-full card-hover" aria-label="Notifikasi">
+                <i class="fa-regular fa-bell text-white text-lg"></i>
+              </button>
+              <a href="/profil-siswa" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden card-hover" aria-label="Profil">
+                <i class="fa-solid fa-user text-white"></i>
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <main class="content flex-1 px-5 -mt-2 pb-24 overflow-auto hide-scrollbar space-y-4">
+          <section class="bg-white rounded-3xl p-4 shadow-lg">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs text-slate-500 font-semibold uppercase tracking-wide">Tagihan Aktif</div>
+                <div class="text-2xl font-extrabold text-slate-800 mt-1" id="siswaTagihanTotal">Rp 0</div>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-sm border border-indigo-100">
+                <i class="fa-solid fa-file-invoice"></i>
+              </div>
+            </div>
+            <div class="text-xs text-slate-400 mt-2">Total kewajiban tagihan yang masih aktif.</div>
+          </section>
+
+          <section class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-gray-900">Daftar Tagihan</h3>
+            </div>
+            <div id="tagihanList" class="space-y-3"></div>
+            <div id="tagihanEmpty" class="hidden py-8 text-center text-slate-400">
+              <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fa-solid fa-receipt text-2xl text-slate-300"></i>
+              </div>
+              <p class="text-sm font-semibold text-slate-600">Tidak ada tagihan aktif</p>
+              <p class="text-xs text-slate-400 mt-1">Semua tagihan sudah lunas.</p>
+            </div>
+          </section>
+        </main>
+
+        <footer class="siswa-footer" id="siswaFooterNav" aria-label="Navigasi Siswa"></footer>
+      </div>
+    </div>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/siswa-footer.js"></script>
+    <script src="/js/tagihan-siswa.js"></script>
+  </body>
+</html>

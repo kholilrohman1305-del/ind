@@ -1,11 +1,12 @@
 const express = require("express");
 const kasController = require("../controllers/kas.controller");
 const { requireRole } = require("../middlewares/auth.middleware");
+const { ROLES } = require("../config/constants");
 
 const router = express.Router();
 
-router.get("/", requireRole("admin_cabang"), kasController.summary);
-router.get("/entries", requireRole("admin_cabang"), kasController.entries);
-router.post("/saldo", requireRole("admin_cabang"), kasController.setSaldo);
+router.get("/", requireRole(ROLES.ADMIN_CABANG), kasController.summary);
+router.get("/entries", requireRole(ROLES.ADMIN_CABANG), kasController.entries);
+router.post("/saldo", requireRole(ROLES.ADMIN_CABANG), kasController.setSaldo);
 
 module.exports = router;

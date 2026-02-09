@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Program Saya - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      body { font-family: 'Plus Jakarta Sans', sans-serif; }
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .card-hover { transition: all 0.3s ease; }
+      .card-hover:active { transform: scale(0.97); }
+      .tab-btn {
+        padding: 10px 0;
+        border: none;
+        background: none;
+        font-weight: 600;
+        color: #64748b;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+      }
+      .tab-btn.active {
+        color: #2563eb;
+        border-bottom-color: #2563eb;
+      }
+    </style>
+  </head>
+
+  <body class="h-full" data-page="program-saya" data-view="siswa-mobile">
+    <div class="h-full w-full overflow-auto hide-scrollbar" style="background: linear-gradient(180deg, #0ea5e9 0%, #2563eb 100%);">
+      <div class="max-w-md mx-auto h-full flex flex-col bg-[#F5F7FA]">
+        <header class="topbar px-5 pt-5 pb-6" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <p class="text-white/80 text-sm">Program Saya</p>
+              <h1 class="text-white text-xl font-bold mt-1">Daftar Program</h1>
+            </div>
+            <div class="edukator-header-actions">
+              <button class="relative p-2 bg-white/20 rounded-full card-hover" aria-label="Notifikasi">
+                <i class="fa-regular fa-bell text-white text-lg"></i>
+              </button>
+              <a href="/profil-siswa" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden card-hover" aria-label="Profil">
+                <i class="fa-solid fa-user text-white"></i>
+              </a>
+            </div>
+          </div>
+
+          <div class="relative">
+            <input id="programSearch" type="text" placeholder="Cari program..." class="w-full py-3 px-4 pl-11 bg-white rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg" style="color: #374151;">
+            <i class="fa-solid fa-magnifying-glass w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
+        </header>
+
+        <main class="content flex-1 px-5 -mt-2 pb-24 overflow-auto hide-scrollbar space-y-4">
+          <div class="bg-white rounded-3xl p-4 shadow-lg">
+            <nav class="flex gap-4">
+              <button class="tab-btn active" data-target="tab-aktif">Aktif</button>
+              <button class="tab-btn" data-target="tab-selesai">Selesai</button>
+            </nav>
+          </div>
+
+          <div id="tab-aktif" class="tab-content space-y-3"></div>
+          <div id="tab-selesai" class="tab-content space-y-3 hidden"></div>
+
+          <div id="programEmpty" class="hidden py-8 text-center text-slate-400">
+            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
+              <i class="fa-solid fa-book text-2xl text-slate-300"></i>
+            </div>
+            <p class="text-sm font-semibold text-slate-600">Belum ada program</p>
+          </div>
+        </main>
+
+        <footer class="siswa-footer" id="siswaFooterNav" aria-label="Navigasi Siswa"></footer>
+      </div>
+    </div>
+
+    <!-- Modal Riwayat Kehadiran -->
+    <div id="riwayatModal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" data-close="riwayat"></div>
+      <div class="absolute inset-0 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-5 w-full max-w-md max-h-[85vh] overflow-y-auto shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h3 class="font-bold text-slate-800">Riwayat Kehadiran</h3>
+            <p class="text-xs text-slate-500" id="riwayatProgramLabel">Program</p>
+          </div>
+          <button id="closeRiwayatModal" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="text-[11px] uppercase text-slate-400">
+              <tr>
+                <th class="py-2">Tanggal</th>
+                <th class="py-2">Mapel</th>
+                <th class="py-2">Waktu</th>
+                <th class="py-2 text-center">Tipe</th>
+              </tr>
+            </thead>
+            <tbody id="riwayatRows" class="text-slate-600"></tbody>
+          </table>
+          <div id="riwayatEmpty" class="hidden flex flex-col items-center justify-center py-8 text-center">
+            <div class="bg-slate-50 p-4 rounded-full mb-3">
+              <i class="fa-regular fa-clipboard text-2xl text-slate-300"></i>
+            </div>
+            <p class="text-slate-500 font-medium">Belum ada riwayat kehadiran.</p>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Perpanjangan Program -->
+    <div id="renewModal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" data-close="renew"></div>
+      <div class="absolute inset-0 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-5 w-full max-w-md shadow-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-bold text-slate-800">Perpanjang Program</h3>
+              <p class="text-xs text-slate-500" id="renewProgramLabel">Program</p>
+            </div>
+            <button id="closeRenewModal" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <i class="fa-solid fa-info text-blue-600"></i>
+                </div>
+                <div class="text-sm text-blue-700">
+                  <p class="font-semibold mb-1">Yang akan dibuat:</p>
+                  <ul class="list-disc list-inside space-y-0.5 text-blue-600">
+                    <li>Enrollment baru dengan pertemuan penuh</li>
+                    <li>Tagihan baru untuk periode ini</li>
+                    <li>Jadwal otomatis (jika tersedia template)</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">Tanggal Mulai</label>
+              <input type="date" id="renewStartDate" class="w-full py-3 px-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <p class="text-xs text-slate-400 mt-1">Kosongkan untuk mulai dari hari ini</p>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+              <button id="cancelRenewBtn" class="flex-1 py-3 rounded-2xl font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-colors">
+                Batal
+              </button>
+              <button id="confirmRenewBtn" class="flex-1 py-3 rounded-2xl font-semibold text-white transition-colors" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);">
+                <span id="renewBtnText">Perpanjang</span>
+                <i id="renewBtnSpinner" class="fa-solid fa-spinner fa-spin ml-2 hidden"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Success -->
+    <div id="successModal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+      <div class="absolute inset-0 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl text-center">
+          <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-check text-3xl text-emerald-600"></i>
+          </div>
+          <h3 class="font-bold text-slate-800 text-lg mb-2">Berhasil!</h3>
+          <p id="successMessage" class="text-sm text-slate-600 mb-4">Program berhasil diperpanjang.</p>
+          <div id="successDetails" class="bg-slate-50 rounded-2xl p-4 text-left text-sm mb-4 hidden">
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-slate-500">Tagihan Baru</span>
+                <span id="successTagihan" class="font-semibold text-slate-700">✓ Dibuat</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Jadwal Baru</span>
+                <span id="successJadwal" class="font-semibold text-slate-700">-</span>
+              </div>
+            </div>
+          </div>
+          <button id="closeSuccessBtn" class="w-full py-3 rounded-2xl font-semibold text-white" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/siswa-footer.js"></script>
+    <script src="/js/program-siswa.js"></script>
+  </body>
+</html>

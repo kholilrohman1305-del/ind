@@ -6,15 +6,25 @@
       <div class="brand-sub">{{brandSub}}</div>
     </div>
   </div>
-  <nav class="nav">
+  <nav class="nav nav-scroll">
     {{menuItems}}
   </nav>
   <div class="profile-card">
-    <div class="profile-avatar">{{initials}}</div>
-    <div class="profile-info">
-      <div class="profile-name">{{displayRole}}</div>
-      <div class="profile-email">{{displayEmail}}</div>
+    <div class="profile-main">
+      <div class="profile-avatar">{{initials}}</div>
+      <div class="profile-info">
+        <div class="profile-name">{{displayRole}}</div>
+        <div class="profile-email">{{displayEmail}}</div>
+      </div>
     </div>
-    <button class="profile-action" aria-label="Logout">Log out</button>
+    <button class="profile-action" aria-label="Logout">
+      <span class="profile-action-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M12 3v9" stroke-width="1.6" stroke-linecap="round" />
+          <path d="M7 6a8 8 0 1 0 10 0" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </span>
+      <span class="profile-action-label">Keluar</span>
+    </button>
   </div>
 </aside>

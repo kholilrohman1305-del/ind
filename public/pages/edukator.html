@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind.css" />
     
     <style>
       :root {
@@ -57,6 +57,9 @@
       .custom-scrollbar::-webkit-scrollbar { width: 6px; }
       .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
       .custom-scrollbar::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 10px; }
+      
+      /* Table Specific Styles */
+      th { white-space: nowrap; }
     </style>
   </head>
 
@@ -65,9 +68,6 @@
       
       <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div class="flex items-center gap-4">
-          <button class="p-2 rounded-lg hover:bg-white shadow-sm md:hidden text-gray-600 transition" id="sidebarToggle">
-            <i class="fa-solid fa-bars"></i>
-          </button>
           <div>
             <h1 class="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-2">
               <span class="bg-purple-100 text-purple-600 p-2 rounded-lg text-xl shadow-sm"><i class="fa-solid fa-chalkboard-user"></i></span>
@@ -98,7 +98,7 @@
       <div class="md:hidden flex flex-col gap-3 mb-6">
           <input type="text" id="searchInputMobile" class="w-full p-3 rounded-lg border border-gray-200 shadow-sm" placeholder="Cari edukator...">
           <select id="filterMapelMobile" class="w-full p-3 rounded-lg border border-gray-200 shadow-sm bg-white">
-               <option value="">Semua Mapel</option>
+                <option value="">Semua Mapel</option>
           </select>
       </div>
 
@@ -113,12 +113,33 @@
               <i class="fa-solid fa-user-slash text-gray-400"></i> Edukator Nonaktif
               <span id="edukatorCountInactive" class="bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs font-bold">0</span>
             </button>
+            <button class="tab-btn px-4 py-3 font-semibold text-sm flex items-center gap-2 rounded-t-lg outline-none" data-target="tab-history">
+              <i class="fa-solid fa-chart-line text-indigo-500"></i> Riwayat Edukator
+            </button>
           </nav>
         </div>
 
         <div id="tab-active" class="tab-content active">
-          <div id="edukatorRowsActive" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 pb-10">
-              </div>
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-10">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-gray-600 text-xs uppercase font-bold tracking-wider border-b border-gray-200">
+                  <tr>
+                    <th class="p-4 font-semibold">Profil Edukator</th>
+                    <th class="p-4 font-semibold">Kontak & NIK</th>
+                    <th class="p-4 font-semibold">Pendidikan</th>
+                    <th class="p-4 font-semibold">Mapel Dikuasai</th>
+                    <th class="p-4 font-semibold text-center">Status</th>
+                    <th class="p-4 font-semibold text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="edukatorRowsActive" class="divide-y divide-gray-100 text-sm text-gray-700">
+                  </tbody>
+              </table>
+            </div>
+            <div id="pager-container-active" class="p-4 border-t border-gray-100 bg-white"></div>
+          </div>
+
           <div id="edukatorEmptyActive" class="hidden flex flex-col items-center justify-center py-16 text-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">
             <div class="bg-gray-50 p-4 rounded-full mb-3"><i class="fa-solid fa-users-slash text-3xl"></i></div>
             <p class="font-medium text-gray-600">Tidak ada data ditemukan</p>
@@ -126,11 +147,65 @@
         </div>
 
         <div id="tab-inactive" class="tab-content">
-          <div id="edukatorRowsInactive" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 pb-10">
-               </div>
+           <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-10">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-gray-600 text-xs uppercase font-bold tracking-wider border-b border-gray-200">
+                  <tr>
+                    <th class="p-4 font-semibold">Profil Edukator</th>
+                    <th class="p-4 font-semibold">Kontak & NIK</th>
+                    <th class="p-4 font-semibold">Pendidikan</th>
+                    <th class="p-4 font-semibold">Mapel Dikuasai</th>
+                    <th class="p-4 font-semibold text-center">Status</th>
+                    <th class="p-4 font-semibold text-center">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="edukatorRowsInactive" class="divide-y divide-gray-100 text-sm text-gray-700">
+                  </tbody>
+              </table>
+            </div>
+            <div id="pager-container-inactive" class="p-4 border-t border-gray-100 bg-white"></div>
+          </div>
+
           <div id="edukatorEmptyInactive" class="hidden flex flex-col items-center justify-center py-16 text-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">
             <div class="bg-gray-50 p-4 rounded-full mb-3"><i class="fa-solid fa-box-open text-3xl"></i></div>
             <p class="font-medium text-gray-600">Arsip kosong</p>
+          </div>
+        </div>
+
+        <div id="tab-history" class="tab-content">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-gray-800">Top 5 Edukator Terbaik</h3>
+              <p class="text-xs text-gray-500">Berdasarkan total jam, gaji, dan kehadiran dalam 1 bulan.</p>
+            </div>
+            <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-gray-100 shadow-sm">
+              <i class="fa-solid fa-calendar text-gray-400"></i>
+              <input id="edukatorHistoryMonth" type="month" class="bg-transparent text-sm outline-none">
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-10">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-gray-600 text-xs uppercase font-bold tracking-wider border-b border-gray-200">
+                  <tr>
+                    <th class="p-4 font-semibold">Edukator</th>
+                    <th class="p-4 font-semibold">Cabang</th>
+                    <th class="p-4 font-semibold">Total Jam</th>
+                    <th class="p-4 font-semibold">Total Gaji</th>
+                    <th class="p-4 font-semibold">Kehadiran</th>
+                  </tr>
+                </thead>
+                <tbody id="edukatorHistoryRows" class="divide-y divide-gray-100 text-sm text-gray-700">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="edukatorHistoryEmpty" class="hidden flex flex-col items-center justify-center py-16 text-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">
+            <div class="bg-gray-50 p-4 rounded-full mb-3"><i class="fa-solid fa-chart-simple text-3xl"></i></div>
+            <p class="font-medium text-gray-600">Belum ada data riwayat</p>
           </div>
         </div>
       </div>
@@ -141,33 +216,59 @@
               <i class="fa-solid fa-chalkboard-user text-9xl"></i>
           </div>
           <h2 class="text-3xl font-bold mb-2 relative z-10">Halo, Edukator!</h2>
-          <p class="opacity-90 relative z-10 text-indigo-100">Berikut jadwal mengajar Anda.</p>
+          <p class="opacity-90 relative z-10 text-indigo-100">Kelola jadwal dan catatan siswa Anda.</p>
         </div>
 
-        <div class="grid md:grid-cols-2 gap-6 pb-10">
-          <div class="glass-panel p-6 border-t-4 border-t-pink-500">
-            <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
-              <span class="bg-pink-100 text-pink-600 w-8 h-8 rounded-lg flex items-center justify-center"><i class="fa-solid fa-user-graduate"></i></span>
-              Jadwal Privat
-            </h3>
-            <div id="edukatorJadwalPrivat" class="space-y-3"></div>
-            <div id="edukatorJadwalPrivatEmpty" class="hidden text-center py-8 text-gray-400 text-sm">Tidak ada jadwal.</div>
-          </div>
+        <div class="mb-6 border-b border-gray-200">
+          <nav class="flex gap-6">
+            <button class="tab-btn active px-4 py-3 font-semibold text-sm flex items-center gap-2 rounded-t-lg outline-none" data-target="tab-jadwal-edukator">
+              <i class="fa-solid fa-calendar text-indigo-500"></i> Jadwal Mengajar
+            </button>
+            <button class="tab-btn px-4 py-3 font-semibold text-sm flex items-center gap-2 rounded-t-lg outline-none" data-target="tab-catatan-siswa">
+              <i class="fa-solid fa-clipboard-list text-emerald-500"></i> Catatan Siswa
+              <span id="totalCatatanBadge" class="bg-emerald-100 text-emerald-700 py-0.5 px-2 rounded-full text-xs font-bold hidden">0</span>
+            </button>
+          </nav>
+        </div>
 
-          <div class="glass-panel p-6 border-t-4 border-t-blue-500">
-             <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
-               <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-lg flex items-center justify-center"><i class="fa-solid fa-users-rectangle"></i></span>
-               Jadwal Kelas
-             </h3>
-            <div id="edukatorJadwalKelas" class="space-y-3"></div>
-            <div id="edukatorJadwalKelasEmpty" class="hidden text-center py-8 text-gray-400 text-sm">Tidak ada jadwal.</div>
+        <div id="tab-jadwal-edukator" class="tab-content active">
+          <div class="grid md:grid-cols-2 gap-6 pb-10">
+            <div class="glass-panel p-6 border-t-4 border-t-pink-500">
+              <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
+                <span class="bg-pink-100 text-pink-600 w-8 h-8 rounded-lg flex items-center justify-center"><i class="fa-solid fa-user-graduate"></i></span>
+                Jadwal Privat
+              </h3>
+              <div id="edukatorJadwalPrivat" class="space-y-3"></div>
+              <div id="edukatorJadwalPrivatEmpty" class="hidden text-center py-8 text-gray-400 text-sm">Tidak ada jadwal.</div>
+            </div>
+
+            <div class="glass-panel p-6 border-t-4 border-t-blue-500">
+               <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
+                 <span class="bg-blue-100 text-blue-600 w-8 h-8 rounded-lg flex items-center justify-center"><i class="fa-solid fa-users-rectangle"></i></span>
+                 Jadwal Kelas
+               </h3>
+              <div id="edukatorJadwalKelas" class="space-y-3"></div>
+              <div id="edukatorJadwalKelasEmpty" class="hidden text-center py-8 text-gray-400 text-sm">Tidak ada jadwal.</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-catatan-siswa" class="tab-content">
+          <div id="studentListRows" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 pb-10">
+            </div>
+          <div id="studentListEmpty" class="hidden">
+            <div class="flex flex-col items-center justify-center py-16 text-center text-gray-400 bg-white rounded-xl border border-dashed border-gray-300">
+              <i class="fa-solid fa-user-graduate text-5xl mb-4 opacity-40"></i>
+              <p class="font-medium text-gray-600">Belum ada siswa</p>
+              <p class="text-sm text-gray-400 mt-1">Siswa akan muncul setelah Anda memiliki jadwal mengajar.</p>
+            </div>
           </div>
         </div>
       </section>
 
     </main>
 
-    <div id="edukatorModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+    <div id="edukatorModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
       <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 p-0 overflow-hidden max-h-[90vh] flex flex-col modal-card">
         
         <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
@@ -250,6 +351,93 @@
       </div>
     </div>
 
+    <div id="catatanModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+      <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 p-0 overflow-hidden max-h-[90vh] flex flex-col modal-card">
+
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-emerald-50 to-teal-50">
+          <div>
+            <h3 class="text-lg font-bold text-gray-800" id="catatanModalTitle">Catatan Siswa</h3>
+            <p class="text-xs text-gray-500" id="catatanModalSubtitle">-</p>
+          </div>
+          <button id="closeCatatanModal" class="text-gray-400 hover:text-red-500 transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+
+          <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5">
+            <h4 class="font-bold text-emerald-900 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-plus-circle"></i> Tambah Catatan Baru
+            </h4>
+            <form id="catatanForm" class="space-y-4">
+              <input type="hidden" id="catatan_siswa_id">
+              <input type="hidden" id="catatan_mode" value="create">
+              <input type="hidden" id="catatan_edit_id">
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <label class="block">
+                  <span class="text-gray-700 font-medium text-sm mb-1.5 block">Tanggal <span class="text-red-500">*</span></span>
+                  <input id="catatan_tanggal" type="date" required class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" />
+                </label>
+
+                <label class="block">
+                  <span class="text-gray-700 font-medium text-sm mb-1.5 block">Kategori</span>
+                  <select id="catatan_kategori" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <option value="umum">Umum</option>
+                    <option value="akademik">Akademik</option>
+                    <option value="sikap">Sikap</option>
+                    <option value="kehadiran">Kehadiran</option>
+                  </select>
+                </label>
+              </div>
+
+              <label class="block">
+                <span class="text-gray-700 font-medium text-sm mb-1.5 block">Catatan <span class="text-red-500">*</span></span>
+                <textarea id="catatan_text" required maxlength="1000" rows="4" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none resize-none" placeholder="Tulis catatan untuk siswa ini..."></textarea>
+                <div class="text-xs text-gray-400 mt-1 text-right">
+                  <span id="catatan_char_count">0</span>/1000
+                </div>
+              </label>
+
+              <div class="flex justify-end gap-3">
+                <button type="button" id="cancelCatatanForm" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition text-sm font-medium">Batal</button>
+                <button type="submit" id="submitCatatanBtn" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-md transition text-sm font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-save"></i> Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-history"></i> Riwayat Catatan
+              <span id="noteCountBadge" class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-bold">0</span>
+            </h4>
+
+            <div class="mb-4 flex gap-2">
+              <select id="filterKategori" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                <option value="">Semua Kategori</option>
+                <option value="akademik">Akademik</option>
+                <option value="sikap">Sikap</option>
+                <option value="kehadiran">Kehadiran</option>
+                <option value="umum">Umum</option>
+              </select>
+            </div>
+
+            <div id="noteHistoryList" class="space-y-3">
+              </div>
+
+            <div id="noteHistoryEmpty" class="hidden text-center py-8 text-gray-400">
+              <i class="fa-solid fa-clipboard text-4xl mb-3 opacity-30"></i>
+              <p class="text-sm">Belum ada catatan untuk siswa ini</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <script>
       document.addEventListener('DOMContentLoaded', () => {
         const tabs = document.querySelectorAll('.tab-btn');
@@ -262,12 +450,14 @@
             document.getElementById(tab.getAttribute('data-target')).classList.add('active');
           });
         });
-
-        // Modal animation dikelola oleh edukator.js untuk menghindari konflik.
       });
     </script>
     
+    <footer class="edukator-footer" id="edukatorFooterNav" aria-label="Navigasi Edukator"></footer>
+
     <script src="/js/sidebar.js"></script>
+    <script src="/js/edukator-footer.js"></script>
     <script src="/js/edukator.js"></script>
+    <script src="/js/catatan-siswa.js"></script>
   </body>
 </html>

@@ -4,8 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Presensi Edukator - ILHAMI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind.css" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
       body { font-family: 'Plus Jakarta Sans', sans-serif; }
       
@@ -43,31 +44,35 @@
     </style>
   </head>
   
-  <body class="bg-[#F8FAFC] flex h-screen overflow-hidden text-slate-800" data-page="presensi">
-    
-    <main class="content flex-1 flex flex-col relative h-full overflow-hidden">
-      <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-         <div class="absolute top-[10%] right-[10%] w-[500px] h-[500px] bg-emerald-100/40 rounded-full blur-[80px]"></div>
-         <div class="absolute bottom-[10%] left-[10%] w-[400px] h-[400px] bg-teal-100/40 rounded-full blur-[80px]"></div>
-      </div>
-
-      <header class="topbar h-20 flex items-center justify-between px-8 bg-white/70 backdrop-blur-md border-b border-white/50 sticky top-0 z-10">
-        <div class="topbar-left flex items-center gap-4">
-          <button class="icon-button p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors" id="sidebarToggle" aria-label="Toggle menu">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-          </button>
-          <div>
-            <div class="page-title text-xl font-bold text-slate-800">Presensi Edukator</div>
-            <div class="page-subtitle text-xs text-slate-500">Lakukan absensi pada jadwal yang sudah dibuat admin.</div>
+  <body class="h-full" data-page="presensi" data-view="edukator-mobile">
+    <div class="h-full w-full overflow-auto hide-scrollbar" style="background: linear-gradient(180deg, #00A6B4 0%, #008891 100%);">
+      <div class="max-w-md mx-auto h-full flex flex-col bg-[#F5F7FA]">
+        <header class="topbar px-5 pt-5 pb-6" style="background: linear-gradient(135deg, #00A6B4 0%, #008891 100%);">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <p class="text-white/80 text-sm">Presensi Edukator</p>
+              <h1 class="text-white text-xl font-bold mt-1">Absensi Mengajar</h1>
+            </div>
+            <div class="edukator-header-actions">
+              <button class="relative p-2 bg-white/20 rounded-full card-hover" aria-label="Notifikasi">
+                <i class="fa-regular fa-bell text-white text-lg"></i>
+              </button>
+              <a href="/profil-edukator" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden card-hover" aria-label="Profil">
+                <i class="fa-solid fa-user text-white"></i>
+              </a>
+            </div>
           </div>
-        </div>
-      </header>
+          <div class="relative">
+            <input id="presensiSearch" type="text" placeholder="Cari siswa atau program..." class="w-full py-3 px-4 pl-11 bg-white rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg" style="color: #374151;">
+            <i class="fa-solid fa-magnifying-glass w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
+        </header>
 
-      <div class="flex-1 overflow-y-auto p-6 md:p-8 relative z-10">
-        <section class="panel bg-white/80 backdrop-blur-sm rounded-3xl border border-white shadow-xl shadow-slate-200/50 flex flex-col min-h-[600px] overflow-hidden">
+        <main class="content flex-1 px-5 -mt-2 pb-24 overflow-auto hide-scrollbar">
+          <section class="panel bg-white/80 backdrop-blur-sm rounded-3xl border border-white shadow-xl shadow-slate-200/50 flex flex-col min-h-[600px] overflow-hidden">
             
-            <div class="panel-head flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-6 border-b border-slate-100">
-                <div class="w-full md:w-auto">
+              <div class="panel-head flex flex-col items-start justify-between gap-4 p-6 border-b border-slate-100">
+                <div class="w-full">
                     <h3 class="panel-title text-lg font-bold text-slate-800 mb-3">Jadwal & Absensi</h3>
                     <div class="panel-tabs inline-flex p-1 bg-slate-100 rounded-xl w-full md:w-auto">
                         <button class="tab-button active flex-1 md:flex-none px-6 py-2.5 text-sm font-semibold rounded-lg focus:outline-none" data-tab="privat">Privat</button>
@@ -75,20 +80,19 @@
                     </div>
                 </div>
 
-                <div class="relative w-full md:w-72">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    </span>
-                    <input 
-                        id="presensiSearch" 
-                        class="input w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all" 
-                        type="search" 
-                        placeholder="Cari siswa atau program..." 
-                    />
+                <div class="w-full">
+                    <label class="flex flex-col text-[10px] uppercase tracking-wide text-slate-400 font-semibold">
+                        Tanggal Presensi
+                        <input 
+                            id="presensiDate" 
+                            type="date" 
+                            class="mt-1 bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-600 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition" 
+                        />
+                    </label>
                 </div>
-            </div>
+              </div>
 
-            <div class="p-6 bg-slate-50/50 flex-1">
+              <div class="p-6 bg-slate-50/50 flex-1">
                 
                 <div id="jadwalPrivat" class="jadwal-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
                 
@@ -99,13 +103,17 @@
                 </div>
             </div>
 
-        </section>
-      </div>
-    </main>
+          </section>
+        </main>
 
+        <footer class="edukator-footer" id="edukatorFooterNav" aria-label="Navigasi Edukator"></footer>
+      </div>
+    </div>
+
+    <!-- Modal Materi untuk Privat -->
     <div id="materiModal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
-      
+
       <div class="modal-card bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden">
         <div class="modal-header flex items-center justify-between p-6 border-b border-slate-100">
           <div>
@@ -114,13 +122,13 @@
           </div>
           <button id="closeMateriModal" class="icon-button p-2 hover:bg-slate-100 rounded-full">✕</button>
         </div>
-        
+
         <div class="modal-body p-6">
           <label class="modal-label block text-sm font-medium text-slate-700 mb-2">Materi</label>
           <textarea id="materiInput" rows="4" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Contoh: Pecahan & latihan soal 1-10"></textarea>
           <div id="materiError" class="form-error text-xs text-rose-500 mt-2"></div>
         </div>
-        
+
         <div class="modal-actions flex justify-end gap-3 p-6 bg-slate-50 border-t border-slate-100">
           <button type="button" id="cancelMateriModal" class="ghost-button px-4 py-2 text-slate-500 hover:text-slate-700 font-medium">Batal</button>
           <button type="button" id="submitMateriModal" class="primary-button px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-lg shadow-emerald-200">Simpan & Absen</button>
@@ -128,7 +136,66 @@
       </div>
     </div>
 
+    <!-- Modal Absensi Kelas dengan List Siswa -->
+    <div id="kelasAbsenModal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+
+      <div class="modal-card bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden max-h-[90vh] flex flex-col">
+        <div class="modal-header flex items-center justify-between p-6 border-b border-slate-100">
+          <div>
+            <div class="modal-title text-lg font-bold text-slate-800">Absensi Kelas</div>
+            <div id="kelasNamaHeader" class="modal-subtitle text-xs text-slate-500 mt-1">Nama Kelas</div>
+          </div>
+          <button id="closeKelasModal" class="icon-button p-2 hover:bg-slate-100 rounded-full">✕</button>
+        </div>
+
+        <div class="modal-body p-6 overflow-y-auto flex-1">
+          <!-- Student List -->
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <label class="block text-sm font-semibold text-slate-700">Daftar Siswa</label>
+              <div class="flex gap-2">
+                <button type="button" id="selectAllHadir" class="text-xs px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 font-medium">Semua Hadir</button>
+                <button type="button" id="selectAllTidakHadir" class="text-xs px-3 py-1 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 font-medium">Semua Tidak Hadir</button>
+              </div>
+            </div>
+            <div id="kelasSiswaList" class="space-y-2 max-h-60 overflow-y-auto">
+              <!-- Student items will be rendered here -->
+              <div class="text-center py-4 text-slate-400 text-sm">Memuat data siswa...</div>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="bg-slate-50 rounded-xl p-4 mb-4">
+            <div class="flex justify-between text-sm">
+              <span class="text-slate-600">Total Siswa:</span>
+              <span id="totalSiswaCount" class="font-bold text-slate-800">0</span>
+            </div>
+            <div class="flex justify-between text-sm mt-1">
+              <span class="text-emerald-600">Hadir:</span>
+              <span id="hadirCount" class="font-bold text-emerald-600">0</span>
+            </div>
+            <div class="flex justify-between text-sm mt-1">
+              <span class="text-rose-600">Tidak Hadir:</span>
+              <span id="tidakHadirCount" class="font-bold text-rose-600">0</span>
+            </div>
+          </div>
+
+          <!-- Materi -->
+          <label class="modal-label block text-sm font-medium text-slate-700 mb-2">Materi</label>
+          <textarea id="kelasMateriInput" rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Contoh: Pecahan & latihan soal 1-10"></textarea>
+          <div id="kelasMateriError" class="form-error text-xs text-rose-500 mt-2"></div>
+        </div>
+
+        <div class="modal-actions flex justify-end gap-3 p-6 bg-slate-50 border-t border-slate-100">
+          <button type="button" id="cancelKelasModal" class="ghost-button px-4 py-2 text-slate-500 hover:text-slate-700 font-medium">Batal</button>
+          <button type="button" id="submitKelasModal" class="primary-button px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-lg shadow-emerald-200">Simpan & Absen</button>
+        </div>
+      </div>
+    </div>
+
     <script src="/js/sidebar.js"></script>
+    <script src="/js/edukator-footer.js"></script>
     <script src="/js/presensi-edukator.js"></script>
   </body>
 </html>

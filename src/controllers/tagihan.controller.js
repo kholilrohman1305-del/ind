@@ -1,4 +1,6 @@
 const tagihanService = require("../services/tagihan.service");
+const { ROLES } = require("../config/constants");
+const { parsePagination, paginatedResponse } = require("../utils/pagination");
 
 const list = async (req, res) => {
   try {
@@ -6,16 +8,17 @@ const list = async (req, res) => {
     let cabangId = null;
     let siswaId = null;
 
-    if (user.role === "admin_cabang") {
+    if (user.role === ROLES.ADMIN_CABANG) {
       cabangId = user.cabang_id;
-    } else if (user.role === "siswa") {
+    } else if (user.role === ROLES.SISWA) {
       siswaId = await tagihanService.getSiswaIdByUserId(user.id);
     }
 
     const month = req.query.month ? Number(req.query.month) : null;
     const year = req.query.year ? Number(req.query.year) : null;
-    const data = await tagihanService.listTagihan({ cabangId, siswaId, month, year });
-    res.json({ success: true, data });
+    const { page, limit, offset } = parsePagination(req.query);
+    const { rows, total } = await tagihanService.listTagihan({ cabangId, siswaId, month, year }, { limit, offset });
+    res.json(paginatedResponse(rows, total, { page, limit }));
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

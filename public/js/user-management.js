@@ -9,7 +9,8 @@
   };
 
   const fetchJson = async (url, options = {}) => {
-    const res = await fetch(url, { credentials: "same-origin", ...options });
+    const requester = window.api?.request || fetch;
+    const res = await requester(url, { credentials: "same-origin", ...options });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || data.success === false) {
       throw new Error(data.message || "Permintaan gagal.");

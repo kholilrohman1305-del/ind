@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const db = require("../db");
+const { ROLES } = require("../config/constants");
 
 const listAdminCabang = async () => {
   const [rows] = await db.query(
@@ -7,7 +8,7 @@ const listAdminCabang = async () => {
             c.id AS cabang_id, c.kode AS cabang_kode, c.nama AS cabang_nama
      FROM users u
      LEFT JOIN cabang c ON c.id = u.cabang_id
-     WHERE u.role = 'admin_cabang'
+     WHERE u.role = '${ROLES.ADMIN_CABANG}'
      ORDER BY c.nama ASC, u.email ASC`
   );
   return rows || [];
@@ -19,7 +20,7 @@ const ensureAdminCabang = async (userId) => {
     [userId]
   );
   const user = rows[0];
-  if (!user || user.role !== "admin_cabang") {
+  if (!user || user.role !== ROLES.ADMIN_CABANG) {
     throw new Error("User admin cabang tidak ditemukan.");
   }
   return user;

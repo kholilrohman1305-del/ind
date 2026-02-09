@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profil Siswa - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      body { font-family: 'Plus Jakarta Sans', sans-serif; }
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .card-hover { transition: all 0.3s ease; }
+      .card-hover:active { transform: scale(0.97); }
+    </style>
+  </head>
+
+  <body class="h-full" data-page="profil" data-view="siswa-mobile">
+    <div class="h-full w-full overflow-auto hide-scrollbar" style="background: linear-gradient(180deg, #0ea5e9 0%, #2563eb 100%);">
+      <div class="max-w-md mx-auto h-full flex flex-col bg-[#F5F7FA]">
+        <header class="topbar px-5 pt-5 pb-6" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <p class="text-white/80 text-sm">Profil Siswa</p>
+              <h1 class="text-white text-xl font-bold mt-1">Akun & Data Diri</h1>
+            </div>
+            <div class="edukator-header-actions">
+              <button class="relative p-2 bg-white/20 rounded-full card-hover" aria-label="Notifikasi">
+                <i class="fa-regular fa-bell text-white text-lg"></i>
+              </button>
+              <a href="/profil-siswa" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden card-hover" aria-label="Profil">
+                <i class="fa-solid fa-user text-white"></i>
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <main class="content flex-1 px-5 -mt-2 pb-24 overflow-auto hide-scrollbar space-y-4">
+          <form id="profilSiswaForm" class="space-y-4">
+            <section class="panel bg-white rounded-3xl p-5 shadow-lg">
+              <div class="flex items-center gap-2 mb-4 text-slate-700 font-bold">
+                <i class="fa-solid fa-id-card"></i>
+                <span>Data Diri</span>
+              </div>
+              <div class="space-y-3">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  Nama Lengkap
+                  <input id="profilNama" type="text" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" placeholder="Nama lengkap">
+                </label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  Kelas
+                  <input id="profilKelas" type="text" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" placeholder="Contoh: 10 IPA">
+                </label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  Jenjang
+                  <input id="profilJenjang" type="text" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" placeholder="Contoh: SMA">
+                </label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  Tanggal Lahir
+                  <input id="profilTanggalLahir" type="date" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none">
+                </label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  Nomor Telepon
+                  <input id="profilTelepon" type="text" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" placeholder="08xxxxxxxxxx">
+                </label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  Sekolah Asal
+                  <input id="profilSekolah" type="text" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" placeholder="Nama sekolah">
+                </label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  Alamat
+                  <textarea id="profilAlamat" rows="3" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" placeholder="Alamat lengkap"></textarea>
+                </label>
+              </div>
+            </section>
+
+            <section class="panel bg-white rounded-3xl p-5 shadow-lg">
+              <div class="flex items-center gap-2 mb-4 text-slate-700 font-bold">
+                <i class="fa-solid fa-envelope"></i>
+                <span>Email</span>
+              </div>
+              <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                Email Akun
+                <input id="profilEmail" type="email" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" placeholder="nama@email.com">
+              </label>
+            </section>
+
+            <section class="panel bg-white rounded-3xl p-5 shadow-lg">
+              <div class="flex items-center gap-2 mb-4 text-slate-700 font-bold">
+                <i class="fa-solid fa-lock"></i>
+                <span>Password</span>
+              </div>
+              <div class="space-y-3">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  Password Baru
+                  <input id="profilPassword" type="password" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" placeholder="Minimal 6 karakter">
+                </label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  Konfirmasi Password
+                  <input id="profilPasswordConfirm" type="password" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-400 outline-none" placeholder="Ulangi password baru">
+                </label>
+              </div>
+              <p class="text-xs text-slate-500 mt-3">Kosongkan jika tidak ingin mengubah password.</p>
+            </section>
+
+            <section class="panel bg-white rounded-3xl p-5 shadow-lg flex flex-col gap-3">
+              <button type="submit" id="profilSaveBtn" class="w-full py-3 rounded-2xl font-semibold text-white shadow-lg" style="background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);">
+                Simpan Perubahan
+              </button>
+              <button type="button" id="logoutBtn" class="w-full py-3 rounded-2xl font-semibold border border-slate-200 text-slate-500 hover:text-rose-600 hover:border-rose-200">
+                Logout
+              </button>
+            </section>
+          </form>
+        </main>
+
+        <footer class="siswa-footer" id="siswaFooterNav" aria-label="Navigasi Siswa"></footer>
+      </div>
+    </div>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/siswa-footer.js"></script>
+    <script src="/js/profil-siswa.js"></script>
+  </body>
+</html>

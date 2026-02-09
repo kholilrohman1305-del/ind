@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisis Sentimen - Dashboard ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Base Layout */
+        body { background-color: #f8fafc; color: #334155; }
+        
+        /* Modern Card Style (Light) */
+        .card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e1;
+        }
+
+        /* Clean Input */
+        .clean-input {
+            background: #f1f5f9;
+            border: 1px solid transparent;
+            color: #1e293b;
+            transition: all 0.2s;
+        }
+        .clean-input:focus {
+            background: #ffffff;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Table Styling */
+        .modern-table thead th {
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .modern-table tbody tr {
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .modern-table tbody tr:last-child { border-bottom: none; }
+        .modern-table td {
+            padding: 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* Sidebar Fix */
+        /* Pastikan sidebar fixed di kiri, main content geser */
+        .sidebar-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 16rem; /* w-64 */
+            z-index: 40;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body class="app h-screen flex flex-col overflow-hidden" data-page="analisis-sentimen">
+    <main class="content flex-1 overflow-y-auto p-4 md:p-8">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div class="flex items-center gap-4">
+                <button class="p-2 rounded-lg hover:bg-white shadow-sm md:hidden text-gray-600 transition" id="sidebarToggle">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900">Analisis Sentimen</h1>
+                    <p class="text-slate-500 text-sm">Monitoring kepuasan siswa secara real-time</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchFeedback" class="clean-input pl-10 pr-4 py-2 rounded-lg text-sm w-64 focus:outline-none" placeholder="Cari feedback...">
+                </div>
+                <select id="filterPeriode" class="clean-input px-3 py-2 rounded-lg text-sm font-medium cursor-pointer">
+                    <option value="this_month">Bulan Ini</option>
+                    <option value="last_month">Bulan Lalu</option>
+                    <option value="this_year">Tahun Ini</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="space-y-6">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 animate-fade-in">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Ringkasan Feedback</h2>
+                    <p class="text-slate-500 text-sm">Monitoring kepuasan siswa secara real-time.</p>
+                </div>
+                <div class="flex gap-2">
+                    <select id="filterPeriodeSummary" class="clean-input px-3 py-2 rounded-lg text-sm font-medium cursor-pointer">
+                        <option value="this_month">Bulan Ini</option>
+                        <option value="last_month">Bulan Lalu</option>
+                        <option value="this_year">Tahun Ini</option>
+                    </select>
+                    <button class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-3 py-2 rounded-lg text-sm font-medium shadow-sm transition-all">
+                        <i class="fa-solid fa-download mr-1"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+                <div class="card p-5 rounded-xl border-l-4 border-l-blue-500 relative">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Feedback</p>
+                            <h3 class="text-3xl font-bold text-slate-800 mt-1" id="totalFeedback">0</h3>
+                        </div>
+                        <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
+                            <i class="fa-solid fa-comments text-lg"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500">Semua feedback masuk</p>
+                </div>
+
+                <div class="card p-5 rounded-xl border-l-4 border-l-emerald-500 relative">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Positif</p>
+                            <h3 class="text-3xl font-bold text-slate-800 mt-1" id="positiveCount">0</h3>
+                        </div>
+                        <div class="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                            <i class="fa-solid fa-face-smile text-lg"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500">Sentimen memuaskan</p>
+                </div>
+
+                <div class="card p-5 rounded-xl border-l-4 border-l-slate-400 relative">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Netral</p>
+                            <h3 class="text-3xl font-bold text-slate-800 mt-1" id="neutralCount">0</h3>
+                        </div>
+                        <div class="p-2 bg-slate-100 rounded-lg text-slate-500">
+                            <i class="fa-solid fa-face-meh text-lg"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500">Perlu evaluasi</p>
+                </div>
+
+                <div class="card p-5 rounded-xl border-l-4 border-l-rose-500 relative">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Negatif</p>
+                            <h3 class="text-3xl font-bold text-slate-800 mt-1" id="negativeCount">0</h3>
+                        </div>
+                        <div class="p-2 bg-rose-50 rounded-lg text-rose-600">
+                            <i class="fa-solid fa-face-frown text-lg"></i>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500">Butuh penanganan</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="card p-6 rounded-xl lg:col-span-1 flex flex-col">
+                    <h4 class="text-base font-bold text-slate-800 mb-4">Distribusi Sentimen</h4>
+                    <div class="relative flex-1 min-h-[250px] flex items-center justify-center">
+                        <canvas id="sentimentChart"></canvas>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div class="text-center">
+                                <span class="text-2xl font-bold text-slate-800" id="chartTotal">100%</span>
+                                <span class="block text-xs text-slate-400">Total Data</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6 rounded-xl lg:col-span-2 flex flex-col">
+                    <h4 class="text-base font-bold text-slate-800 mb-4">Rata-rata Rating Kategori</h4>
+                    <div class="relative flex-1 min-h-[250px]">
+                        <canvas id="ratingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card rounded-xl overflow-hidden animate-fade-in" style="animation-delay: 0.2s;">
+                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-white">
+                    <h4 class="font-bold text-slate-800 text-lg">Feedback Terbaru</h4>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full modern-table">
+                        <thead>
+                            <tr>
+                                <th>Siswa</th>
+                                <th>Program</th>
+                                <th>Rating</th>
+                                <th>Sentimen</th>
+                                <th>Komentar</th>
+                                <th>Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedbackTableBody" class="bg-white">
+                            <tr>
+                                <td colspan="6" class="text-center py-12">
+                                    <div class="flex flex-col items-center justify-center text-slate-400">
+                                        <i class="fa-solid fa-circle-notch fa-spin text-2xl mb-2 text-brand-500"></i>
+                                        <span class="text-sm">Memuat data terbaru...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="p-4 border-t border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <span class="text-xs text-slate-500">Menampilkan 10 data terbaru</span>
+                    <div class="flex gap-1">
+                        <button class="px-3 py-1 rounded bg-white border border-slate-200 text-slate-400 text-xs hover:text-slate-600 disabled:opacity-50" disabled>Previous</button>
+                        <button class="px-3 py-1 rounded bg-white border border-slate-200 text-slate-600 text-xs hover:text-slate-800">Next</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/analisis-sentimen.js"></script>
+</body>
+</html>

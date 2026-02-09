@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analisa Cabang - ILHAMI</title>
+  <link rel="stylesheet" href="/css/tailwind.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { background-color: #f8fafc; color: #334155; }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      transition: all 0.2s ease;
+    }
+    .card:hover { box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08); }
+    .clean-input {
+      background: #f1f5f9;
+      border: 1px solid transparent;
+      color: #1e293b;
+      transition: all 0.2s;
+    }
+    .clean-input:focus {
+      background: #ffffff;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      outline: none;
+    }
+  </style>
+</head>
+<body class="app h-screen flex flex-col overflow-hidden" data-page="analisa-cabang">
+  <main class="content flex-1 overflow-y-auto p-4 md:p-8">
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div class="flex items-center gap-4">
+        <button class="p-2 rounded-lg hover:bg-white shadow-sm md:hidden text-gray-600 transition" id="sidebarToggle">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900">Analisa Cabang</h1>
+          <p class="text-slate-500 text-sm">Rekapitulasi performa cabang dan proyeksi tren.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <select id="filterCabang" class="clean-input px-3 py-2 rounded-lg text-sm font-medium cursor-pointer">
+          <option value="">Semua Cabang</option>
+        </select>
+        <select id="filterMonth" class="clean-input px-3 py-2 rounded-lg text-sm font-medium cursor-pointer"></select>
+        <select id="filterYear" class="clean-input px-3 py-2 rounded-lg text-sm font-medium cursor-pointer"></select>
+        <button id="applyFilter" class="px-4 py-2 rounded-lg bg-brand-600 text-white text-sm font-semibold shadow hover:bg-brand-500 transition">
+          Terapkan
+        </button>
+      </div>
+    </header>
+
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="card p-5 rounded-xl border-l-4 border-l-blue-500">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Siswa</p>
+        <h3 class="text-2xl font-bold text-slate-800 mt-2" id="totalSiswa">0</h3>
+        <p class="text-xs text-slate-500">Seluruh cabang</p>
+      </div>
+      <div class="card p-5 rounded-xl border-l-4 border-l-emerald-500">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Siswa Aktif</p>
+        <h3 class="text-2xl font-bold text-slate-800 mt-2" id="siswaAktif">0</h3>
+        <p class="text-xs text-slate-500" id="siswaAktifBreakdown">Privat 0 · Kelas 0</p>
+      </div>
+      <div class="card p-5 rounded-xl border-l-4 border-l-amber-500">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Siswa Baru</p>
+        <h3 class="text-2xl font-bold text-slate-800 mt-2" id="siswaBaru">0</h3>
+        <p class="text-xs text-slate-500">Periode terpilih</p>
+      </div>
+      <div class="card p-5 rounded-xl border-l-4 border-l-indigo-500">
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Edukator</p>
+        <h3 class="text-2xl font-bold text-slate-800 mt-2" id="totalEdukator">0</h3>
+        <p class="text-xs text-slate-500">Aktif</p>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+      <div class="card p-6 rounded-xl lg:col-span-1">
+        <h4 class="font-bold text-slate-800 mb-3">Keuangan Periode</h4>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Pendapatan</span>
+            <span class="font-semibold text-emerald-600" id="pendapatan">Rp0</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Pengeluaran</span>
+            <span class="font-semibold text-rose-500" id="pengeluaran">Rp0</span>
+          </div>
+          <div class="flex justify-between border-t pt-3">
+            <span class="text-slate-600 font-semibold">Selisih</span>
+            <span class="font-bold" id="selisih">Rp0</span>
+          </div>
+        </div>
+      </div>
+      <div class="card p-6 rounded-xl lg:col-span-2">
+        <h4 class="font-bold text-slate-800 mb-2">Proyeksi Pendapatan & Pengeluaran (3 Bulan)</h4>
+        <p class="text-xs text-slate-500 mb-3">Algoritma: Holt-Winters (musiman) dengan fallback Holt Linear untuk data pendek.</p>
+        <div class="relative min-h-[240px]">
+          <canvas id="forecastChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="card rounded-xl overflow-hidden mt-6">
+      <div class="p-6 border-b border-slate-100">
+        <h4 class="font-bold text-slate-800 text-lg">Rekap Cabang</h4>
+        <p class="text-xs text-slate-500 mt-1">Data periode terpilih per cabang.</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] tracking-wider">
+            <tr>
+              <th class="px-4 py-3 text-left">Cabang</th>
+              <th class="px-4 py-3 text-left">Total Siswa</th>
+              <th class="px-4 py-3 text-left">Siswa Aktif</th>
+              <th class="px-4 py-3 text-left">Privat</th>
+              <th class="px-4 py-3 text-left">Kelas</th>
+              <th class="px-4 py-3 text-left">Siswa Baru</th>
+              <th class="px-4 py-3 text-left">Edukator</th>
+              <th class="px-4 py-3 text-left">Pendapatan</th>
+              <th class="px-4 py-3 text-left">Pengeluaran</th>
+              <th class="px-4 py-3 text-left">Selisih</th>
+            </tr>
+          </thead>
+          <tbody id="cabangTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/sidebar.js"></script>
+  <script src="/js/analisa-cabang.js"></script>
+</body>
+</html>

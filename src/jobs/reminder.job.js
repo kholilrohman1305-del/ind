@@ -1,26 +1,67 @@
-const { createTagihanReminders } = require("../services/notifikasi.service");
+const notifikasiService = require("../services/notifikasi.service");
 
-const startReminderJob = () => {
-  const fallbackMs = 6 * 60 * 60 * 1000;
-  const intervalRaw = Number(process.env.REMINDER_INTERVAL_MS || fallbackMs);
-  const intervalMs = Number.isNaN(intervalRaw) || intervalRaw < 60 * 1000 ? fallbackMs : intervalRaw;
+const runReminderJob = async ({ silent = false } = {}) => {
+  if (!silent) {
+    console.log("[Job] Memulai pengecekan pengingat tagihan...");
+  }
 
-  const run = async () => {
-    try {
-      const result = await createTagihanReminders();
-      if (result?.total) {
-        console.log(`Reminder job: ${result.total} notifikasi dibuat.`);
+  try {
+    // 0. Pengingat jadwal H-0 (untuk siswa & edukator)
+    const jadwalResult = await notifikasiService.createJadwalRemindersH0();
+    if (!silent) {
+      if (jadwalResult && jadwalResult.total > 0) {
+        console.log(`[Job] Terkirim ${jadwalResult.total} pengingat jadwal H-0.`);
+      } else {
+        console.log("[Job] Tidak ada jadwal H-0 yang perlu diingatkan.");
       }
-    } catch (err) {
+    }
+
+    // 1. Pengingat tagihan mendekati jatuh tempo (H-3 sampai H-0)
+    const result = await notifikasiService.createTagihanReminders();
+    if (!silent) {
+      if (result && result.total > 0) {
+        console.log(`[Job] Terkirim ${result.total} pengingat tagihan.`);
+      } else {
+        console.log("[Job] Tidak ada tagihan yang perlu diingatkan hari ini.");
+      }
+    }
+
+    // 2. Update status tagihan overdue dan buat notifikasi
+    const overdueResult = await notifikasiService.updateOverdueTagihan();
+    if (!silent) {
+      if (overdueResult.updated > 0 || overdueResult.notified > 0) {
+        console.log(`[Job] Tagihan overdue: ${overdueResult.updated} diupdate, ${overdueResult.notified} notifikasi terkirim.`);
+      }
+    }
+  } catch (err) {
+    if (!silent) {
       console.error("Reminder job error:", err.message);
     }
+  }
+};
+
+const startReminderJob = () => {
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+
+  const scheduleDailyAt = (hour, minute, task) => {
+    const now = new Date();
+    const next = new Date();
+    next.setHours(hour, minute, 0, 0);
+    if (next <= now) {
+      next.setDate(next.getDate() + 1);
+    }
+    const delay = next.getTime() - now.getTime();
+    setTimeout(() => {
+      task();
+      setInterval(task, ONE_DAY);
+    }, delay);
   };
 
-  run();
-  const timer = setInterval(run, intervalMs);
-  if (typeof timer.unref === "function") {
-    timer.unref();
-  }
+  // Initial check without logging so server startup stays clean
+  void runReminderJob({ silent: true });
+
+  // Schedule daily at 05:00
+  scheduleDailyAt(5, 0, () => void runReminderJob());
 };
 
 module.exports = { startReminderJob };

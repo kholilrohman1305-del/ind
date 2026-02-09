@@ -1,4 +1,5 @@
 const db = require("../db");
+const { ROLES, ENROLLMENT_STATUS, JADWAL_STATUS, TIPE_LES } = require("../config/constants");
 
 const getSiswaIdByUserId = async (userId) => {
   const [rows] = await db.query("SELECT id FROM siswa WHERE user_id = ? LIMIT 1", [userId]);
@@ -10,9 +11,10 @@ const getEdukatorIdByUserId = async (userId) => {
   return rows[0]?.id || null;
 };
 
-const listPrivatJadwal = async ({ cabangId, siswaId, edukatorId }) => {
+const listPrivatJadwal = async ({ cabangId, siswaId, edukatorId }, { limit, offset } = {}) => {
   const params = [];
-  let where = "WHERE j.tipe_les = 'privat'";
+  // Include all tipe_les except 'kelas'
+  let where = `WHERE j.tipe_les != '${TIPE_LES.KELAS}'`;
 
   if (cabangId) {
     where += " AND j.cabang_id = ?";
@@ -27,8 +29,15 @@ const listPrivatJadwal = async ({ cabangId, siswaId, edukatorId }) => {
     params.push(edukatorId);
   }
 
-  const [rows] = await db.query(
-    `SELECT j.id, j.cabang_id, j.enrollment_id, j.program_id, j.edukator_id, j.mapel_id,
+  const [[{ total }]] = await db.query(
+    `SELECT COUNT(*) AS total
+     FROM jadwal j
+     LEFT JOIN enrollment en ON en.id = j.enrollment_id
+     ${where}`,
+    [...params]
+  );
+
+  let dataQuery = `SELECT j.id, j.cabang_id, j.enrollment_id, j.program_id, j.edukator_id, j.mapel_id,
             j.tipe_les, j.tanggal, j.jam_mulai, j.jam_selesai, j.status_jadwal, j.created_at,
             s.nama AS siswa_nama, p.nama AS program_nama, e.nama AS edukator_nama,
             m.nama AS mapel_nama, p.jumlah_pertemuan,
@@ -41,15 +50,20 @@ const listPrivatJadwal = async ({ cabangId, siswaId, edukatorId }) => {
      LEFT JOIN edukator e ON e.id = j.edukator_id
      LEFT JOIN mapel m ON m.id = j.mapel_id
      ${where}
-     ORDER BY j.tanggal DESC, j.jam_mulai ASC`,
-    params
-  );
-  return rows;
+     ORDER BY j.tanggal DESC, j.jam_mulai ASC`;
+  const dataParams = [...params];
+  if (limit !== undefined) {
+    dataQuery += " LIMIT ? OFFSET ?";
+    dataParams.push(limit, offset || 0);
+  }
+  const [rows] = await db.query(dataQuery, dataParams);
+  return { rows, total };
 };
 
 const listPrivatSummary = async (cabangId) => {
   const params = [];
-  let where = "WHERE p.tipe_les = 'privat'";
+  // Include all tipe_les except 'kelas'
+  let where = `WHERE p.tipe_les != '${TIPE_LES.KELAS}'`;
   if (cabangId) {
     where += " AND s.cabang_id = ?";
     params.push(cabangId);
@@ -57,9 +71,10 @@ const listPrivatSummary = async (cabangId) => {
 
   const [rows] = await db.query(
     `SELECT en.id AS enrollment_id, s.id AS siswa_id, s.nama AS siswa_nama,
-            p.id AS program_id, p.nama AS program_nama, p.jumlah_pertemuan,
+            s.jenjang, p.id AS program_id, p.nama AS program_nama,
+            p.jumlah_pertemuan, p.tipe_les,
             COUNT(j.id) AS total_jadwal,
-            SUM(CASE WHEN j.status_jadwal = 'completed' THEN 1 ELSE 0 END) AS completed_jadwal
+            SUM(CASE WHEN j.status_jadwal = '${JADWAL_STATUS.COMPLETED}' THEN 1 ELSE 0 END) AS completed_jadwal
      FROM enrollment en
      JOIN siswa s ON s.id = en.siswa_id
      JOIN program p ON p.id = en.program_id
@@ -67,7 +82,7 @@ const listPrivatSummary = async (cabangId) => {
      ${where}
      GROUP BY en.id
      HAVING COUNT(j.id) > 0
-     ORDER BY s.nama ASC`,
+     ORDER BY p.tipe_les ASC, s.nama ASC`,
     params
   );
   return rows;
@@ -99,7 +114,6 @@ const listPrivatSlots = async (enrollmentId, cabangId) => {
   );
   return rows;
 };
-
 
 const listKelasGroups = async (cabangId) => {
   const params = [];
@@ -133,7 +147,7 @@ const listKelasGroups = async (cabangId) => {
 const listKelasSiswaByPrograms = async (programIds, cabangId) => {
   if (!programIds || !programIds.length) return [];
   const params = [programIds];
-  let where = "WHERE en.program_id IN (?) AND en.status_enrollment = 'aktif'";
+  let where = `WHERE en.program_id IN (?) AND en.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'`;
   if (cabangId) {
     where += " AND s.cabang_id = ?";
     params.push(cabangId);
@@ -213,7 +227,7 @@ const listKelasSummary = async (cabangId) => {
      FROM kelas k
      LEFT JOIN kelas_program kp ON kp.kelas_id = k.id
      LEFT JOIN program p ON p.id = kp.program_id
-     LEFT JOIN jadwal j ON j.kelas_id = k.id AND j.tipe_les = 'kelas'
+     LEFT JOIN jadwal j ON j.kelas_id = k.id AND j.tipe_les = '${TIPE_LES.KELAS}'
      ${where}
      GROUP BY k.id
      HAVING COUNT(j.id) > 0
@@ -225,7 +239,7 @@ const listKelasSummary = async (cabangId) => {
 
 const listKelasSlots = async (kelasId, cabangId) => {
   const params = [kelasId];
-  let where = "WHERE j.kelas_id = ? AND j.tipe_les = 'kelas'";
+  let where = `WHERE j.kelas_id = ? AND j.tipe_les = '${TIPE_LES.KELAS}'`;
   if (cabangId) {
     where += " AND k.cabang_id = ?";
     params.push(cabangId);
@@ -247,9 +261,9 @@ const listKelasSlots = async (kelasId, cabangId) => {
   return rows;
 };
 
-const listKelasJadwal = async ({ cabangId, siswaId, edukatorId }) => {
+const listKelasJadwal = async ({ cabangId, siswaId, edukatorId }, { limit, offset } = {}) => {
   const params = [];
-  let where = "WHERE j.tipe_les = 'kelas'";
+  let where = `WHERE j.tipe_les = '${TIPE_LES.KELAS}'`;
 
   if (cabangId) {
     where += " AND j.cabang_id = ?";
@@ -262,6 +276,7 @@ const listKelasJadwal = async ({ cabangId, siswaId, edukatorId }) => {
 
   let siswaJoin = "";
   let siswaSelect = "";
+  const countSiswaJoin = siswaId ? `JOIN jadwal_kelas_siswa jks ON jks.jadwal_id = j.id JOIN enrollment en ON en.id = jks.enrollment_id AND en.siswa_id = ?` : "";
   if (siswaId) {
     siswaJoin = `
       JOIN jadwal_kelas_siswa jks ON jks.jadwal_id = j.id
@@ -272,8 +287,30 @@ const listKelasJadwal = async ({ cabangId, siswaId, edukatorId }) => {
     params.push(siswaId);
   }
 
-  const [rows] = await db.query(
-    `SELECT j.id, j.cabang_id, j.kelas_id, j.edukator_id, j.mapel_id, j.tipe_les,
+  const countParams = [];
+  let countWhere = `WHERE j.tipe_les = '${TIPE_LES.KELAS}'`;
+  if (cabangId) {
+    countWhere += " AND j.cabang_id = ?";
+    countParams.push(cabangId);
+  }
+  if (edukatorId) {
+    countWhere += " AND j.edukator_id = ?";
+    countParams.push(edukatorId);
+  }
+  if (siswaId) {
+    countParams.push(siswaId);
+  }
+
+  const [[{ total }]] = await db.query(
+    `SELECT COUNT(*) AS total
+     FROM jadwal j
+     JOIN kelas k ON k.id = j.kelas_id
+     ${countSiswaJoin}
+     ${countWhere}`,
+    countParams
+  );
+
+  let dataQuery = `SELECT j.id, j.cabang_id, j.kelas_id, j.edukator_id, j.mapel_id, j.tipe_les,
             j.tanggal, j.jam_mulai, j.jam_selesai, j.status_jadwal, j.created_at,
             k.nama AS kelas_nama, e.nama AS edukator_nama, m.nama AS mapel_nama
             ${siswaSelect}
@@ -283,35 +320,40 @@ const listKelasJadwal = async ({ cabangId, siswaId, edukatorId }) => {
      LEFT JOIN mapel m ON m.id = j.mapel_id
      ${siswaJoin}
      ${where}
-     ORDER BY j.tanggal DESC, j.jam_mulai ASC`,
-    params
-  );
-  return rows;
+     ORDER BY j.tanggal DESC, j.jam_mulai ASC`;
+  const dataParams = [...params];
+  if (limit !== undefined) {
+    dataQuery += " LIMIT ? OFFSET ?";
+    dataParams.push(limit, offset || 0);
+  }
+  const [rows] = await db.query(dataQuery, dataParams);
+  return { rows, total };
 };
 
-const listJadwal = async ({ tipe, role, cabangId, userId }) => {
+const listJadwal = async ({ tipe, role, cabangId, userId }, { limit, offset } = {}) => {
   let siswaId = null;
   let edukatorId = null;
 
-  if (role === "siswa") {
+  if (role === ROLES.SISWA) {
     siswaId = await getSiswaIdByUserId(userId);
-    if (!siswaId) return [];
+    if (!siswaId) return { rows: [], total: 0 };
   }
 
-  if (role === "edukator") {
+  if (role === ROLES.EDUKATOR) {
     edukatorId = await getEdukatorIdByUserId(userId);
-    if (!edukatorId) return [];
+    if (!edukatorId) return { rows: [], total: 0 };
   }
 
-  if (tipe === "kelas") {
-    return listKelasJadwal({ cabangId, siswaId, edukatorId });
+  if (tipe === TIPE_LES.KELAS) {
+    return listKelasJadwal({ cabangId, siswaId, edukatorId }, { limit, offset });
   }
-  return listPrivatJadwal({ cabangId, siswaId, edukatorId });
+  return listPrivatJadwal({ cabangId, siswaId, edukatorId }, { limit, offset });
 };
 
 const listPrivatSiswa = async (cabangId) => {
   const params = [];
-  let where = "WHERE en.status_enrollment = 'aktif' AND p.tipe_les = 'privat'";
+  // Include all tipe_les except 'kelas' (which uses different workflow)
+  let where = `WHERE en.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}' AND p.tipe_les != '${TIPE_LES.KELAS}'`;
   if (cabangId) {
     where += " AND s.cabang_id = ?";
     params.push(cabangId);
@@ -319,12 +361,13 @@ const listPrivatSiswa = async (cabangId) => {
 
   const [rows] = await db.query(
     `SELECT en.id AS enrollment_id, s.id AS siswa_id, s.nama AS siswa_nama,
-            s.kelas, p.id AS program_id, p.nama AS program_nama, p.jumlah_pertemuan
+            s.kelas, s.jenjang, p.id AS program_id, p.nama AS program_nama,
+            p.jumlah_pertemuan, p.tipe_les
      FROM enrollment en
      JOIN siswa s ON s.id = en.siswa_id
      JOIN program p ON p.id = en.program_id
      ${where}
-     ORDER BY s.nama ASC`,
+     ORDER BY p.tipe_les ASC, s.nama ASC`,
     params
   );
   return rows;
@@ -332,7 +375,7 @@ const listPrivatSiswa = async (cabangId) => {
 
 const listKelasSiswa = async (kelasId, cabangId) => {
   const params = [kelasId];
-  let where = "WHERE kp.kelas_id = ? AND en.status_enrollment = 'aktif'";
+  let where = `WHERE kp.kelas_id = ? AND en.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'`;
   if (cabangId) {
     where += " AND s.cabang_id = ?";
     params.push(cabangId);
@@ -369,8 +412,8 @@ const createPrivatJadwal = async ({ enrollment_id, slots }, cabangId) => {
     if (!enrollment) {
       throw new Error("Enrollment tidak ditemukan.");
     }
-    if (enrollment.tipe_les !== "privat") {
-      throw new Error("Enrollment bukan program privat.");
+    if (enrollment.tipe_les === TIPE_LES.KELAS) {
+      throw new Error("Enrollment tipe kelas gunakan menu jadwal kelas.");
     }
     if (cabangId && enrollment.cabang_id !== cabangId) {
       throw new Error("Cabang tidak sesuai.");
@@ -430,11 +473,11 @@ const createPrivatJadwal = async ({ enrollment_id, slots }, cabangId) => {
         enrollment.program_id,
         Number(slot.edukator_id),
         Number(slot.mapel_id),
-        "privat",
+        TIPE_LES.PRIVAT,
         slot.tanggal || null,
         slot.jam_mulai || null,
         slot.jam_selesai || null,
-        "scheduled",
+        JADWAL_STATUS.SCHEDULED,
       ];
     });
 
@@ -444,6 +487,13 @@ const createPrivatJadwal = async ({ enrollment_id, slots }, cabangId) => {
          tanggal, jam_mulai, jam_selesai, status_jadwal)
        VALUES ?`,
       [values]
+    );
+
+    // Update enrollment status dari 'menunggu_jadwal' ke 'aktif' setelah jadwal dibuat
+    await conn.query(
+      `UPDATE enrollment SET status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'
+       WHERE id = ? AND status_enrollment = '${ENROLLMENT_STATUS.MENUNGGU_JADWAL}'`,
+      [enrollment_id]
     );
 
     await conn.commit();
@@ -562,7 +612,7 @@ const createKelasJadwal = async (
       if (programRows.length !== program_ids.length) {
         throw new Error("Program kelas tidak valid.");
       }
-      if (programRows.some((row) => row.tipe_les !== "kelas")) {
+      if (programRows.some((row) => row.tipe_les !== TIPE_LES.KELAS)) {
         throw new Error("Program harus tipe kelas.");
       }
       if (cabangId && programRows.some((row) => row.cabang_id !== cabangId)) {
@@ -576,7 +626,7 @@ const createKelasJadwal = async (
     if (!programs.length) {
       throw new Error("Program kelas belum diatur.");
     }
-    if (programs.some((row) => row.tipe_les !== "kelas")) {
+    if (programs.some((row) => row.tipe_les !== TIPE_LES.KELAS)) {
       throw new Error("Program harus tipe kelas.");
     }
     if (cabangId && programs.some((row) => row.cabang_id !== cabangId)) {
@@ -646,11 +696,11 @@ const createKelasJadwal = async (
       primaryProgramId,
       Number(edukator_id),
       Number(slot.mapel_id),
-      "kelas",
+      TIPE_LES.KELAS,
       slot.tanggal,
       slot.jam_mulai || null,
       slot.jam_selesai || null,
-      "scheduled",
+      JADWAL_STATUS.SCHEDULED,
       kelasId,
     ]);
 
@@ -665,7 +715,7 @@ const createKelasJadwal = async (
     const [jadwalRows] = await conn.query(
       `SELECT id, tanggal, jam_mulai, jam_selesai
        FROM jadwal
-       WHERE kelas_id = ? AND tipe_les = 'kelas'
+       WHERE kelas_id = ? AND tipe_les = '${TIPE_LES.KELAS}'
          AND tanggal >= ? AND tanggal <= ?
        ORDER BY tanggal ASC, jam_mulai ASC, id ASC`,
       [kelasId, tanggal_mulai, tanggal_akhir]
@@ -676,11 +726,12 @@ const createKelasJadwal = async (
       dayIndex: new Date(`${row.tanggal}T00:00:00`).getDay(),
     }));
 
+    // Include both 'aktif' and 'menunggu_jadwal' enrollments
     const [enrollments] = await conn.query(
-      `SELECT en.id AS enrollment_id, en.program_id, p.jumlah_pertemuan
+      `SELECT en.id AS enrollment_id, en.program_id, p.jumlah_pertemuan, en.status_enrollment
        FROM enrollment en
        JOIN program p ON p.id = en.program_id
-       WHERE en.status_enrollment = 'aktif'
+       WHERE en.status_enrollment IN ('${ENROLLMENT_STATUS.AKTIF}', '${ENROLLMENT_STATUS.MENUNGGU_JADWAL}')
          AND en.program_id IN (?)`,
       [programs.map((p) => p.id)]
     );
@@ -710,6 +761,18 @@ const createKelasJadwal = async (
          VALUES ?`,
         [allocationValues]
       );
+
+      // Update enrollment status dari 'menunggu_jadwal' ke 'aktif' setelah jadwal dialokasikan
+      const enrollmentIds = enrollments
+        .filter((e) => e.status_enrollment === ENROLLMENT_STATUS.MENUNGGU_JADWAL)
+        .map((e) => e.enrollment_id);
+      if (enrollmentIds.length > 0) {
+        await conn.query(
+          `UPDATE enrollment SET status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'
+           WHERE id IN (?) AND status_enrollment = '${ENROLLMENT_STATUS.MENUNGGU_JADWAL}'`,
+          [enrollmentIds]
+        );
+      }
     }
 
     await conn.commit();
@@ -811,7 +874,7 @@ const deleteKelasByKelas = async (kelasId, cabangId) => {
   if (cabangId && kelas.cabang_id !== cabangId) {
     throw new Error("Cabang tidak sesuai.");
   }
-  await db.query("DELETE FROM jadwal WHERE kelas_id = ? AND tipe_les = 'kelas'", [kelasId]);
+  await db.query(`DELETE FROM jadwal WHERE kelas_id = ? AND tipe_les = '${TIPE_LES.KELAS}'`, [kelasId]);
   return { id: kelasId };
 };
 

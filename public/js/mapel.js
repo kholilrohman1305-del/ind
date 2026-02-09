@@ -1,8 +1,16 @@
-﻿(() => {
+(() => {
+  const requester = window.api?.request || fetch;
+  const unwrapData = (payload) => {
+    if (payload && typeof payload === "object" && "data" in payload) {
+      return payload.data;
+    }
+    return payload;
+  };
   // --- DOM Elements ---
   const rowsEl = document.getElementById("mapelRows");
   const emptyEl = document.getElementById("mapelEmpty");
-  const searchInput = document.getElementById("searchMapel"); // Input Search Baru
+  const pagerEl = document.getElementById("mapelPager"); // Container Paginasi Baru
+  const searchInput = document.getElementById("searchMapel");
   const addButton = document.getElementById("addMapel");
   
   // Modal Elements
@@ -22,11 +30,14 @@
   // State
   const state = {
     rows: [],
+    filteredRows: [],
     searchQuery: "",
     mode: "create",
+    page: 1,      // Halaman aktif
+    pageSize: 10  // Item per halaman
   };
 
-  // --- Helpers: Color & Avatar Generator ---
+  // --- Helpers: Avatar Generator (Gradient Style) ---
   const stringToHue = (str) => {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
@@ -35,104 +46,178 @@
     return Math.abs(hash % 360);
   };
 
-  const getColorFromName = (name) => {
+  const avatarGradient = (name) => {
     const hue = stringToHue(name || "Mapel");
-    // Generate warna pastel yang enak dilihat
-    return {
-        bg: `hsl(${hue}, 85%, 96%)`,     // Background sangat muda
-        border: `hsl(${hue}, 70%, 90%)`, // Border sedikit lebih tua
-        icon: `hsl(${hue}, 70%, 50%)`,   // Warna icon vibrant
-        text: `hsl(${hue}, 60%, 40%)`    // Warna teks gelap readable
-    };
+    return `linear-gradient(135deg, hsl(${hue}, 70%, 60%), hsl(${(hue + 40) % 360}, 80%, 50%))`;
+  };
+
+  const initials = (name) => {
+    if (!name) return "MP";
+    return name.substring(0, 2).toUpperCase();
   };
 
   // --- Filter Logic ---
   const applyFilter = () => {
     const query = state.searchQuery.toLowerCase();
-    return state.rows.filter(item => {
+    state.filteredRows = state.rows.filter(item => {
         const nama = (item.nama || "").toLowerCase();
         const deskripsi = (item.deskripsi || "").toLowerCase();
         return nama.includes(query) || deskripsi.includes(query);
     });
+    
+    // Reset ke halaman 1 setiap kali filter berubah
+    state.page = 1;
+    render();
   };
 
-  // --- Render Function ---
+  // --- Render Pager ---
+  const renderPager = () => {
+    if (!pagerEl) return;
+    pagerEl.innerHTML = "";
+
+    const totalPages = Math.ceil(state.filteredRows.length / state.pageSize);
+    
+    // Sembunyikan pager jika data kosong atau hanya 1 halaman
+    if (totalPages <= 1) {
+        pagerEl.classList.add("hidden");
+        return;
+    }
+    pagerEl.classList.remove("hidden");
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "flex justify-between items-center w-full";
+    
+    wrapper.innerHTML = `
+      <span class="text-xs text-gray-500 font-medium">
+        Halaman ${state.page} dari ${totalPages}
+      </span>
+      <div class="flex gap-2">
+         <button class="w-8 h-8 flex items-center justify-center rounded-lg border ${state.page === 1 ? 'bg-gray-50 text-gray-300 cursor-not-allowed' : 'bg-white text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200'} transition" 
+            type="button" data-action="prev" ${state.page === 1 ? 'disabled' : ''}>
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+         </button>
+         <button class="w-8 h-8 flex items-center justify-center rounded-lg border ${state.page === totalPages ? 'bg-gray-50 text-gray-300 cursor-not-allowed' : 'bg-white text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200'} transition" 
+            type="button" data-action="next" ${state.page === totalPages ? 'disabled' : ''}>
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+         </button>
+      </div>
+    `;
+
+    // Event Listener Pager
+    wrapper.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (btn.disabled) return;
+            if (btn.dataset.action === "prev") state.page--;
+            if (btn.dataset.action === "next") state.page++;
+            render();
+        });
+    });
+
+    pagerEl.appendChild(wrapper);
+  };
+
+  // --- Render Table ---
   const render = () => {
     if (!rowsEl) return;
     rowsEl.innerHTML = "";
 
-    const filteredData = applyFilter();
+    // Calculate Pagination
+    const totalPages = Math.ceil(state.filteredRows.length / state.pageSize);
+    if (state.page > totalPages && totalPages > 0) state.page = totalPages;
+    
+    const start = (state.page - 1) * state.pageSize;
+    const end = start + state.pageSize;
+    const pageData = state.filteredRows.slice(start, end);
 
     // Handle Empty State
-    if (!filteredData.length) {
+    const tableWrapper = rowsEl.closest('.bg-white'); // Wrapper tabel utama
+    if (!pageData.length) {
       if (emptyEl) emptyEl.classList.remove("hidden");
+      if (tableWrapper) tableWrapper.classList.add("hidden");
+      if (pagerEl) pagerEl.classList.add("hidden");
       return;
     }
+    
     if (emptyEl) emptyEl.classList.add("hidden");
+    if (tableWrapper) tableWrapper.classList.remove("hidden");
 
-    // Render Cards
-    filteredData.forEach((item) => {
-      const colors = getColorFromName(item.nama);
-      const initial = (item.nama || "?").substring(0, 2).toUpperCase();
+    // Render Rows
+    pageData.forEach((item) => {
+      const tr = document.createElement("tr");
+      tr.className = "hover:bg-gray-50 transition-colors group border-b border-gray-50 last:border-none";
       
-      const card = document.createElement("div");
-      card.className = "mapel-card group flex flex-col h-full";
-      
-      // Status Dot
-      const statusHtml = item.is_active
-        ? `<span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-50 text-emerald-600 text-[10px] font-bold border border-emerald-100"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Aktif</span>`
-        : `<span class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-slate-50 text-slate-500 text-[10px] font-bold border border-slate-100"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Nonaktif</span>`;
+      const deskripsi = item.deskripsi ? item.deskripsi : '<span class="text-gray-300 italic">Tidak ada deskripsi</span>';
 
-      card.innerHTML = `
-        <div class="p-5 flex-1">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-bold shadow-sm transition-transform group-hover:scale-110 duration-300"
-                     style="background-color: ${colors.bg}; color: ${colors.icon}; border: 1px solid ${colors.border};">
-                    ${initial}
-                </div>
-                ${statusHtml}
-            </div>
-            
-            <h3 class="text-lg font-bold text-slate-800 mb-1 line-clamp-1" title="${item.nama}">${item.nama}</h3>
-            <p class="text-sm text-slate-500 line-clamp-2 leading-relaxed h-10">${item.deskripsi || "Tidak ada deskripsi tambahan."}</p>
-        </div>
+      tr.innerHTML = `
+        <td class="p-4 align-middle">
+           <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-sm ring-2 ring-white shrink-0" 
+                  style="background:${avatarGradient(item.nama)}">
+                ${initials(item.nama)}
+              </div>
+              <div>
+                 <h4 class="font-bold text-gray-900 text-sm leading-tight">${item.nama}</h4>
+              </div>
+           </div>
+        </td>
 
-        <div class="px-5 py-3 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center opacity-80 group-hover:opacity-100 transition-opacity">
-            <button class="text-xs font-bold text-slate-400 hover:text-indigo-600 transition flex items-center gap-1" data-action="toggle" data-id="${item.id}">
-                <i class="fa-solid fa-power-off"></i> ${item.is_active ? 'Nonaktifkan' : 'Aktifkan'}
-            </button>
-            
-            <div class="flex gap-2">
-                <button class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-blue-600 hover:border-blue-200 flex items-center justify-center transition shadow-sm" 
-                        data-action="edit" data-id="${item.id}" title="Edit">
-                    <i class="fa-regular fa-pen-to-square text-xs"></i>
-                </button>
-                <button class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:border-rose-200 flex items-center justify-center transition shadow-sm" 
-                        data-action="delete" data-id="${item.id}" title="Hapus">
-                    <i class="fa-regular fa-trash-can text-xs"></i>
-                </button>
-            </div>
-        </div>
+        <td class="p-4 align-middle">
+           <p class="text-xs text-gray-500 line-clamp-2 max-w-xs">${deskripsi}</p>
+        </td>
+
+        <td class="p-4 align-middle text-center">
+             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${
+               item.is_active 
+               ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+               : 'bg-gray-100 text-gray-500 border-gray-200'
+             }">
+               <span class="w-1.5 h-1.5 rounded-full mr-1.5 ${item.is_active ? 'bg-emerald-500' : 'bg-gray-400'}"></span>
+               ${item.is_active ? 'Aktif' : 'Nonaktif'}
+             </span>
+        </td>
+
+        <td class="p-4 align-middle text-center">
+           <div class="flex items-center justify-center gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+              <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition" 
+                  data-action="edit" data-id="${item.id}" title="Edit Data">
+                 <i class="fa-regular fa-pen-to-square"></i>
+              </button>
+              
+              <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-amber-50 text-gray-400 hover:text-amber-600 transition" 
+                  data-action="toggle" data-id="${item.id}" title="${item.is_active ? 'Nonaktifkan' : 'Aktifkan'}">
+                 <i class="fa-solid ${item.is_active ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>
+              </button>
+              
+              <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-red-50 text-gray-400 hover:text-red-500 transition" 
+                  data-action="delete" data-id="${item.id}" title="Hapus Data">
+                 <i class="fa-regular fa-trash-can"></i>
+              </button>
+           </div>
+        </td>
       `;
-      rowsEl.appendChild(card);
+      rowsEl.appendChild(tr);
     });
+
+    renderPager();
   };
 
   // --- API & Logic ---
   const fetchMapel = async () => {
     try {
-      const res = await fetch("/api/mapel", { credentials: "same-origin" });
+      const res = await requester("/api/mapel", { credentials: "same-origin" });
       if (!res.ok) {
         state.rows = [];
       } else {
-        const data = await res.json();
-        state.rows = Array.isArray(data) ? data : (data.data || []);
+        const payload = await res.json();
+        const data = unwrapData(payload);
+        state.rows = Array.isArray(data) ? data : [];
       }
-      render();
+      applyFilter(); // Trigger filter + render
     } catch (err) {
       console.error(err);
       state.rows = [];
-      render();
+      applyFilter();
     }
   };
 
@@ -140,7 +225,7 @@
   if (searchInput) {
       searchInput.addEventListener("input", (e) => {
           state.searchQuery = e.target.value;
-          render(); // Re-render based on search
+          applyFilter();
       });
   }
 
@@ -175,7 +260,7 @@
     }
     setTimeout(() => {
         modal.classList.add("hidden", "pointer-events-none", "opacity-0");
-    }, 150); // Delay for animation
+    }, 150);
   };
 
   const createPayload = () => ({
@@ -189,27 +274,27 @@
     const url = id ? `/api/mapel/${id}` : "/api/mapel";
     const method = id ? "PUT" : "POST";
 
-    const res = await fetch(url, {
+    const res = await requester(url, {
       method,
       headers: { "Content-Type": "application/json" },
       credentials: "same-origin",
       body: JSON.stringify(payload),
     });
 
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.message || "Gagal menyimpan data.");
+    const result = await res.json();
+    if (!res.ok || result?.success === false) {
+      throw new Error(result?.message || "Gagal menyimpan data.");
     }
   };
 
   const deleteMapel = async (id) => {
-    const res = await fetch(`/api/mapel/${id}`, {
+    const res = await requester(`/api/mapel/${id}`, {
       method: "DELETE",
       credentials: "same-origin",
     });
-    const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.message || "Gagal menghapus data.");
+    const payload = await res.json();
+    if (!res.ok || payload?.success === false) {
+      throw new Error(payload?.message || "Gagal menghapus data.");
     }
   };
 
@@ -224,7 +309,7 @@
       });
   }
 
-  // Handle Card Actions (Event Delegation)
+  // Handle Table Actions (Event Delegation on TBODY)
   if (rowsEl) {
     rowsEl.addEventListener("click", async (event) => {
       const target = event.target.closest('button[data-action]');

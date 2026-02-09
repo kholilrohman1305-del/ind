@@ -7,6 +7,24 @@ const buildPeriod = (year, month) => {
   return `${safeYear}-${padded}-01`;
 };
 
+// Helper: Check if period is current or past (not future)
+// Management salary only counts for periods that have started (tanggal 1 sudah lewat)
+const isPeriodStarted = (year, month) => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  const targetYear = Number(year);
+  const targetMonth = Number(month);
+
+  // Future year
+  if (targetYear > currentYear) return false;
+  // Same year, future month
+  if (targetYear === currentYear && targetMonth > currentMonth) return false;
+
+  return true;
+};
+
 const getSaldoAwal = async ({ cabangId, year, month }) => {
   const period = buildPeriod(year, month);
   const [rows] = await db.query(
@@ -41,6 +59,14 @@ const getSummary = async ({ cabangId, year, month }) => {
     [cabangId, targetYear, targetMonth]
   );
 
+  // Pemasukan lain-lain (termasuk Transport ILHAMI)
+  const [[kasPemasukanRow]] = await db.query(
+    `SELECT COALESCE(SUM(nominal), 0) AS total
+     FROM kas_pemasukan
+     WHERE cabang_id = ? AND YEAR(tanggal) = ? AND MONTH(tanggal) = ?`,
+    [cabangId, targetYear, targetMonth]
+  );
+
   const [[pengeluaranRow]] = await db.query(
     `SELECT COALESCE(SUM(nominal), 0) AS total
      FROM pengeluaran
@@ -55,19 +81,24 @@ const getSummary = async ({ cabangId, year, month }) => {
     [cabangId, targetYear, targetMonth]
   );
 
-  const [[manajemenRow]] = await db.query(
-    `SELECT COALESCE(SUM(m.gaji_tambahan), 0) AS total
-     FROM edukator e
-     JOIN manajemen m ON m.id = e.manajemen_id
-     WHERE e.cabang_utama_id = ? AND e.is_active = 1`,
-    [cabangId]
-  );
+  // Gaji manajemen hanya dihitung jika periode sudah berjalan (bukan bulan depan)
+  let manajemenTotal = 0;
+  if (isPeriodStarted(targetYear, targetMonth)) {
+    const [[manajemenRow]] = await db.query(
+      `SELECT COALESCE(SUM(m.gaji_tambahan), 0) AS total
+       FROM edukator e
+       JOIN manajemen m ON m.id = e.manajemen_id
+       WHERE e.cabang_utama_id = ? AND e.is_active = 1`,
+      [cabangId]
+    );
+    manajemenTotal = Number(manajemenRow?.total || 0);
+  }
 
-  const pemasukan = Number(pemasukanRow?.total || 0);
+  const pemasukan = Number(pemasukanRow?.total || 0) + Number(kasPemasukanRow?.total || 0);
   const pengeluaran =
     Number(pengeluaranRow?.total || 0) +
     Number(gajiRow?.total || 0) +
-    Number(manajemenRow?.total || 0);
+    manajemenTotal;
 
   const saldoAkhir = saldoAwal + pemasukan - pengeluaran;
 
@@ -79,7 +110,7 @@ const getSummary = async ({ cabangId, year, month }) => {
   };
 };
 
-const listEntries = async ({ cabangId, year, month }) => {
+const listEntries = async ({ cabangId, year, month }, { limit, offset } = {}) => {
   const targetYear = Number(year || new Date().getFullYear());
   const targetMonth = Number(month || new Date().getMonth() + 1);
 
@@ -94,6 +125,16 @@ const listEntries = async ({ cabangId, year, month }) => {
      JOIN program p ON p.id = en.program_id
      WHERE pb.cabang_id = ? AND YEAR(pb.tanggal_bayar) = ? AND MONTH(pb.tanggal_bayar) = ?
      ORDER BY pb.tanggal_bayar DESC, pb.id DESC`,
+    [cabangId, targetYear, targetMonth]
+  );
+
+  // Pemasukan lain-lain (Transport ILHAMI, dll)
+  const [kasPemasukanRows] = await db.query(
+    `SELECT id, nominal, tanggal, 'pemasukan' AS tipe, kategori,
+            COALESCE(deskripsi, '-') AS deskripsi
+     FROM kas_pemasukan
+     WHERE cabang_id = ? AND YEAR(tanggal) = ? AND MONTH(tanggal) = ?
+     ORDER BY tanggal DESC, id DESC`,
     [cabangId, targetYear, targetMonth]
   );
 
@@ -117,17 +158,20 @@ const listEntries = async ({ cabangId, year, month }) => {
     [cabangId, targetYear, targetMonth]
   );
 
-  const [[manajemenRow]] = await db.query(
-    `SELECT COALESCE(SUM(m.gaji_tambahan), 0) AS total
-     FROM edukator e
-     JOIN manajemen m ON m.id = e.manajemen_id
-     WHERE e.cabang_utama_id = ? AND e.is_active = 1`,
-    [cabangId]
-  );
+  // Gaji manajemen hanya ditampilkan jika periode sudah berjalan (bukan bulan depan)
+  let manajemenEntry = [];
+  if (isPeriodStarted(targetYear, targetMonth)) {
+    const [[manajemenRow]] = await db.query(
+      `SELECT COALESCE(SUM(m.gaji_tambahan), 0) AS total
+       FROM edukator e
+       JOIN manajemen m ON m.id = e.manajemen_id
+       WHERE e.cabang_utama_id = ? AND e.is_active = 1`,
+      [cabangId]
+    );
 
-  const manajemenTotal = Number(manajemenRow?.total || 0);
-  const manajemenEntry = manajemenTotal
-    ? [
+    const manajemenTotal = Number(manajemenRow?.total || 0);
+    if (manajemenTotal > 0) {
+      manajemenEntry = [
         {
           id: `manajemen-${targetYear}-${targetMonth}`,
           nominal: manajemenTotal,
@@ -136,22 +180,31 @@ const listEntries = async ({ cabangId, year, month }) => {
           kategori: "Gaji Manajemen",
           deskripsi: "Tambahan jabatan edukator",
         },
-      ]
-    : [];
+      ];
+    }
+  }
 
   const allEntries = [
     ...pembayaranRows,
+    ...kasPemasukanRows,
     ...pengeluaranRows,
     ...gajiRows,
     ...manajemenEntry,
   ];
 
-  return allEntries.sort((a, b) => {
+  allEntries.sort((a, b) => {
     const dateA = new Date(a.tanggal);
     const dateB = new Date(b.tanggal);
     if (dateA.getTime() === dateB.getTime()) return 0;
     return dateB.getTime() - dateA.getTime();
   });
+
+  const total = allEntries.length;
+  if (limit !== undefined) {
+    const start = offset || 0;
+    return { rows: allEntries.slice(start, start + limit), total };
+  }
+  return { rows: allEntries, total };
 };
 
 module.exports = {

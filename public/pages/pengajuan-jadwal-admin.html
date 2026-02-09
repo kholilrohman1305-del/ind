@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Persetujuan Jadwal - ILHAMI</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      body { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+      /* Animasi Masuk */
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-enter {
+        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        opacity: 0;
+      }
+
+      /* Delay Animation */
+      .delay-100 { animation-delay: 0.1s; }
+      .delay-200 { animation-delay: 0.2s; }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+      /* Status Badge Colors */
+      .badge-menunggu { @apply bg-yellow-100 text-yellow-700; }
+      .badge-disetujui { @apply bg-green-100 text-green-700; }
+      .badge-ditolak { @apply bg-red-100 text-red-700; }
+    </style>
+  </head>
+
+  <body class="bg-[#F8FAFC] flex h-screen overflow-hidden text-slate-800" data-page="pengajuan-jadwal-admin">
+
+    <main class="content flex-1 flex flex-col relative h-full overflow-hidden bg-[#F8FAFC]">
+
+      <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+         <div class="absolute -top-[10%] -right-[5%] w-[600px] h-[600px] bg-amber-100/40 rounded-full blur-[80px]"></div>
+         <div class="absolute -bottom-[10%] -left-[5%] w-[500px] h-[500px] bg-orange-100/40 rounded-full blur-[80px]"></div>
+      </div>
+
+      <header class="topbar h-20 flex items-center justify-between px-8 bg-white/70 backdrop-blur-md border-b border-white/50 sticky top-0 z-10">
+        <div class="topbar-left flex items-center gap-4">
+          <button class="icon-button p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors" id="sidebarToggle" aria-label="Toggle menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div>
+            <div class="page-title text-xl font-bold text-slate-800">Persetujuan Jadwal</div>
+            <div class="page-subtitle text-xs text-slate-500">Kelola pengajuan perubahan jadwal dari edukator.</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <select id="filterStatus" class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+            <option value="">Semua Status</option>
+            <option value="menunggu" selected>Menunggu</option>
+            <option value="disetujui">Disetujui</option>
+            <option value="ditolak">Ditolak</option>
+          </select>
+        </div>
+      </header>
+
+      <div class="flex-1 overflow-y-auto p-6 md:p-8 relative z-10">
+
+        <!-- Stats Cards -->
+        <section class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8 animate-enter">
+          <div class="stat-card bg-white p-6 rounded-2xl shadow-md border border-slate-100">
+            <div class="flex justify-between items-start mb-4">
+              <div class="stat-label text-xs font-bold text-slate-400 uppercase">Menunggu</div>
+              <div class="p-2 bg-yellow-100 text-yellow-600 rounded-lg">
+                <i class="fas fa-clock"></i>
+              </div>
+            </div>
+            <div id="statMenunggu" class="stat-value text-3xl font-bold text-slate-800">0</div>
+          </div>
+
+          <div class="stat-card bg-white p-6 rounded-2xl shadow-md border border-slate-100">
+            <div class="flex justify-between items-start mb-4">
+              <div class="stat-label text-xs font-bold text-slate-400 uppercase">Disetujui</div>
+              <div class="p-2 bg-green-100 text-green-600 rounded-lg">
+                <i class="fas fa-check-circle"></i>
+              </div>
+            </div>
+            <div id="statDisetujui" class="stat-value text-3xl font-bold text-slate-800">0</div>
+          </div>
+
+          <div class="stat-card bg-white p-6 rounded-2xl shadow-md border border-slate-100">
+            <div class="flex justify-between items-start mb-4">
+              <div class="stat-label text-xs font-bold text-slate-400 uppercase">Ditolak</div>
+              <div class="p-2 bg-red-100 text-red-600 rounded-lg">
+                <i class="fas fa-times-circle"></i>
+              </div>
+            </div>
+            <div id="statDitolak" class="stat-value text-3xl font-bold text-slate-800">0</div>
+          </div>
+        </section>
+
+        <!-- Pengajuan List -->
+        <div class="bg-white rounded-2xl shadow-md border border-slate-100 p-6 animate-enter delay-100">
+          <h3 class="font-bold text-lg mb-6 text-slate-800 flex items-center gap-2">
+            <i class="fas fa-list text-amber-600"></i>
+            Daftar Pengajuan
+          </h3>
+
+          <div id="pengajuanRows" class="space-y-4">
+            <!-- Pengajuan cards will be rendered here -->
+          </div>
+
+          <div id="pengajuanEmpty" class="hidden text-center py-16 text-slate-400">
+            <i class="fas fa-inbox text-5xl mb-4 opacity-30"></i>
+            <p class="text-lg font-medium text-slate-600">Tidak ada pengajuan</p>
+            <p class="text-sm text-slate-400 mt-1">Pengajuan akan muncul di sini setelah edukator mengajukan.</p>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Modal Approval/Rejection -->
+    <div id="approvalModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+      <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 p-0 overflow-hidden modal-card">
+
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center" id="modalHeader">
+          <div>
+            <h3 class="text-lg font-bold text-gray-800" id="modalTitle">Konfirmasi</h3>
+            <p class="text-xs text-gray-500" id="modalSubtitle">-</p>
+          </div>
+          <button id="closeApprovalModal" class="text-gray-400 hover:text-red-500 transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <div class="p-6">
+          <form id="approvalForm">
+            <input type="hidden" id="approval_pengajuan_id">
+            <input type="hidden" id="approval_action">
+
+            <label class="block mb-4">
+              <span class="text-gray-700 font-medium text-sm mb-1.5 block">
+                Catatan <span id="catatanRequired" class="text-red-500 hidden">*</span>
+              </span>
+              <textarea id="approval_catatan" rows="4" class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none resize-none" placeholder="Catatan untuk edukator (opsional)"></textarea>
+            </label>
+
+            <div class="flex justify-end gap-3">
+              <button type="button" id="cancelApprovalModal" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition text-sm font-medium">Batal</button>
+              <button type="submit" id="submitApprovalBtn" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg shadow-md transition text-sm font-bold">
+                Konfirmasi
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script src="/js/pengajuan-jadwal-admin.js"></script>
+  </body>
+</html>

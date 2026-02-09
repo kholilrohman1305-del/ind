@@ -3,100 +3,223 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Kas & Saldo - ILHAMI</title>
+    <title>Kas & Saldo - ILHAMI Pro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/tailwind.css" />
+
+    <style>
+      :root {
+        --primary: #4F46E5;
+        --bg-app: #F8FAFC;
+      }
+      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-app); color: #334155; }
+      
+      /* Glass & Cards */
+      .glass-panel {
+        background: #ffffff;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        border-radius: 1rem;
+      }
+
+      /* Custom Inputs */
+      .custom-input {
+        background-color: #fff;
+        border: 1px solid #E2E8F0;
+        border-radius: 0.75rem;
+        padding: 0.625rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        width: 100%;
+      }
+      .custom-input:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      }
+
+      /* Table Styling */
+      .modern-table thead th {
+        background-color: #F8FAFC;
+        color: #64748B;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        text-align: left;
+        border-bottom: 1px solid #E2E8F0;
+      }
+      .modern-table tbody tr {
+        border-bottom: 1px solid #F1F5F9;
+        transition: background-color 0.2s;
+      }
+      .modern-table tbody tr:hover { background-color: #F8FAFC; }
+      .modern-table td { padding: 1rem 1.5rem; vertical-align: middle; }
+    </style>
   </head>
-  <body class="app" data-page="kas">
-    <main class="content">
-      <header class="topbar">
-        <div class="topbar-left">
-          <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">=</button>
+
+  <body class="app h-screen flex flex-col overflow-hidden" data-page="kas">
+    <main class="content flex-1 overflow-y-auto p-4 md:p-8">
+      
+      <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
+        <div class="flex items-center gap-4">
+          <button class="p-2 rounded-lg hover:bg-white shadow-sm md:hidden text-gray-600 transition" id="sidebarToggle">
+            <i class="fa-solid fa-bars"></i>
+          </button>
           <div>
-            <div class="page-title">Kas & Saldo</div>
-            <div class="page-subtitle">Pantau arus kas dan saldo cabang per bulan.</div>
+            <h1 class="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3">
+              <span class="bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-2.5 rounded-xl text-xl shadow-lg shadow-emerald-200">
+                <i class="fa-solid fa-wallet"></i>
+              </span>
+              Kas & Saldo
+            </h1>
+            <p class="text-gray-500 mt-1 text-sm font-medium ml-1">Manajemen arus kas operasional cabang.</p>
           </div>
         </div>
-        <div class="topbar-actions">
-          <input id="kasMonth" class="input" type="month" />
+        
+        <div class="flex flex-wrap items-center gap-3">
+            <button id="btnOpenSaldo" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-indigo-600 px-4 py-2.5 rounded-xl shadow-sm transition-all font-semibold text-sm flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square"></i> Set Saldo Awal
+            </button>
+
+            <div class="bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm flex items-center gap-2">
+                <span class="text-xs font-bold text-gray-400 uppercase px-2">Periode:</span>
+                <input id="kasMonth" class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2 outline-none font-medium" type="month" />
+            </div>
         </div>
       </header>
 
-      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6" id="kasSummary">
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div class="text-xs uppercase tracking-wider text-slate-400">Saldo Awal</div>
-          <div class="mt-2 text-2xl font-semibold text-slate-800" id="kasSaldoAwal">Rp 0</div>
-          <div class="text-xs text-slate-500">Periode berjalan</div>
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        
+        <div class="glass-panel p-5 relative overflow-hidden group">
+          <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <i class="fa-solid fa-vault text-6xl text-gray-500"></i>
+          </div>
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Saldo Awal</p>
+          <h3 class="text-2xl font-bold text-gray-700 mt-1" id="kasSaldoAwal">Rp 0</h3>
+          <p class="text-[11px] text-gray-400 mt-1 flex items-center gap-1"><i class="fa-regular fa-calendar-check"></i> Periode ini</p>
         </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div class="text-xs uppercase tracking-wider text-slate-400">Pemasukan</div>
-          <div class="mt-2 text-2xl font-semibold text-slate-800" id="kasPemasukan">Rp 0</div>
-          <div class="text-xs text-slate-500">Pembayaran masuk</div>
+
+        <div class="glass-panel p-5 relative overflow-hidden group border-b-4 border-b-emerald-500">
+          <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <i class="fa-solid fa-arrow-trend-up text-6xl text-emerald-500"></i>
+          </div>
+          <p class="text-xs font-bold text-emerald-600 uppercase tracking-wide">Total Pemasukan</p>
+          <h3 class="text-2xl font-bold text-gray-800 mt-1" id="kasPemasukan">Rp 0</h3>
+          <p class="text-[11px] text-emerald-600/80 mt-1 flex items-center gap-1 bg-emerald-50 w-fit px-2 py-0.5 rounded-full">
+            <i class="fa-solid fa-arrow-down"></i> Uang Masuk
+          </p>
         </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div class="text-xs uppercase tracking-wider text-slate-400">Pengeluaran</div>
-          <div class="mt-2 text-2xl font-semibold text-slate-800" id="kasPengeluaran">Rp 0</div>
-          <div class="text-xs text-slate-500">Operasional + gaji</div>
+
+        <div class="glass-panel p-5 relative overflow-hidden group border-b-4 border-b-rose-500">
+          <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+            <i class="fa-solid fa-arrow-trend-down text-6xl text-rose-500"></i>
+          </div>
+          <p class="text-xs font-bold text-rose-600 uppercase tracking-wide">Total Pengeluaran</p>
+          <h3 class="text-2xl font-bold text-gray-800 mt-1" id="kasPengeluaran">Rp 0</h3>
+          <p class="text-[11px] text-rose-600/80 mt-1 flex items-center gap-1 bg-rose-50 w-fit px-2 py-0.5 rounded-full">
+             <i class="fa-solid fa-arrow-up"></i> Uang Keluar
+          </p>
         </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div class="text-xs uppercase tracking-wider text-slate-400">Saldo Akhir</div>
-          <div class="mt-2 text-2xl font-semibold text-slate-800" id="kasSaldoAkhir">Rp 0</div>
-          <div class="text-xs text-slate-500">Perkiraan akhir</div>
+
+        <div class="glass-panel p-5 relative overflow-hidden group bg-gradient-to-br from-indigo-600 to-blue-700 text-white border-none shadow-indigo-200 shadow-lg">
+          <div class="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-30 transition-opacity">
+            <i class="fa-solid fa-scale-balanced text-6xl text-white"></i>
+          </div>
+          <p class="text-xs font-bold text-indigo-100 uppercase tracking-wide">Saldo Akhir</p>
+          <h3 class="text-2xl font-bold text-white mt-1" id="kasSaldoAkhir">Rp 0</h3>
+          <p class="text-[11px] text-indigo-100 mt-1">Estimasi sisa kas</p>
         </div>
       </section>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <section class="panel lg:col-span-1">
-          <div class="panel-head">
-            <div>
-              <div class="panel-title">Saldo Awal Bulanan</div>
-              <div class="panel-subtitle">Atur saldo awal untuk perhitungan kas.</div>
-            </div>
+      <section class="glass-panel overflow-hidden flex flex-col min-h-[500px]">
+        
+        <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white">
+          <div>
+            <h3 class="font-bold text-gray-800 text-lg">Mutasi Kas</h3>
+            <p class="text-xs text-gray-400">Riwayat transaksi masuk & keluar.</p>
           </div>
-          <form id="kasSaldoForm" class="space-y-4">
-            <label class="block">
-              <span class="text-xs font-semibold text-slate-500">Periode</span>
-              <input id="kasSaldoPeriode" type="month" class="input w-full mt-1" />
-            </label>
-            <label class="block">
-              <span class="text-xs font-semibold text-slate-500">Nominal Saldo Awal</span>
-              <input id="kasSaldoNominal" type="number" min="0" class="input w-full mt-1" placeholder="0" />
-            </label>
-            <div class="flex gap-2">
-              <button type="button" id="kasSaldoReset" class="ghost-button">Reset</button>
-              <button type="submit" class="primary-button">Simpan</button>
-            </div>
-          </form>
-        </section>
+          
+          <div class="relative w-full sm:w-64">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-sm"></i>
+              <input id="kasSearch" type="search" class="custom-input pl-9 py-2" placeholder="Cari transaksi..." />
+          </div>
+        </div>
 
-        <section class="panel lg:col-span-2">
-          <div class="panel-head">
-            <div>
-              <div class="panel-title">Cashflow Bulanan</div>
-              <div class="panel-subtitle">Rangkuman pemasukan dan pengeluaran.</div>
+        <div class="overflow-x-auto flex-1">
+          <table class="w-full text-left border-collapse modern-table">
+            <thead>
+              <tr>
+                <th width="15%">Tanggal</th>
+                <th width="20%">Kategori</th>
+                <th>Keterangan</th>
+                <th width="20%" class="text-right">Nominal</th>
+              </tr>
+            </thead>
+            <tbody id="kasRows" class="text-sm">
+              </tbody>
+          </table>
+
+          <div id="kasEmpty" class="hidden flex flex-col items-center justify-center py-20 text-center">
+            <div class="bg-gray-50 p-6 rounded-full mb-4">
+                <i class="fa-solid fa-receipt text-4xl text-gray-300"></i>
             </div>
-            <div class="topbar-actions">
-              <input id="kasSearch" class="input" type="search" placeholder="Cari transaksi..." />
-            </div>
+            <h4 class="text-gray-600 font-bold">Belum ada transaksi</h4>
+            <p class="text-gray-400 text-sm mt-1">Data kas untuk periode ini masih kosong.</p>
           </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="text-xs uppercase text-slate-400 border-b border-slate-100">
-                  <th class="p-4 font-semibold">Tanggal</th>
-                  <th class="p-4 font-semibold">Kategori</th>
-                  <th class="p-4 font-semibold">Keterangan</th>
-                  <th class="p-4 font-semibold text-right">Nominal</th>
-                </tr>
-              </thead>
-              <tbody id="kasRows" class="text-sm text-slate-600"></tbody>
-            </table>
-            <div id="kasEmpty" class="hidden flex flex-col items-center justify-center py-16 text-center">
-              <div class="text-slate-400 text-sm">Belum ada transaksi kas pada periode ini.</div>
-            </div>
-          </div>
-        </section>
-      </div>
+        </div>
+
+        <div class="flex justify-between items-center p-4 border-t border-gray-100 bg-gray-50/50" id="kasPager">
+            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-indigo-600 transition disabled:opacity-50 shadow-sm" data-page="prev">
+              <i class="fa-solid fa-chevron-left mr-1"></i> Sebelumnya
+            </button>
+            <span class="text-xs font-semibold text-gray-500" id="kasPagerInfo">Halaman 1 dari 1</span>
+            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-indigo-600 transition disabled:opacity-50 shadow-sm" data-page="next">
+              Berikutnya <i class="fa-solid fa-chevron-right ml-1"></i>
+            </button>
+        </div>
+      </section>
+
     </main>
+
+    <div id="saldoModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-gray-900/60 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 modal-card p-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">Set Saldo Awal</h3>
+                    <p class="text-xs text-gray-400">Modal kas awal bulan ini.</p>
+                </div>
+                <button id="btnCloseSaldo" class="text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <form id="kasSaldoForm" class="space-y-4">
+                <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100 mb-2">
+                    <label class="block text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-1">Periode</label>
+                    <input id="kasSaldoPeriode" type="month" readonly class="w-full bg-transparent border-none p-0 text-indigo-800 font-bold focus:ring-0 cursor-default" />
+                </div>
+                
+                <div>
+                  <label class="block text-gray-700 font-medium mb-1.5">Nominal (Rp)</label>
+                  <div class="relative">
+                      <span class="absolute left-3 top-2.5 text-gray-400 font-bold">Rp</span>
+                      <input id="kasSaldoNominal" type="number" min="0" class="custom-input pl-10 font-bold text-gray-800 text-lg" placeholder="0" />
+                  </div>
+                </div>
+  
+                <div class="flex gap-3 pt-2">
+                  <button type="button" id="kasSaldoReset" class="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 text-sm transition">
+                     Reset
+                  </button>
+                  <button type="submit" class="flex-[2] px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100 font-medium text-sm transition">
+                     Simpan Data
+                  </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="/js/sidebar.js"></script>
     <script src="/js/kas.js"></script>

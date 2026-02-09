@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Akun - ILHAMI INDONESIA</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #020617; color: #e2e8f0; }
+        
+        /* Custom Scrollbar */
+        .scroller::-webkit-scrollbar { width: 6px; }
+        .scroller::-webkit-scrollbar-track { background: transparent; }
+        .scroller::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 20px; }
+        .scroller::-webkit-scrollbar-thumb:hover { background-color: #475569; }
+
+        /* Glass Components */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-input {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            background: rgba(30, 41, 59, 0.7);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+        
+        /* Select Dropdown Arrow Customization */
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.75rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+        }
+
+        /* Mapel Chip Selection */
+        .mapel-checkbox:checked + div {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+            color: white;
+        }
+
+        /* Hari Chip Selection */
+        .hari-checkbox:checked + div {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+            color: white;
+        }
+
+        /* Entrance Animations */
+        .animate-slide-up {
+            animation: slide-up 0.6s ease forwards;
+        }
+        .animate-fade-in {
+            animation: fade-in 0.5s ease forwards;
+        }
+        @keyframes slide-up {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden selection:bg-primary-500 selection:text-white">
+
+    <div class="hidden lg:flex w-5/12 relative flex-col justify-center items-center bg-slate-900/50 overflow-hidden border-r border-white/5">
+        <div class="absolute top-[-20%] left-[-20%] w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse-glow"></div>
+        <div class="absolute bottom-[-20%] right-[-20%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[100px] animate-pulse-glow" style="animation-delay: 1s"></div>
+        
+        <div class="relative z-10 animate-float text-center">
+            <div class="w-40 h-40 mx-auto rounded-3xl bg-gradient-to-tr from-slate-800 to-slate-900 border border-white/10 flex items-center justify-center shadow-2xl relative mb-8 group">
+                <div class="absolute inset-0 bg-primary-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                <i class="fa-solid fa-rocket text-6xl text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 to-purple-400"></i>
+                
+                <div class="absolute -top-6 -right-6 w-12 h-12 bg-slate-800 rounded-xl border border-white/10 flex items-center justify-center animate-bounce shadow-lg">
+                    <i class="fa-solid fa-atom text-indigo-400 text-sm"></i>
+                </div>
+                <div class="absolute -bottom-4 -left-6 w-10 h-10 bg-slate-800 rounded-xl border border-white/10 flex items-center justify-center animate-bounce shadow-lg" style="animation-delay: 0.5s">
+                    <i class="fa-solid fa-code text-pink-400 text-xs"></i>
+                </div>
+            </div>
+
+            <h1 class="text-4xl font-bold text-white mb-2 tracking-tight">Bergabung Sekarang</h1>
+            <p class="text-slate-400 text-sm max-w-xs mx-auto leading-relaxed">
+                Mulai perjalanan belajarmu bersama ribuan siswa lain di ILHAMI Indonesia.
+            </p>
+        </div>
+
+        <div class="absolute bottom-8 text-xs text-slate-600">
+            © 2026 ILHAMI Indonesia. All rights reserved.
+        </div>
+    </div>
+
+    <div class="w-full lg:w-7/12 relative h-full flex flex-col bg-slate-950">
+        
+        <div class="lg:hidden flex justify-between items-center p-6 border-b border-white/5 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center">
+                    <i class="fa-solid fa-bolt text-white text-xs"></i>
+                </div>
+                <span class="font-bold text-white tracking-wide">ILHAMI</span>
+            </div>
+            <a href="/login" class="text-xs font-bold text-slate-400 hover:text-white transition-colors">Masuk</a>
+        </div>
+
+        <div class="flex-1 overflow-y-auto scroller">
+            <div class="max-w-2xl w-full mx-auto p-6 md:p-12 lg:p-16">
+                
+                <div class="mb-8 animate-slide-up">
+                    <h2 class="text-2xl md:text-3xl font-bold text-white mb-2">Buat Akun Baru 🚀</h2>
+                    <p class="text-slate-400 text-sm">Lengkapi formulir di bawah ini dengan data yang valid.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 p-1 bg-slate-900/80 rounded-2xl mb-8 animate-slide-up border border-white/5 relative overflow-hidden">
+                    <button onclick="setRole('siswa')" id="btnSiswa" class="relative z-10 py-3 rounded-xl text-sm font-bold text-white bg-primary-600 shadow-lg shadow-primary-900/50 transition-all duration-300 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-user-graduate"></i> Siswa
+                    </button>
+                    <button onclick="setRole('edukator')" id="btnEdukator" class="relative z-10 py-3 rounded-xl text-sm font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all duration-300 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-chalkboard-user"></i> Edukator
+                    </button>
+                    <input type="hidden" id="role" value="siswa">
+                    <input type="hidden" id="program_id" value="">
+                </div>
+
+                <form id="registerForm" class="space-y-5 animate-slide-up" style="animation-delay: 0.1s">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div class="group">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Nama Lengkap</label>
+                            <input type="text" id="nama" class="glass-input w-full px-4 py-3 rounded-xl placeholder-slate-600 focus:outline-none" placeholder="Isi nama lengkap" required>
+                        </div>
+                        <div class="group">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">No. WhatsApp</label>
+                            <input type="tel" id="telepon" class="glass-input w-full px-4 py-3 rounded-xl placeholder-slate-600 focus:outline-none" placeholder="0812xxxx" required>
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Email Address</label>
+                        <div class="relative">
+                            <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                            <input type="email" id="email" class="glass-input w-full pl-11 pr-4 py-3 rounded-xl placeholder-slate-600 focus:outline-none" placeholder="nama@email.com" required>
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Password</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                            <input type="password" id="password" class="glass-input w-full pl-11 pr-12 py-3 rounded-xl placeholder-slate-600 focus:outline-none" placeholder="Min. 8 karakter" required>
+                            <button type="button" id="togglePass" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Alamat Domisili</label>
+                        <textarea id="alamat" rows="2" class="glass-input w-full px-4 py-3 rounded-xl placeholder-slate-600 focus:outline-none resize-none" placeholder="Alamat lengkap..." required></textarea>
+                    </div>
+
+                    <div class="relative py-2">
+                        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div>
+                        <div class="relative flex justify-center">
+                            <span class="bg-slate-950 px-4 text-xs font-bold text-slate-500 uppercase" id="detailLabel">Data Akademik</span>
+                        </div>
+                    </div>
+
+                    <div id="siswaFields" class="space-y-5 animate-fade-in">
+                        <!-- Program yang dipilih (dari landing page) -->
+                        <div id="selectedProgramInfo" class="hidden p-4 rounded-xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-lg bg-indigo-500 flex items-center justify-center text-white">
+                                    <i class="fa-solid fa-book-open"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-xs text-slate-400 font-bold uppercase">Program Dipilih</p>
+                                    <p id="selectedProgramName" class="text-white font-bold">-</p>
+                                </div>
+                                <a href="/landing" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold">
+                                    <i class="fa-solid fa-pen mr-1"></i> Ubah
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="group">
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Pilih Cabang</label>
+                                <select id="cabang_id" class="glass-input w-full px-4 py-3 rounded-xl text-slate-300 focus:text-white cursor-pointer">
+                                    <option value="" class="bg-slate-900">Memuat...</option>
+                                </select>
+                            </div>
+                            <div class="group">
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Jenjang</label>
+                                <select id="jenjang" class="glass-input w-full px-4 py-3 rounded-xl text-slate-300 focus:text-white cursor-pointer">
+                                    <option value="PAUD_TK" class="bg-slate-900">PAUD / TK</option>
+                                    <option value="SD" class="bg-slate-900">SD</option>
+                                    <option value="SMP" class="bg-slate-900">SMP</option>
+                                    <option value="SMA" class="bg-slate-900">SMA / SMK</option>
+                                    <option value="ALUMNI" class="bg-slate-900">Alumni / Umum</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Pilihan Mapel (Multi-select Chips) -->
+                        <div class="group">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Mata Pelajaran (Opsional)</label>
+                            <div id="siswaMapelContainer" class="flex flex-wrap gap-2 p-4 rounded-xl border border-white/5 bg-slate-900/50">
+                                <span class="text-xs text-slate-500 italic">Memuat mapel...</span>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1 ml-1">Mapel mengikuti program, pilihan ini hanya untuk preferensi penjadwalan.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                            <div class="group md:col-span-2">
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Asal Sekolah</label>
+                                <input type="text" id="sekolah_asal" class="glass-input w-full px-4 py-3 rounded-xl placeholder-slate-600 focus:outline-none" placeholder="Nama Sekolah">
+                            </div>
+                            <div class="group">
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Kelas</label>
+                                <input type="text" id="kelas" class="glass-input w-full px-4 py-3 rounded-xl placeholder-slate-600 focus:outline-none" placeholder="Cth: 12">
+                            </div>
+                        </div>
+
+                        <div class="group">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Tanggal Lahir</label>
+                            <input type="date" id="tanggal_lahir" class="glass-input w-full px-4 py-3 rounded-xl text-slate-300 focus:outline-none [color-scheme:dark]">
+                        </div>
+
+                        <!-- Separator -->
+                        <div class="relative py-2">
+                            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div>
+                            <div class="relative flex justify-center">
+                                <span class="bg-slate-950 px-4 text-xs font-bold text-slate-500 uppercase">Preferensi Jadwal</span>
+                            </div>
+                        </div>
+
+                        <!-- Tanggal Mulai Belajar -->
+                        <div class="group">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Rencana Mulai Belajar <span class="text-red-400">*</span></label>
+                            <input type="date" id="tanggal_mulai_belajar" class="glass-input w-full px-4 py-3 rounded-xl text-slate-300 focus:outline-none [color-scheme:dark]" required>
+                        </div>
+
+                        <!-- Pilihan Hari (Checkboxes) -->
+                        <div class="group">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Pilih Hari Belajar <span class="text-red-400">*</span></label>
+                            <div class="grid grid-cols-4 md:grid-cols-7 gap-2" id="hariContainer">
+                                <label class="cursor-pointer select-none group">
+                                    <input type="checkbox" name="preferred_days" value="senin" class="hari-checkbox sr-only">
+                                    <div class="px-3 py-2 rounded-lg border border-white/10 bg-slate-800 text-slate-400 text-xs font-bold text-center transition-all hover:border-primary-500/50 hover:text-white">
+                                        Sen
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer select-none group">
+                                    <input type="checkbox" name="preferred_days" value="selasa" class="hari-checkbox sr-only">
+                                    <div class="px-3 py-2 rounded-lg border border-white/10 bg-slate-800 text-slate-400 text-xs font-bold text-center transition-all hover:border-primary-500/50 hover:text-white">
+                                        Sel
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer select-none group">
+                                    <input type="checkbox" name="preferred_days" value="rabu" class="hari-checkbox sr-only">
+                                    <div class="px-3 py-2 rounded-lg border border-white/10 bg-slate-800 text-slate-400 text-xs font-bold text-center transition-all hover:border-primary-500/50 hover:text-white">
+                                        Rab
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer select-none group">
+                                    <input type="checkbox" name="preferred_days" value="kamis" class="hari-checkbox sr-only">
+                                    <div class="px-3 py-2 rounded-lg border border-white/10 bg-slate-800 text-slate-400 text-xs font-bold text-center transition-all hover:border-primary-500/50 hover:text-white">
+                                        Kam
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer select-none group">
+                                    <input type="checkbox" name="preferred_days" value="jumat" class="hari-checkbox sr-only">
+                                    <div class="px-3 py-2 rounded-lg border border-white/10 bg-slate-800 text-slate-400 text-xs font-bold text-center transition-all hover:border-primary-500/50 hover:text-white">
+                                        Jum
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer select-none group">
+                                    <input type="checkbox" name="preferred_days" value="sabtu" class="hari-checkbox sr-only">
+                                    <div class="px-3 py-2 rounded-lg border border-white/10 bg-slate-800 text-slate-400 text-xs font-bold text-center transition-all hover:border-primary-500/50 hover:text-white">
+                                        Sab
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer select-none group">
+                                    <input type="checkbox" name="preferred_days" value="minggu" class="hari-checkbox sr-only">
+                                    <div class="px-3 py-2 rounded-lg border border-white/10 bg-slate-800 text-slate-400 text-xs font-bold text-center transition-all hover:border-primary-500/50 hover:text-white">
+                                        Min
+                                    </div>
+                                </label>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1 ml-1">Pilih minimal satu hari</p>
+                        </div>
+
+                        <!-- Pilihan Jam -->
+                        <div class="group">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Pilih Jam Belajar <span class="text-red-400">*</span></label>
+                            <select id="jam_belajar" class="glass-input w-full px-4 py-3 rounded-xl text-slate-300 focus:text-white cursor-pointer" required>
+                                <option value="" class="bg-slate-900">-- Pilih Jam --</option>
+                                <option value="08:00-10:00" class="bg-slate-900">08:00 - 10:00 (Pagi)</option>
+                                <option value="10:00-12:00" class="bg-slate-900">10:00 - 12:00 (Pagi)</option>
+                                <option value="13:00-15:00" class="bg-slate-900">13:00 - 15:00 (Siang)</option>
+                                <option value="15:00-17:00" class="bg-slate-900">15:00 - 17:00 (Sore)</option>
+                                <option value="17:00-19:00" class="bg-slate-900">17:00 - 19:00 (Sore)</option>
+                                <option value="19:00-21:00" class="bg-slate-900">19:00 - 21:00 (Malam)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="edukatorFields" class="hidden space-y-5 animate-fade-in">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div class="group">
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Cabang Penempatan</label>
+                                <select id="edu_cabang_id" class="glass-input w-full px-4 py-3 rounded-xl text-slate-300 focus:text-white cursor-pointer">
+                                    <option value="" class="bg-slate-900">Memuat...</option>
+                                </select>
+                            </div>
+                            <div class="group">
+                                <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Pendidikan</label>
+                                <select id="pendidikan_terakhir" class="glass-input w-full px-4 py-3 rounded-xl text-slate-300 focus:text-white cursor-pointer">
+                                    <option value="Mahasiswa" class="bg-slate-900">Mahasiswa</option>
+                                    <option value="S1" class="bg-slate-900">Sarjana (S1)</option>
+                                    <option value="S2" class="bg-slate-900">Magister (S2)</option>
+                                    <option value="Lainnya" class="bg-slate-900">Lainnya</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="group">
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Bidang Studi (Keahlian)</label>
+                            <div id="mapelContainer" class="flex flex-wrap gap-2 p-4 rounded-xl border border-white/5 bg-slate-900/50">
+                                <span class="text-xs text-slate-500 italic">Memuat mapel...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 pb-8">
+                        <button type="submit" id="submitBtn" class="w-full group relative py-4 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 text-white font-bold text-sm hover:shadow-[0_0_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all duration-300 flex justify-center items-center gap-2 overflow-hidden">
+                            <div class="absolute inset-0 w-full h-full bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out skew-x-12"></div>
+                            <span>Daftar Sekarang</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                        
+                        <p class="mt-6 text-center text-sm text-slate-500">
+                            Sudah punya akun? 
+                            <a href="/login" class="font-bold text-primary-500 hover:text-primary-400 transition-colors">Masuk disini</a>
+                        </p>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed top-6 right-6 z-[60] transform transition-all duration-500 translate-y-[-200%] opacity-0">
+        <div class="glass-panel bg-slate-900/90 rounded-2xl p-4 flex items-start gap-4 shadow-2xl border-l-4 border-primary-500 min-w-[320px]">
+            <div id="toastIcon" class="mt-0.5"></div>
+            <div>
+                <h4 id="toastTitle" class="text-sm font-bold text-white mb-0.5">Notification</h4>
+                <p id="toastMessage" class="text-xs text-slate-400 leading-snug"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/register.js"></script>
+</body>
+</html>

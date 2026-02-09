@@ -11,6 +11,8 @@
   const searchInput = document.getElementById("pengeluaranSearch");
 
   let cachedRows = [];
+  let currentPage = 1;
+  const pageSize = 10;
 
   const fields = {
     tanggal: document.getElementById("pengeluaranTanggal"),
@@ -21,12 +23,13 @@
 
   // --- HELPERS ---
   const fetchJson = async (url, options = {}) => {
-    const res = await fetch(url, { credentials: "same-origin", ...options });
+    const requester = window.api?.request || fetch;
+    const res = await requester(url, { credentials: "same-origin", ...options });
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || "Request gagal.");
+      throw new Error(data.message || "Request gagal.");
     }
-    return res.json();
+    return data && data.success ? data.data : data;
   };
 
   const formatRupiah = (value) => new Intl.NumberFormat("id-ID").format(Number(value || 0));
@@ -85,11 +88,55 @@
     
     if (!rows.length) {
       emptyEl.classList.remove("hidden");
+      const pager = document.getElementById("pengeluaranPager");
+      if (pager) pager.classList.add("hidden");
       return;
     }
     emptyEl.classList.add("hidden");
 
-    rows.forEach(row => {
+    const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * pageSize;
+    const pageRows = rows.slice(start, start + pageSize);
+
+    const pager = document.getElementById("pengeluaranPager");
+    if (pager) {
+      if (rows.length <= pageSize) {
+        pager.classList.add("hidden");
+      } else {
+        pager.classList.remove("hidden");
+        pager.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-gray-500 font-medium">Halaman ${currentPage} dari ${totalPages}</span>
+            <div class="flex gap-2">
+              <button class="w-8 h-8 flex items-center justify-center rounded-lg border ${
+                currentPage === 1
+                  ? "bg-gray-50 text-gray-300 cursor-not-allowed"
+                  : "bg-white text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200"
+              } transition" type="button" data-page="prev" ${currentPage === 1 ? "disabled" : ""}>
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+              </button>
+              <button class="w-8 h-8 flex items-center justify-center rounded-lg border ${
+                currentPage === totalPages
+                  ? "bg-gray-50 text-gray-300 cursor-not-allowed"
+                  : "bg-white text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200"
+              } transition" type="button" data-page="next" ${currentPage === totalPages ? "disabled" : ""}>
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+        `;
+        pager.querySelectorAll("button").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            if (btn.disabled) return;
+            currentPage = btn.dataset.page === "prev" ? currentPage - 1 : currentPage + 1;
+            renderRows(rows);
+          });
+        });
+      }
+    }
+
+    pageRows.forEach(row => {
         const tr = document.createElement("tr");
         tr.className = "border-b border-gray-50 hover:bg-gray-50 transition group";
         
@@ -154,6 +201,7 @@
     }
     
     try {
+        currentPage = 1;
         const query = params.toString();
         const rows = await fetchJson(`/api/pengeluaran${query ? `?${query}` : ""}`);
         cachedRows = rows || [];
@@ -215,7 +263,10 @@
 
   // Search Input
   if (searchInput) {
-    searchInput.addEventListener("input", () => applyFilters());
+    searchInput.addEventListener("input", () => {
+      currentPage = 1;
+      applyFilters();
+    });
   }
 
   // Delete Action

@@ -3,104 +3,227 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Promo & Diskon - ILHAMI</title>
+    <title>Promo & Diskon - ILHAMI Pro</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/tailwind.css" />
+
+    <style>
+      :root {
+        --primary: #ec4899; /* Pink-500 styling for Promo */
+        --bg-app: #F8FAFC;
+      }
+      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-app); color: #334155; }
+      
+      /* Glass & Cards */
+      .glass-panel {
+        background: #ffffff;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        border-radius: 1rem;
+      }
+
+      /* Custom Inputs */
+      .custom-input, .custom-select {
+        background-color: #fff;
+        border: 1px solid #E2E8F0;
+        border-radius: 0.75rem;
+        padding: 0.625rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+        width: 100%;
+      }
+      .custom-input:focus, .custom-select:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+      }
+
+      /* Modern Table Styling */
+      .modern-table thead th {
+        background-color: #FDF2F8; /* Pink-50 */
+        color: #BE185D; /* Pink-700 */
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 1.25rem 1.5rem;
+        font-weight: 700;
+        text-align: left;
+        border-bottom: 1px solid #FBCFE8;
+      }
+      .modern-table tbody tr {
+        border-bottom: 1px solid #F1F5F9;
+        transition: all 0.2s ease;
+      }
+      .modern-table tbody tr:hover { 
+        background-color: #FFF1F2; /* Rose-50 very light */
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      }
+      .modern-table td { padding: 1.25rem 1.5rem; vertical-align: middle; }
+    </style>
   </head>
-  <body class="app" data-page="promo">
-    <main class="content">
-      <header class="topbar">
-        <div class="topbar-left">
-          <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">=</button>
+
+  <body class="app h-screen flex flex-col overflow-hidden" data-page="promo">
+    <main class="content flex-1 overflow-y-auto p-4 md:p-8">
+      
+      <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
+        <div class="flex items-center gap-4">
+          <button class="p-2 rounded-lg hover:bg-white shadow-sm md:hidden text-gray-600 transition" id="sidebarToggle">
+            <i class="fa-solid fa-bars"></i>
+          </button>
           <div>
-            <div class="page-title">Promo & Diskon</div>
-            <div class="page-subtitle">Atur promo per program dan periode.</div>
+            <h1 class="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3">
+              <span class="bg-gradient-to-br from-pink-500 to-rose-600 text-white p-2.5 rounded-xl text-xl shadow-lg shadow-pink-200">
+                <i class="fa-solid fa-percent"></i>
+              </span>
+              Promo & Diskon
+            </h1>
+            <p class="text-gray-500 mt-1 text-sm font-medium ml-1">Kelola strategi harga dan potongan.</p>
           </div>
+        </div>
+
+        <div class="flex items-center gap-3 w-full md:w-auto">
+             <button id="btnAddPromo" class="bg-pink-600 hover:bg-pink-700 text-white px-6 py-2.5 rounded-xl shadow-lg shadow-pink-200 transition-all font-semibold text-sm flex items-center gap-2 transform active:scale-95 ml-auto md:ml-0">
+                <i class="fa-solid fa-plus"></i> Buat Promo Baru
+            </button>
         </div>
       </header>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <section class="panel lg:col-span-1">
-          <div class="panel-head">
+      <section class="glass-panel overflow-hidden flex flex-col min-h-[600px]">
+          
+          <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white">
             <div>
-              <div class="panel-title">Buat Promo</div>
-              <div class="panel-subtitle">Diskon persen atau nominal tetap.</div>
+              <h3 class="font-bold text-gray-800 text-lg">Daftar Promo Aktif</h3>
+              <p class="text-xs text-gray-400">Semua promo yang tersedia untuk pendaftaran.</p>
+            </div>
+            
+            <div class="relative w-full sm:w-72 group">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 group-focus-within:text-pink-500 transition-colors text-sm"></i>
+                <input id="promoSearch" type="search" class="custom-input pl-10 py-2.5 border-gray-200" placeholder="Cari nama promo atau program..." />
             </div>
           </div>
-          <form id="promoForm" class="space-y-4">
-            <input type="hidden" id="promoId" />
-            <label class="block">
-              <span class="text-xs font-semibold text-slate-500">Program</span>
-              <select id="promoProgram" class="input w-full mt-1"></select>
-            </label>
-            <label class="block">
-              <span class="text-xs font-semibold text-slate-500">Nama Promo</span>
-              <input id="promoNama" class="input w-full mt-1" type="text" placeholder="Contoh: Diskon Awal Tahun" />
-            </label>
-            <div class="grid grid-cols-2 gap-3">
-              <label class="block">
-                <span class="text-xs font-semibold text-slate-500">Tipe Diskon</span>
-                <select id="promoTipe" class="input w-full mt-1">
-                  <option value="percent">Persen (%)</option>
-                  <option value="fixed">Nominal (Rp)</option>
-                </select>
-              </label>
-              <label class="block">
-                <span class="text-xs font-semibold text-slate-500">Nilai</span>
-                <input id="promoNilai" class="input w-full mt-1" type="number" min="0" placeholder="0" />
-              </label>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <label class="block">
-                <span class="text-xs font-semibold text-slate-500">Mulai</span>
-                <input id="promoMulai" class="input w-full mt-1" type="date" />
-              </label>
-              <label class="block">
-                <span class="text-xs font-semibold text-slate-500">Selesai</span>
-                <input id="promoSelesai" class="input w-full mt-1" type="date" />
-              </label>
-            </div>
-            <label class="flex items-center gap-2 text-sm text-slate-600">
-              <input id="promoActive" type="checkbox" class="h-4 w-4" checked />
-              Aktifkan promo
-            </label>
-            <div class="flex gap-2">
-              <button type="button" id="promoReset" class="ghost-button">Reset</button>
-              <button type="submit" class="primary-button">Simpan</button>
-            </div>
-          </form>
-        </section>
 
-        <section class="panel lg:col-span-2">
-          <div class="panel-head">
-            <div>
-              <div class="panel-title">Daftar Promo</div>
-              <div class="panel-subtitle">Kelola promo aktif maupun berakhir.</div>
-            </div>
-            <div class="topbar-actions">
-              <input id="promoSearch" class="input" type="search" placeholder="Cari promo..." />
-            </div>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+          <div class="overflow-x-auto flex-1 bg-white">
+            <table class="w-full text-left border-collapse modern-table">
               <thead>
-                <tr class="text-xs uppercase text-slate-400 border-b border-slate-100">
-                  <th class="p-4 font-semibold">Promo</th>
-                  <th class="p-4 font-semibold">Program</th>
-                  <th class="p-4 font-semibold">Periode</th>
-                  <th class="p-4 font-semibold">Diskon</th>
-                  <th class="p-4 font-semibold text-center">Status</th>
-                  <th class="p-4 font-semibold text-center">Aksi</th>
+                <tr>
+                  <th width="35%">Detail Promo</th>
+                  <th width="20%">Target Program</th>
+                  <th width="20%">Periode Berlaku</th>
+                  <th width="15%">Nilai Potongan</th>
+                  <th class="text-center">Status</th>
+                  <th class="text-right">Opsi</th>
                 </tr>
               </thead>
-              <tbody id="promoRows" class="text-sm text-slate-600"></tbody>
+              <tbody id="promoRows" class="text-sm">
+                </tbody>
             </table>
-            <div id="promoEmpty" class="hidden flex flex-col items-center justify-center py-16 text-center">
-              <div class="text-slate-400 text-sm">Belum ada promo pada cabang ini.</div>
+
+            <div id="promoEmpty" class="hidden flex flex-col items-center justify-center py-24 text-center">
+              <div class="bg-pink-50 p-6 rounded-full mb-4 animate-bounce-slow">
+                  <i class="fa-solid fa-ticket text-4xl text-pink-300"></i>
+              </div>
+              <h4 class="text-gray-700 font-bold text-lg">Belum ada promo</h4>
+              <p class="text-gray-400 text-sm mt-1 max-w-xs mx-auto">Buat promo menarik untuk meningkatkan jumlah pendaftar siswa baru.</p>
+              <button onclick="document.getElementById('btnAddPromo').click()" class="mt-4 text-pink-600 font-semibold text-sm hover:underline">Buat Promo Sekarang</button>
             </div>
           </div>
-        </section>
-      </div>
+      </section>
+
     </main>
+
+    <div id="promoModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-gray-900/60 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 modal-card flex flex-col max-h-[90vh]">
+            
+            <div class="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-pink-50/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center">
+                        <i class="fa-solid fa-tag text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800" id="modalTitle">Tambah Promo</h3>
+                        <p class="text-xs text-gray-500">Isi detail promo dengan lengkap.</p>
+                    </div>
+                </div>
+                <button id="closeModal" class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="promoForm" class="p-6 space-y-5 overflow-y-auto">
+                <input type="hidden" id="promoId" />
+
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-gray-600 uppercase tracking-wide">Target Program</label>
+                    <select id="promoProgram" class="custom-select"></select>
+                    <p class="text-[10px] text-gray-400">Promo ini hanya akan berlaku untuk program yang dipilih.</p>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-gray-600 uppercase tracking-wide">Nama Promo <span class="text-red-500">*</span></label>
+                    <input id="promoNama" class="custom-input font-semibold text-gray-700" type="text" placeholder="Contoh: Diskon Kemerdekaan 17%" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-600 uppercase tracking-wide">Tipe Diskon</label>
+                        <select id="promoTipe" class="custom-select">
+                            <option value="percent">Persentase (%)</option>
+                            <option value="fixed">Nominal Tetap (Rp)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-600 uppercase tracking-wide">Besaran Nilai</label>
+                        <div class="relative">
+                            <input id="promoNilai" class="custom-input font-bold text-gray-800 pl-10" type="number" min="0" placeholder="0" />
+                            <span class="absolute left-3 top-2.5 text-gray-400 font-bold" id="nilaiSymbol">%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 grid grid-cols-2 gap-4 relative">
+                    <div class="absolute -top-2 left-4 bg-white px-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Masa Berlaku</div>
+                    <div class="space-y-1">
+                        <label class="text-xs text-gray-500 font-semibold">Tanggal Mulai</label>
+                        <input id="promoMulai" class="custom-input text-sm py-2" type="date" />
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-xs text-gray-500 font-semibold">Tanggal Berakhir</label>
+                        <input id="promoSelesai" class="custom-input text-sm py-2" type="date" />
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer" onclick="document.getElementById('promoActive').click()">
+                     <div class="flex flex-col">
+                        <span class="text-sm font-bold text-gray-700">Status Aktif</span>
+                        <span class="text-xs text-gray-400">Nonaktifkan untuk menyembunyikan promo.</span>
+                     </div>
+                     <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                        <input type="checkbox" name="toggle" id="promoActive" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-emerald-500 transition-all duration-200"/>
+                        <label for="promoActive" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer checked:bg-emerald-500 transition-colors duration-200"></label>
+                    </div>
+                </div>
+
+                <style>
+                    /* Custom Toggle Switch CSS since Tailwind doesn't have it built-in cleanly */
+                    .toggle-checkbox:checked { right: 0; border-color: #10B981; }
+                    .toggle-checkbox:checked + .toggle-label { background-color: #10B981; }
+                    .toggle-checkbox { right: 50%; }
+                </style>
+
+                <div class="pt-2 flex gap-3 border-t border-gray-100 mt-4">
+                    <button type="button" id="promoReset" class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-100 font-semibold text-sm transition">
+                        Reset
+                    </button>
+                    <button type="submit" class="flex-1 px-5 py-2.5 rounded-xl bg-pink-600 text-white hover:bg-pink-700 shadow-md shadow-pink-100 font-bold text-sm transition transform active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i> Simpan Promo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="/js/sidebar.js"></script>
     <script src="/js/promo.js"></script>

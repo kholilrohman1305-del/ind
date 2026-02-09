@@ -1,9 +1,10 @@
 const programService = require("../services/program.service");
+const { ROLES } = require("../config/constants");
 
 const getAll = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : null;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const rows = await programService.listProgram(cabangId);
     return res.json(rows);
   } catch (err) {
@@ -14,7 +15,7 @@ const getAll = async (req, res) => {
 const create = async (req, res) => {
   try {
     const role = req.session.user.role;
-    const cabangId = role === "admin_cabang" ? req.session.user.cabang_id : req.body.cabang_id;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : req.body.cabang_id;
     if (!cabangId) {
       return res.status(400).json({ success: false, message: "Cabang wajib diisi." });
     }
@@ -34,7 +35,7 @@ const update = async (req, res) => {
     if (!existing) {
       return res.status(404).json({ success: false, message: "Program tidak ditemukan." });
     }
-    if (role === "admin_cabang" && existing.cabang_id !== req.session.user.cabang_id) {
+    if (role === ROLES.ADMIN_CABANG && existing.cabang_id !== req.session.user.cabang_id) {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
     const result = await programService.updateProgram(id, req.body, existing);
@@ -52,7 +53,7 @@ const remove = async (req, res) => {
     if (!existing) {
       return res.status(404).json({ success: false, message: "Program tidak ditemukan." });
     }
-    if (role === "admin_cabang" && existing.cabang_id !== req.session.user.cabang_id) {
+    if (role === ROLES.ADMIN_CABANG && existing.cabang_id !== req.session.user.cabang_id) {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
     await programService.deleteProgram(id);

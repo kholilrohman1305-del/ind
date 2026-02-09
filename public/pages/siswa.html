@@ -7,160 +7,289 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script> 
+    <link rel="stylesheet" href="/css/tailwind.css" />
     <link rel="stylesheet" href="/css/siswa.css" />
 
     <style>
       :root {
         --primary: #4F46E5; /* Indigo */
         --secondary: #EC4899; /* Pink */
-        --bg-app: #F3F4F6;
+        --bg-app: #F8FAFC; /* Slate-50 for cleaner bg */
         --surface: #ffffff;
       }
-      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-app); color: #1F2937; }
+      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-app); color: #334155; }
       
       /* Glass & Cards */
       .glass-panel {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.5);
+        background: rgba(255, 255, 255, 1);
+        border: 1px solid #E2E8F0;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         border-radius: 1rem;
       }
 
+      /* Custom Table Styling */
+      .modern-table thead th {
+        background-color: #F8FAFC;
+        color: #64748B;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        text-align: left;
+        border-bottom: 1px solid #E2E8F0;
+      }
+      .modern-table tbody tr {
+        border-bottom: 1px solid #F1F5F9;
+        transition: all 0.2s ease;
+      }
+      .modern-table tbody tr:last-child { border-bottom: none; }
+      .modern-table tbody tr:hover {
+        background-color: #F8FAFC;
+      }
+      
       /* Tab Styling */
       .tab-btn {
         transition: all 0.3s ease;
         border-bottom: 2px solid transparent;
-        color: #6B7280;
+        color: #64748B;
       }
       .tab-btn.active {
         color: var(--primary);
         border-bottom-color: var(--primary);
-        background-color: rgba(79, 70, 229, 0.05);
-      }
-      
-      /* Custom Input Styling overrides */
-      .modal-form input, .modal-form select {
-        border-radius: 0.5rem;
-        border: 1px solid #E5E7EB;
-        padding: 0.625rem;
-        transition: border-color 0.2s;
-      }
-      .modal-form input:focus, .modal-form select:focus {
-        border-color: var(--primary);
-        outline: none;
-        ring: 2px var(--primary);
+        background-color: rgba(79, 70, 229, 0.04);
       }
 
-      /* Hide sections for tabs */
+      /* Transitions */
       .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
       .tab-content.active { display: block; }
-      
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(5px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
   </head>
 
   <body class="app h-screen flex flex-col overflow-hidden" data-page="siswa">
     <main class="content flex-1 overflow-y-auto p-4 md:p-8">
       
-      <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <header class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-6">
         <div class="flex items-center gap-4">
           <button class="p-2 rounded-lg hover:bg-white shadow-sm md:hidden text-gray-600 transition" id="sidebarToggle" aria-label="Toggle menu">
             <i class="fa-solid fa-bars"></i>
           </button>
           <div>
-            <h1 class="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-2">
-              <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg text-xl"><i class="fa-solid fa-graduation-cap"></i></span>
+            <h1 class="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3">
+              <span class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-2.5 rounded-xl text-xl shadow-lg shadow-indigo-200">
+                <i class="fa-solid fa-graduation-cap"></i>
+              </span>
               Data Siswa
             </h1>
-            <p class="text-gray-500 mt-1 text-sm font-medium">Kelola database akademik siswa aktif dan alumni.</p>
+            <p class="text-gray-500 mt-1 text-sm font-medium ml-1">Database akademik siswa aktif dan alumni.</p>
           </div>
         </div>
         
-        <div class="topbar-actions">
-          <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center gap-2 font-semibold text-sm transform hover:-translate-y-0.5" id="addSiswa">
-            <i class="fa-solid fa-plus"></i> Tambah Siswa
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full xl:w-auto">
+          <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+            <select id="filterTipeLes" class="w-full sm:w-44 border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white text-gray-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="">Semua Tipe</option>
+              <option value="privat">Privat</option>
+              <option value="kelas">Kelas</option>
+            </select>
+            <select id="filterJenjang" class="w-full sm:w-44 border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white text-gray-600 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="">Semua Jenjang</option>
+              <option value="PAUD_TK">TK / PAUD</option>
+              <option value="SD">SD</option>
+              <option value="SMP">SMP</option>
+              <option value="SMA">SMA / SMK</option>
+              <option value="ALUMNI">Alumni / Umum</option>
+            </select>
+          </div>
+          <div class="relative group w-full sm:w-80 xl:w-96">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fa-solid fa-magnifying-glass text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
+            </div>
+            <input type="text" id="searchSiswa" 
+              class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all shadow-sm" 
+              placeholder="Cari nama, NIK, atau kelas...">
+          </div>
+
+          <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2 font-semibold text-sm transform hover:-translate-y-0.5 active:scale-95 sm:min-w-[160px]" id="addSiswa">
+            <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Tambah Siswa</span>
           </button>
         </div>
       </header>
 
-      <div class="mb-6 border-b border-gray-200">
-        <nav class="flex gap-6" aria-label="Tabs">
-          <button class="tab-btn active px-4 py-3 font-semibold text-sm flex items-center gap-2 rounded-t-lg" data-target="tab-active">
-            <i class="fa-solid fa-user-check text-emerald-500"></i> Siswa Aktif
-            <span id="badgeActive" class="bg-emerald-100 text-emerald-700 py-0.5 px-2 rounded-full text-xs hidden">0</span>
+      <section class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4 mb-6">
+        <div class="glass-panel p-4">
+          <div class="text-xs font-semibold text-gray-400 uppercase">Privat</div>
+          <div class="text-2xl font-extrabold text-indigo-700 mt-1" id="countPrivat">0</div>
+          <div class="text-[11px] text-gray-400">Total siswa privat</div>
+        </div>
+        <div class="glass-panel p-4">
+          <div class="text-xs font-semibold text-gray-400 uppercase">Kelas</div>
+          <div class="text-2xl font-extrabold text-emerald-600 mt-1" id="countKelas">0</div>
+          <div class="text-[11px] text-gray-400">Total siswa kelas</div>
+        </div>
+        <div class="glass-panel p-4">
+          <div class="text-xs font-semibold text-gray-400 uppercase">TK / PAUD</div>
+          <div class="text-2xl font-extrabold text-slate-700 mt-1" id="countJenjangTK">0</div>
+          <div class="text-[11px] text-gray-400">Jenjang awal</div>
+        </div>
+        <div class="glass-panel p-4">
+          <div class="text-xs font-semibold text-gray-400 uppercase">SD</div>
+          <div class="text-2xl font-extrabold text-slate-700 mt-1" id="countJenjangSD">0</div>
+          <div class="text-[11px] text-gray-400">Jenjang SD</div>
+        </div>
+        <div class="glass-panel p-4">
+          <div class="text-xs font-semibold text-gray-400 uppercase">SMP</div>
+          <div class="text-2xl font-extrabold text-slate-700 mt-1" id="countJenjangSMP">0</div>
+          <div class="text-[11px] text-gray-400">Jenjang SMP</div>
+        </div>
+        <div class="glass-panel p-4">
+          <div class="text-xs font-semibold text-gray-400 uppercase">SMA / SMK</div>
+          <div class="text-2xl font-extrabold text-slate-700 mt-1" id="countJenjangSMA">0</div>
+          <div class="text-[11px] text-gray-400">Jenjang SMA</div>
+        </div>
+        <div class="glass-panel p-4">
+          <div class="text-xs font-semibold text-gray-400 uppercase">Alumni</div>
+          <div class="text-2xl font-extrabold text-slate-700 mt-1" id="countJenjangAlumni">0</div>
+          <div class="text-[11px] text-gray-400">Umum / Alumni</div>
+        </div>
+      </section>
+
+      <div class="mb-0">
+        <nav class="flex gap-2" aria-label="Tabs">
+          <button class="tab-btn active px-6 py-3 font-semibold text-sm flex items-center gap-2 rounded-t-xl hover:bg-gray-50" data-target="tab-pending">
+            <i class="fa-solid fa-user-plus text-blue-500"></i> Siswa Baru
+            <span id="badgePending" class="bg-blue-100 text-blue-700 py-0.5 px-2 rounded-full text-[10px] font-bold hidden">0</span>
           </button>
-          <button class="tab-btn px-4 py-3 font-semibold text-sm flex items-center gap-2 rounded-t-lg" data-target="tab-inactive">
-            <i class="fa-solid fa-user-clock text-amber-500"></i> Siswa Nonaktif
-            <span id="badgeInactive" class="bg-amber-100 text-amber-700 py-0.5 px-2 rounded-full text-xs hidden">0</span>
+          <button class="tab-btn px-6 py-3 font-semibold text-sm flex items-center gap-2 rounded-t-xl hover:bg-gray-50" data-target="tab-active">
+            <i class="fa-solid fa-user-check text-emerald-500"></i> Siswa Aktif
+            <span id="badgeActive" class="bg-emerald-100 text-emerald-700 py-0.5 px-2 rounded-full text-[10px] font-bold hidden">0</span>
+          </button>
+          <button class="tab-btn px-6 py-3 font-semibold text-sm flex items-center gap-2 rounded-t-xl hover:bg-gray-50" data-target="tab-inactive">
+            <i class="fa-solid fa-user-clock text-amber-500"></i> Nonaktif / Alumni
+            <span id="badgeInactive" class="bg-amber-100 text-amber-700 py-0.5 px-2 rounded-full text-[10px] font-bold hidden">0</span>
           </button>
         </nav>
       </div>
 
-      <div id="tab-active" class="tab-content active">
-        <section class="glass-panel p-6">
-          <div class="flex justify-between items-center mb-6">
-            <div>
-              <h2 class="text-lg font-bold text-gray-800">Daftar Siswa Aktif</h2>
-              <p class="text-xs text-gray-400">Siswa yang sedang menempuh pendidikan.</p>
-            </div>
-            <div class="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold border border-emerald-100 shadow-sm" id="siswaCountActive">
-              0 siswa
-            </div>
+      <!-- Tab Content: Siswa Baru (Pending) -->
+      <div id="tab-pending" class="tab-content active">
+        <section class="glass-panel overflow-hidden flex flex-col border-t-4 border-t-blue-400">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse modern-table">
+              <thead>
+                <tr>
+                  <th>Profil Siswa</th>
+                  <th>Program</th>
+                  <th>Mapel</th>
+                  <th>Preferensi Jadwal</th>
+                  <th>Tanggal Daftar</th>
+                  <th class="text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="siswaRowsPending" class="text-sm">
+              </tbody>
+            </table>
           </div>
 
-          <div id="siswaRowsActive" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 data-list">
+          <div id="siswaEmptyPending" class="flex flex-col items-center justify-center py-16 text-center hidden">
+            <div class="bg-blue-50 p-4 rounded-full mb-4">
+              <i class="fa-solid fa-user-plus text-3xl text-blue-300"></i>
             </div>
-          
-          <div id="siswaEmptyActive" class="flex flex-col items-center justify-center py-12 text-center hidden">
-            <div class="bg-gray-100 p-4 rounded-full mb-3"><i class="fa-regular fa-folder-open text-3xl text-gray-400"></i></div>
-            <p class="text-gray-500 font-medium">Belum ada siswa aktif.</p>
-            <p class="text-xs text-gray-400">Klik 'Tambah Siswa' untuk memulai.</p>
+            <h3 class="text-gray-800 font-bold text-lg">Tidak ada pendaftaran baru</h3>
+            <p class="text-gray-400 text-sm mt-1">Siswa baru dari registrasi akan muncul di sini.</p>
           </div>
 
-          <div class="flex justify-between items-center mt-8 pt-4 border-t border-gray-100 pager" id="siswaPagerActive">
-            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition pager-button" data-page="prev">
-              <i class="fa-solid fa-chevron-left mr-1"></i> Sebelumnya
+          <div class="flex justify-between items-center p-4 border-t border-gray-100 bg-gray-50/50" id="siswaPagerPending">
+            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition disabled:opacity-50 shadow-sm" data-page="prev">
+              <i class="fa-solid fa-chevron-left mr-1"></i> Prev
             </button>
-            <span class="text-sm font-medium text-gray-500 pager-info" id="siswaPagerActiveInfo">Halaman 1 dari 1</span>
-            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition pager-button" data-page="next">
-              Berikutnya <i class="fa-solid fa-chevron-right ml-1"></i>
+            <span class="text-xs font-semibold text-gray-500" id="siswaPagerPendingInfo">Hal 1 dari 1</span>
+            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-blue-600 transition disabled:opacity-50 shadow-sm" data-page="next">
+              Next <i class="fa-solid fa-chevron-right ml-1"></i>
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <div id="tab-active" class="tab-content">
+        <section class="glass-panel overflow-hidden flex flex-col">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse modern-table">
+              <thead>
+                <tr>
+                  <th>Profil Siswa</th>
+                  <th>Asal Cabang</th>
+                  <th>Akademik</th>
+                  <th>Mapel</th>
+                  <th>Program Bimbel</th>
+                  <th>Progres</th>
+                  <th>Tagihan</th>
+                  <th>Status</th>
+                  <th class="text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="siswaRowsActive" class="text-sm">
+                </tbody>
+            </table>
+          </div>
+          
+          <div id="siswaEmptyActive" class="flex flex-col items-center justify-center py-16 text-center hidden">
+            <div class="bg-indigo-50 p-4 rounded-full mb-4 animate-bounce-slow">
+              <i class="fa-solid fa-magnifying-glass text-3xl text-indigo-300"></i>
+            </div>
+            <h3 class="text-gray-800 font-bold text-lg">Data tidak ditemukan</h3>
+            <p class="text-gray-400 text-sm mt-1">Belum ada siswa aktif atau hasil pencarian nihil.</p>
+          </div>
+
+          <div class="flex justify-between items-center p-4 border-t border-gray-100 bg-gray-50/50" id="siswaPagerActive">
+            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-indigo-600 transition disabled:opacity-50 shadow-sm" data-page="prev">
+              <i class="fa-solid fa-chevron-left mr-1"></i> Prev
+            </button>
+            <span class="text-xs font-semibold text-gray-500" id="siswaPagerActiveInfo">Hal 1 dari 1</span>
+            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-indigo-600 transition disabled:opacity-50 shadow-sm" data-page="next">
+              Next <i class="fa-solid fa-chevron-right ml-1"></i>
             </button>
           </div>
         </section>
       </div>
 
       <div id="tab-inactive" class="tab-content">
-        <section class="glass-panel p-6 border-l-4 border-amber-400">
-          <div class="flex justify-between items-center mb-6">
-            <div>
-              <h2 class="text-lg font-bold text-gray-800">Arsip Siswa Nonaktif</h2>
-              <p class="text-xs text-gray-400">Siswa cuti, lulus, atau berhenti sementara.</p>
-            </div>
-            <div class="bg-amber-50 text-amber-600 px-3 py-1 rounded-full text-xs font-bold border border-amber-100 shadow-sm" id="siswaCountInactive">
-              0 siswa
-            </div>
+        <section class="glass-panel overflow-hidden flex flex-col border-t-4 border-t-amber-400">
+           <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse modern-table">
+              <thead>
+                <tr>
+                  <th>Profil Siswa</th>
+                  <th>Asal Cabang</th>
+                  <th>Akademik</th>
+                  <th>Mapel</th>
+                  <th>Program Bimbel</th>
+                  <th>Progress</th>
+                  <th>Tagihan</th>
+                  <th>Status</th>
+                  <th class="text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="siswaRowsInactive" class="text-sm">
+                 </tbody>
+            </table>
           </div>
 
-          <div id="siswaRowsInactive" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 data-list">
-             </div>
-
-          <div id="siswaEmptyInactive" class="flex flex-col items-center justify-center py-12 text-center hidden">
-            <div class="bg-gray-100 p-4 rounded-full mb-3"><i class="fa-solid fa-box-archive text-3xl text-gray-400"></i></div>
-            <p class="text-gray-500 font-medium">Belum ada siswa nonaktif.</p>
+          <div id="siswaEmptyInactive" class="flex flex-col items-center justify-center py-16 text-center hidden">
+             <div class="bg-amber-50 p-4 rounded-full mb-4">
+              <i class="fa-solid fa-box-archive text-3xl text-amber-300"></i>
+            </div>
+            <p class="text-gray-500 font-medium">Tidak ada data siswa nonaktif.</p>
           </div>
 
-          <div class="flex justify-between items-center mt-8 pt-4 border-t border-gray-100 pager" id="siswaPagerInactive">
-            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition pager-button" data-page="prev">
-              <i class="fa-solid fa-chevron-left mr-1"></i> Sebelumnya
+          <div class="flex justify-between items-center p-4 border-t border-gray-100 bg-gray-50/50" id="siswaPagerInactive">
+            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-amber-600 transition disabled:opacity-50 shadow-sm" data-page="prev">
+              <i class="fa-solid fa-chevron-left mr-1"></i> Prev
             </button>
-            <div class="text-sm font-medium text-gray-500 pager-info" id="siswaPagerInactiveInfo">Halaman 1 dari 1</div>
-            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition pager-button" data-page="next">
-              Berikutnya <i class="fa-solid fa-chevron-right ml-1"></i>
+            <span class="text-xs font-semibold text-gray-500" id="siswaPagerInactiveInfo">Hal 1 dari 1</span>
+            <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-amber-600 transition disabled:opacity-50 shadow-sm" data-page="next">
+              Next <i class="fa-solid fa-chevron-right ml-1"></i>
             </button>
           </div>
         </section>
@@ -168,156 +297,153 @@
 
     </main>
 
-    <div id="siswaModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
-      <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 p-0 overflow-hidden modal-card">
-        
+    <div id="siswaModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center bg-gray-900/60 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+      <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 p-0 overflow-hidden modal-card flex flex-col max-h-[90vh]">
         <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
           <div>
             <h3 class="text-lg font-bold text-gray-800" id="modalTitle">Tambah Siswa</h3>
-            <p class="text-xs text-gray-500 modal-subtitle">Lengkapi data siswa sesuai database.</p>
+            <p class="text-xs text-gray-500 modal-subtitle">Lengkapi biodata siswa.</p>
           </div>
-          <button id="closeModal" class="text-gray-400 hover:text-red-500 transition w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+          <button id="closeModal" class="text-gray-400 hover:text-red-500 transition w-8 h-8 rounded-full hover:bg-red-50 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
         </div>
-
-        <form id="siswaForm" class="p-6 overflow-y-auto max-h-[80vh] modal-form text-sm space-y-4">
+        <form id="siswaForm" class="p-6 overflow-y-auto text-sm space-y-4">
           <input type="hidden" id="siswaId" />
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label class="block col-span-2">
-              <span class="text-gray-700 font-semibold mb-1 block">Nama Lengkap <span class="text-red-500">*</span></span>
-              <input id="nama" type="text" required class="w-full" placeholder="Contoh: Ahmad Dahlan"/>
-            </label>
-            
-            <label class="block">
-              <span class="text-gray-700 font-medium mb-1 block">NIK</span>
-              <input id="nik" type="text" class="w-full" placeholder="16 digit angka"/>
-            </label>
-            
-            <label class="block">
-              <span class="text-gray-700 font-medium mb-1 block">Telepon / WA</span>
-              <input id="telepon" type="text" class="w-full" placeholder="08..."/>
-            </label>
+          <div class="flex items-center gap-4 mb-2">
+             <div class="w-16 h-16 rounded-full bg-indigo-50 border-2 border-indigo-100 flex items-center justify-center text-indigo-300">
+                <i class="fa-solid fa-user text-2xl"></i>
+             </div>
+             <div class="flex-1">
+                <label class="block text-gray-700 font-semibold mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                <input id="nama" type="text" required class="w-full border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 p-2 border" placeholder="Nama Siswa"/>
+             </div>
           </div>
 
-          <label class="block">
-            <span class="text-gray-700 font-medium mb-1 block">Alamat Domisili</span>
-            <input id="alamat" type="text" class="w-full" placeholder="Jalan..."/>
-          </label>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label class="block">
-              <span class="text-gray-700 font-medium mb-1 block">Tanggal Lahir</span>
-              <input id="tanggal_lahir" type="date" class="w-full"/>
-            </label>
-            <label class="block">
-              <span class="text-gray-700 font-medium mb-1 block">Kelas</span>
-              <input id="kelas" type="text" class="w-full" placeholder="Contoh: 10 SMA"/>
-            </label>
+          <div class="grid grid-cols-2 gap-4">
+             <div>
+                <label class="block text-gray-700 font-medium mb-1">NIK</label>
+                <input id="nik" type="text" class="w-full border-gray-300 rounded-lg p-2 border" placeholder="Nomor Induk"/>
+             </div>
+             <div>
+                <label class="block text-gray-700 font-medium mb-1">No. Telepon</label>
+                <input id="telepon" type="text" class="w-full border-gray-300 rounded-lg p-2 border" placeholder="08..."/>
+             </div>
           </div>
 
-          <label class="block">
-            <span class="text-gray-700 font-medium mb-1 block">Sekolah Asal</span>
-            <input id="sekolah_asal" type="text" class="w-full" />
-          </label>
+          <div>
+             <label class="block text-gray-700 font-medium mb-1">Alamat Domisili</label>
+             <input id="alamat" type="text" class="w-full border-gray-300 rounded-lg p-2 border" placeholder="Alamat lengkap"/>
+          </div>
 
-          <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100 space-y-3">
-             <label class="block">
-              <span class="text-indigo-900 font-semibold mb-1 block">Program Bimbel <span class="text-red-500">*</span></span>
-              <select id="program_id" required class="w-full bg-white"></select>
-            </label>
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Tanggal Lahir</label>
+            <input id="tanggal_lahir" type="date" class="w-full border-gray-300 rounded-lg p-2 border"/>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-gray-700 font-semibold mb-1">Jenjang <span class="text-red-500">*</span></label>
+              <select id="jenjang" required class="w-full border-gray-300 rounded-lg p-2 border focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="">Pilih jenjang...</option>
+                <option value="PAUD_TK">TK / PAUD</option>
+                <option value="SD">SD</option>
+                <option value="SMP">SMP</option>
+                <option value="SMA">SMA / SMK</option>
+                <option value="ALUMNI">Alumni / Umum</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-700 font-medium mb-1">Kelas</label>
+              <input id="kelas" type="text" class="w-full border-gray-300 rounded-lg p-2 border" placeholder="Ex: 12 IPA 1"/>
+            </div>
+          </div>
+
+          <div>
+             <label class="block text-gray-700 font-medium mb-1">Sekolah Asal</label>
+             <input id="sekolah_asal" type="text" class="w-full border-gray-300 rounded-lg p-2 border" />
+          </div>
+
+          <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+             <label class="block text-indigo-900 font-semibold mb-1">Program Bimbel <span class="text-red-500">*</span></label>
+             <select id="program_id" required class="w-full bg-white border-gray-300 rounded-lg p-2 border focus:ring-indigo-500"></select>
+          </div>
+
+          <!-- Mapel Selection -->
+          <div class="bg-violet-50/50 p-4 rounded-xl border border-violet-100">
+             <label class="block text-violet-900 font-semibold mb-1">Mata Pelajaran</label>
+             <p class="text-xs text-gray-500 mb-2">Pilih satu atau lebih mapel untuk siswa ini</p>
+             <div id="mapelCheckboxList" class="max-h-32 overflow-y-auto space-y-1 bg-white rounded-lg p-2 border border-gray-200">
+                <span class="text-xs text-gray-400">Memuat mapel...</span>
+             </div>
           </div>
 
           <div class="space-y-3 pt-2 border-t border-gray-100">
-             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Akun Login</h4>
-             <label class="block">
-               <span class="text-gray-700 font-medium mb-1 block">Email</span>
-               <input id="email" type="email" required class="w-full" placeholder="email@siswa.com"/>
-             </label>
-             <label class="block">
-               <span class="text-gray-700 font-medium mb-1 block">Password</span>
-               <input id="password" type="password" class="w-full" placeholder="Kosongkan jika tidak diubah"/>
-             </label>
+             <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2"><i class="fa-solid fa-lock"></i> Akun Login</h4>
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input id="email" type="email" required class="w-full border-gray-300 rounded-lg p-2 border" placeholder="Email"/>
+                <input id="password" type="password" class="w-full border-gray-300 rounded-lg p-2 border" placeholder="Password"/>
+             </div>
           </div>
 
-          <label class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer toggle-row">
+          <div class="flex items-center justify-between py-2">
             <span class="font-medium text-gray-700">Status Aktif</span>
-            <input id="is_active" type="checkbox" checked class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
-          </label>
+            <input id="is_active" type="checkbox" checked class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300" />
+          </div>
 
-          <div id="formError" class="text-red-500 text-sm font-medium hidden form-error"></div>
+          <div id="formError" class="text-red-500 text-sm font-medium hidden bg-red-50 p-2 rounded-lg border border-red-100"></div>
 
-          <div class="modal-actions pt-4 flex justify-end gap-3">
-            <button type="button" id="cancelModal" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition ghost-button">Batal</button>
-            <button type="submit" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition primary-button">Simpan Data</button>
+          <div class="pt-4 flex justify-end gap-3 border-t border-gray-100">
+            <button type="button" id="cancelModal" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition">Batal</button>
+            <button type="submit" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition font-medium">Simpan</button>
           </div>
         </form>
       </div>
     </div>
 
-    <div id="renewModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+    <div id="renewModal" class="modal fixed inset-0 z-50 hidden flex items-center justify-center bg-gray-900/60 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
       <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 modal-card">
         <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-          <div>
-            <h3 class="text-lg font-bold text-gray-800">Perpanjang Program</h3>
-            <p class="text-xs text-gray-500 modal-subtitle">Update masa aktif siswa.</p>
-          </div>
+          <h3 class="text-lg font-bold text-gray-800">Perpanjang Program</h3>
           <button id="closeRenewModal" class="text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        
-        <form id="renewForm" class="p-6 space-y-4 modal-form">
+        <form id="renewForm" class="p-6 space-y-4">
           <input type="hidden" id="renewSiswaId" />
-          
-          <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-2">
-            <p class="text-xs text-blue-700"><i class="fa-solid fa-circle-info mr-1"></i> Jadwal baru akan otomatis mengikuti pola jadwal terakhir.</p>
+          <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 flex gap-3">
+             <i class="fa-solid fa-circle-info text-blue-600 mt-0.5"></i>
+             <p class="text-xs text-blue-700 leading-relaxed">Perpanjangan akan menambahkan durasi aktif siswa berdasarkan program yang dipilih.</p>
           </div>
-
-          <label class="block">
-            <span class="text-gray-700 font-medium mb-1 block">Pilih Program</span>
-            <select id="renewProgram" required class="w-full"></select>
-          </label>
-          
-          <label class="block">
-            <span class="text-gray-700 font-medium mb-1 block">Tanggal Mulai Baru</span>
-            <input id="renewStartDate" type="date" required class="w-full" />
-          </label>
-          
-          <div id="renewError" class="text-red-500 text-sm hidden form-error"></div>
-          
-          <div class="modal-actions flex justify-end gap-3 mt-6">
-            <button type="button" id="cancelRenewModal" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition ghost-button">Batal</button>
-            <button type="submit" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-md transition primary-button">
-              <i class="fa-solid fa-check mr-2"></i> Perpanjang
-            </button>
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Pilih Program</label>
+            <select id="renewProgram" required class="w-full border-gray-300 rounded-lg p-2 border"></select>
+          </div>
+          <div>
+            <label class="block text-gray-700 font-medium mb-1">Tanggal Mulai Baru</label>
+            <input id="renewStartDate" type="date" required class="w-full border-gray-300 rounded-lg p-2 border" />
+          </div>
+          <div id="renewError" class="text-red-500 text-sm hidden"></div>
+          <div class="flex justify-end gap-3 mt-4">
+            <button type="button" id="cancelRenewModal" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition">Batal</button>
+            <button type="submit" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-md transition font-medium">Perpanjang</button>
           </div>
         </form>
       </div>
     </div>
 
     <script>
-        // Logika sederhana untuk Tab Switching
+        // Simple Tab Logic
         document.addEventListener('DOMContentLoaded', () => {
             const tabs = document.querySelectorAll('.tab-btn');
             const contents = document.querySelectorAll('.tab-content');
-
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
-                    // Reset Active States
                     tabs.forEach(t => t.classList.remove('active'));
                     contents.forEach(c => c.classList.remove('active'));
-
-                    // Set Active State
                     tab.classList.add('active');
-                    const targetId = tab.getAttribute('data-target');
-                    document.getElementById(targetId).classList.add('active');
+                    document.getElementById(tab.getAttribute('data-target')).classList.add('active');
                 });
             });
-
-            // Modal animation dikelola oleh siswa.js untuk menghindari konflik.
         });
     </script>
-    
     <script src="/js/sidebar.js"></script>
     <script src="/js/siswa.js"></script>
   </body>
