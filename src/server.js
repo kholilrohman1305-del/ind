@@ -1,35 +1,32 @@
+const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
-// Log errors to file for debugging on hosting
+const PORT = process.env.PORT || 3000;
+
+// Diagnostic: write env info to file
 const logFile = path.join(__dirname, "..", "startup.log");
 const log = (msg) => {
   const line = `[${new Date().toISOString()}] ${msg}\n`;
-  fs.appendFileSync(logFile, line);
+  try { fs.appendFileSync(logFile, line); } catch(e) { /* ignore */ }
   console.log(msg);
 };
 
-process.on("uncaughtException", (err) => {
-  log(`UNCAUGHT EXCEPTION: ${err.stack || err.message}`);
-  process.exit(1);
+log(`Node ${process.version}, PORT=${PORT}, CWD=${process.cwd()}`);
+log(`ENV keys: ${Object.keys(process.env).join(", ")}`);
+
+// Minimal test server - replace with real app after confirming runtime works
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { "Content-Type": "application/json" });
+  res.end(JSON.stringify({
+    status: "ok",
+    node: process.version,
+    port: PORT,
+    time: new Date().toISOString(),
+    env_keys: Object.keys(process.env),
+  }));
 });
 
-process.on("unhandledRejection", (err) => {
-  log(`UNHANDLED REJECTION: ${err.stack || err.message}`);
+server.listen(PORT, () => {
+  log(`Test server running on port ${PORT}`);
 });
-
-try {
-  log("Starting app...");
-  const app = require("./app");
-  const { startReminderJob } = require("./jobs/reminder.job");
-
-  const PORT = process.env.PORT || 3000;
-
-  app.listen(PORT, () => {
-    log(`Server is live on port ${PORT}`);
-    startReminderJob();
-  });
-} catch (err) {
-  log(`STARTUP ERROR: ${err.stack || err.message}`);
-  process.exit(1);
-}
