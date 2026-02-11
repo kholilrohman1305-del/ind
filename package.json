@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "npm run build:css && node src/server.js",
-    "build": "npm run build:css",
+    "build": "echo 'CSS already pre-built'",
     "build:css": "npx tailwindcss -i ./src/styles/tailwind.css -o ./public/css/tailwind.css --minify",
     "dev:css": "tailwindcss -i ./src/styles/tailwind.css -o ./public/css/tailwind.css --watch",
     "test": "jest"
