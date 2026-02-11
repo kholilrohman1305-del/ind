@@ -4,76 +4,94 @@ const tagihanService = require("./tagihan.service");
 const { ENROLLMENT_STATUS, JADWAL_STATUS, TAGIHAN_STATUS, TIPE_LES, ROLES } = require("../config/constants");
 
 const listSiswa = async (cabangId, { limit, offset } = {}) => {
-  // Query dengan koneksi ke jadwal, presensi, dan tagihan
+  // Optimized query with pre-aggregated JOINs instead of scalar subqueries
   const baseQuery = `
     SELECT s.id, s.user_id, s.cabang_id, c.nama AS cabang_nama, s.nama, s.nik, s.telepon, s.alamat,
            s.tanggal_lahir, s.sekolah_asal, s.jenjang, s.kelas, s.foto, s.is_active, s.status_pendaftaran,
            s.program_id, p.nama AS program_nama, p.tipe_les,
            s.preferred_days, s.preferred_jam_mulai, s.preferred_jam_selesai, s.tanggal_mulai_belajar,
            s.created_at, u.email,
-           -- Program list dari enrollment aktif
-           (SELECT GROUP_CONCAT(DISTINCT p2.nama ORDER BY p2.nama SEPARATOR ', ')
-            FROM enrollment en2
-            JOIN program p2 ON p2.id = en2.program_id
-            WHERE en2.siswa_id = s.id AND en2.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}') AS program_list,
-           -- Tipe les dari enrollment aktif (fallback untuk siswa aktif)
-           (SELECT p2.tipe_les
-            FROM enrollment en2
-            JOIN program p2 ON p2.id = en2.program_id
-            WHERE en2.siswa_id = s.id AND en2.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'
-            ORDER BY en2.id DESC LIMIT 1) AS program_tipe_les,
-           -- Total pertemuan dari enrollment aktif
-           COALESCE((SELECT en3.total_pertemuan
-            FROM enrollment en3
-            WHERE en3.siswa_id = s.id AND en3.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'
-            ORDER BY en3.id DESC LIMIT 1), 0) AS total_pertemuan,
-           -- Sisa pertemuan dari enrollment aktif
-           COALESCE((SELECT en4.sisa_pertemuan
-            FROM enrollment en4
-            WHERE en4.siswa_id = s.id AND en4.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'
-            ORDER BY en4.id DESC LIMIT 1), 0) AS sisa_pertemuan,
-           -- Status enrollment
-           (SELECT en5.status_enrollment
-            FROM enrollment en5
-            WHERE en5.siswa_id = s.id
-            ORDER BY en5.id DESC LIMIT 1) AS status_enrollment,
-           -- Pertemuan selesai: hitung jadwal yang sudah ada presensi
-           COALESCE((SELECT COUNT(DISTINCT j.id)
-            FROM enrollment en6
-            JOIN jadwal j ON j.enrollment_id = en6.id
-            JOIN presensi pr ON pr.jadwal_id = j.id
-            WHERE en6.siswa_id = s.id
-            AND en6.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'
-            AND j.status_jadwal = '${JADWAL_STATUS.COMPLETED}'), 0) AS pertemuan_selesai,
-           -- Total jadwal: hitung semua jadwal untuk enrollment aktif
-           COALESCE((SELECT COUNT(j2.id)
-            FROM enrollment en7
-            JOIN jadwal j2 ON j2.enrollment_id = en7.id
-            WHERE en7.siswa_id = s.id
-            AND en7.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'), 0) AS total_jadwal,
-           -- Mapel list dari siswa_mapel (untuk siswa baru)
-           (SELECT GROUP_CONCAT(DISTINCT m.nama ORDER BY m.nama SEPARATOR ', ')
-            FROM siswa_mapel sm
-            JOIN mapel m ON m.id = sm.mapel_id
-            WHERE sm.siswa_id = s.id) AS mapel_list,
-           -- Sisa tagihan: nominal tagihan - total pembayaran (yang belum lunas)
-           COALESCE((SELECT SUM(GREATEST(t.nominal - IFNULL((
-              SELECT SUM(pb.nominal) FROM pembayaran pb WHERE pb.tagihan_id = t.id
-            ), 0), 0))
-            FROM enrollment en8
-            JOIN tagihan t ON t.enrollment_id = en8.id
-            WHERE en8.siswa_id = s.id
-            AND t.status_tagihan != '${TAGIHAN_STATUS.LUNAS}'), 0) AS sisa_tagihan,
-           -- Jumlah tagihan belum lunas
-           COALESCE((SELECT COUNT(t2.id)
-            FROM enrollment en9
-            JOIN tagihan t2 ON t2.enrollment_id = en9.id
-            WHERE en9.siswa_id = s.id
-            AND t2.status_tagihan != '${TAGIHAN_STATUS.LUNAS}'), 0) AS tagihan_belum_lunas
+           COALESCE(prog_aktif.program_list, '') AS program_list,
+           prog_aktif.program_tipe_les,
+           COALESCE(enroll_latest.total_pertemuan, 0) AS total_pertemuan,
+           COALESCE(enroll_latest.sisa_pertemuan, 0) AS sisa_pertemuan,
+           enroll_any.status_enrollment,
+           COALESCE(jadwal_done.pertemuan_selesai, 0) AS pertemuan_selesai,
+           COALESCE(jadwal_all.total_jadwal, 0) AS total_jadwal,
+           COALESCE(mapel_agg.mapel_list, '') AS mapel_list,
+           COALESCE(tagihan_agg.sisa_tagihan, 0) AS sisa_tagihan,
+           COALESCE(tagihan_agg.tagihan_belum_lunas, 0) AS tagihan_belum_lunas
     FROM siswa s
     LEFT JOIN users u ON u.id = s.user_id
     LEFT JOIN cabang c ON c.id = s.cabang_id
     LEFT JOIN program p ON p.id = s.program_id
+    -- Program list dari enrollment aktif
+    LEFT JOIN (
+      SELECT en2.siswa_id,
+             GROUP_CONCAT(DISTINCT p2.nama ORDER BY p2.nama SEPARATOR ', ') AS program_list,
+             MAX(p2.tipe_les) AS program_tipe_les
+      FROM enrollment en2
+      JOIN program p2 ON p2.id = en2.program_id
+      WHERE en2.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'
+      GROUP BY en2.siswa_id
+    ) prog_aktif ON prog_aktif.siswa_id = s.id
+    -- Latest enrollment aktif
+    LEFT JOIN (
+      SELECT en3.siswa_id, en3.total_pertemuan, en3.sisa_pertemuan
+      FROM enrollment en3
+      WHERE en3.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'
+      GROUP BY en3.siswa_id
+      HAVING en3.id = MAX(en3.id)
+    ) enroll_latest ON enroll_latest.siswa_id = s.id
+    -- Latest enrollment any status
+    LEFT JOIN (
+      SELECT en5.siswa_id, en5.status_enrollment
+      FROM enrollment en5
+      WHERE en5.id = (
+        SELECT MAX(en5b.id) FROM enrollment en5b WHERE en5b.siswa_id = en5.siswa_id
+      )
+      GROUP BY en5.siswa_id
+    ) enroll_any ON enroll_any.siswa_id = s.id
+    -- Pertemuan selesai
+    LEFT JOIN (
+      SELECT en6.siswa_id, COUNT(DISTINCT j.id) AS pertemuan_selesai
+      FROM enrollment en6
+      JOIN jadwal j ON j.enrollment_id = en6.id
+      JOIN presensi pr ON pr.jadwal_id = j.id
+      WHERE en6.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'
+        AND j.status_jadwal = '${JADWAL_STATUS.COMPLETED}'
+      GROUP BY en6.siswa_id
+    ) jadwal_done ON jadwal_done.siswa_id = s.id
+    -- Total jadwal
+    LEFT JOIN (
+      SELECT en7.siswa_id, COUNT(j2.id) AS total_jadwal
+      FROM enrollment en7
+      JOIN jadwal j2 ON j2.enrollment_id = en7.id
+      WHERE en7.status_enrollment = '${ENROLLMENT_STATUS.AKTIF}'
+      GROUP BY en7.siswa_id
+    ) jadwal_all ON jadwal_all.siswa_id = s.id
+    -- Mapel list
+    LEFT JOIN (
+      SELECT sm.siswa_id, GROUP_CONCAT(DISTINCT m.nama ORDER BY m.nama SEPARATOR ', ') AS mapel_list
+      FROM siswa_mapel sm
+      JOIN mapel m ON m.id = sm.mapel_id
+      GROUP BY sm.siswa_id
+    ) mapel_agg ON mapel_agg.siswa_id = s.id
+    -- Sisa tagihan
+    LEFT JOIN (
+      SELECT en8.siswa_id,
+             SUM(GREATEST(t.nominal - COALESCE(pb_agg.total_bayar, 0), 0)) AS sisa_tagihan,
+             COUNT(DISTINCT t.id) AS tagihan_belum_lunas
+      FROM enrollment en8
+      JOIN tagihan t ON t.enrollment_id = en8.id
+      LEFT JOIN (
+        SELECT pb.tagihan_id, SUM(pb.nominal) AS total_bayar
+        FROM pembayaran pb
+        GROUP BY pb.tagihan_id
+      ) pb_agg ON pb_agg.tagihan_id = t.id
+      WHERE t.status_tagihan != '${TAGIHAN_STATUS.LUNAS}'
+      GROUP BY en8.siswa_id
+    ) tagihan_agg ON tagihan_agg.siswa_id = s.id
   `;
 
   const whereClause = cabangId ? "WHERE s.cabang_id = ?" : "";
