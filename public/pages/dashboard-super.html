@@ -82,60 +82,60 @@
         
         <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
             
-            <div class="bento-card p-6 flex flex-col justify-between h-40 xl:col-span-1 border-l-4 border-indigo-500">
+            <div class="bg-gradient-to-br from-indigo-600 to-purple-700 p-6 flex flex-col justify-between h-40 xl:col-span-1 rounded-2xl shadow-xl shadow-indigo-200 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-indigo-400/20">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Siswa Aktif</p>
-                        <h2 id="statSiswaAktif" class="text-4xl font-extrabold text-slate-800 tracking-tight">0</h2>
+                        <p class="text-xs font-bold text-indigo-100 uppercase tracking-wider mb-2">Total Siswa Aktif</p>
+                        <h2 id="statSiswaAktif" class="text-5xl font-extrabold text-white tracking-tight">0</h2>
                     </div>
-                    <div class="bg-indigo-50 text-indigo-600 w-10 h-10 rounded-2xl flex items-center justify-center text-lg">
+                    <div class="bg-white/20 backdrop-blur-sm text-white w-12 h-12 rounded-2xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-users"></i>
                     </div>
                 </div>
                 <div class="flex gap-2 mt-4">
-                    <span class="text-[10px] font-bold bg-indigo-50 text-indigo-700 px-2 py-1 rounded-lg border border-indigo-100">
+                    <span class="text-[10px] font-bold bg-white/20 backdrop-blur-sm text-white px-2 py-1.5 rounded-lg border border-white/30">
                         <span id="statSiswaPrivat">0</span> Privat
                     </span>
-                    <span class="text-[10px] font-bold bg-purple-50 text-purple-700 px-2 py-1 rounded-lg border border-purple-100">
+                    <span class="text-[10px] font-bold bg-white/20 backdrop-blur-sm text-white px-2 py-1.5 rounded-lg border border-white/30">
                         <span id="statSiswaKelas">0</span> Kelas
                     </span>
                 </div>
             </div>
 
-            <div class="bento-card p-6 flex flex-col justify-between h-40 xl:col-span-1">
-                <div class="absolute inset-0 bg-pattern"></div>
+            <div class="bg-gradient-to-br from-emerald-500 to-teal-600 p-6 flex flex-col justify-between h-40 xl:col-span-1 rounded-2xl shadow-xl shadow-emerald-200 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-emerald-400/20 relative overflow-hidden">
+                <div class="absolute inset-0 bg-pattern opacity-10"></div>
                 <div class="flex justify-between items-start relative z-10">
                     <div>
-                        <p class="text-xs font-bold text-emerald-600/80 uppercase tracking-wider mb-1">Revenue (Bulan Ini)</p>
-                        <h2 id="statPendapatan" class="text-3xl font-extrabold text-emerald-600 tracking-tight">Rp 0</h2>
+                        <p class="text-xs font-bold text-emerald-100 uppercase tracking-wider mb-2">Revenue (Bulan Ini)</p>
+                        <h2 id="statPendapatan" class="text-4xl font-extrabold text-white tracking-tight">Rp 0</h2>
                     </div>
-                    <div class="bg-emerald-50 text-emerald-600 w-10 h-10 rounded-2xl flex items-center justify-center text-lg">
+                    <div class="bg-white/20 backdrop-blur-sm text-white w-12 h-12 rounded-2xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-arrow-trend-up"></i>
                     </div>
                 </div>
-                <p class="text-xs text-slate-400 mt-2 relative z-10">Gross income seluruh cabang</p>
+                <p class="text-xs text-emerald-100 font-medium mt-2 relative z-10">Gross income seluruh cabang</p>
             </div>
 
-            <div class="bento-card p-6 flex flex-col justify-between h-40 xl:col-span-1">
+            <div class="bg-gradient-to-br from-rose-500 to-pink-600 p-6 flex flex-col justify-between h-40 xl:col-span-1 rounded-2xl shadow-xl shadow-rose-200 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-rose-400/20">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-bold text-rose-500/80 uppercase tracking-wider mb-1">Pengeluaran</p>
-                        <h2 id="statPengeluaran" class="text-3xl font-extrabold text-rose-600 tracking-tight">Rp 0</h2>
+                        <p class="text-xs font-bold text-rose-100 uppercase tracking-wider mb-2">Pengeluaran</p>
+                        <h2 id="statPengeluaran" class="text-4xl font-extrabold text-white tracking-tight">Rp 0</h2>
                     </div>
-                    <div class="bg-rose-50 text-rose-600 w-10 h-10 rounded-2xl flex items-center justify-center text-lg">
+                    <div class="bg-white/20 backdrop-blur-sm text-white w-12 h-12 rounded-2xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-arrow-trend-down"></i>
                     </div>
                 </div>
-                <p class="text-xs text-slate-400 mt-2">Biaya operasional & gaji</p>
+                <p class="text-xs text-rose-100 font-medium mt-2">Biaya operasional & gaji</p>
             </div>
 
-            <div class="bento-card p-6 flex flex-col justify-between h-40 xl:col-span-1">
+            <div class="bg-gradient-to-br from-amber-500 to-orange-600 p-6 flex flex-col justify-between h-40 xl:col-span-1 rounded-2xl shadow-xl shadow-amber-200 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border-2 border-amber-400/20">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-bold text-amber-500/80 uppercase tracking-wider mb-1">New Enrollment</p>
-                        <h2 id="statSiswaBaru" class="text-4xl font-extrabold text-slate-800 tracking-tight">0</h2>
+                        <p class="text-xs font-bold text-amber-100 uppercase tracking-wider mb-2">New Enrollment</p>
+                        <h2 id="statSiswaBaru" class="text-5xl font-extrabold text-white tracking-tight">0</h2>
                     </div>
-                    <div class="bg-amber-50 text-amber-600 w-10 h-10 rounded-2xl flex items-center justify-center text-lg">
+                    <div class="bg-white/20 backdrop-blur-sm text-white w-12 h-12 rounded-2xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-user-plus"></i>
                     </div>
                 </div>
@@ -251,6 +251,7 @@
       </div>
     </main>
     
+    <script src="/js/toast.js"></script>
     <script src="/js/sidebar.js"></script>
     <script src="/js/dashboard-super.js"></script>
   </body>
