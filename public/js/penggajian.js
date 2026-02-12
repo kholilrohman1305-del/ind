@@ -70,6 +70,7 @@
   let slipCache = [];
   let slipPage = 1;
   const slipPageSize = 10;
+  let activeTarifFilter = 'all'; // Active tarif filter for "Tarif Aktif Saat Ini" table
 
   // --- HELPERS ---
   const fetchJson = async (url, options = {}) => {
@@ -326,6 +327,49 @@
     });
   };
 
+  const renderTarifFilterTabs = () => {
+    const tabsContainer = document.getElementById("tarifFilterTabs");
+    if (!tabsContainer) return;
+
+    // Get unique tarif names
+    const uniqueTarifs = [...new Set(tarifRows.map(r => r.nama_tarif))].sort();
+
+    // Clear existing dynamic tabs (keep "Semua Tarif" button)
+    const allBtn = tabsContainer.querySelector('[data-tarif="all"]');
+    tabsContainer.innerHTML = '';
+    if (allBtn) tabsContainer.appendChild(allBtn);
+
+    // Add tab for each unique tarif
+    uniqueTarifs.forEach(namaTarif => {
+      const btn = document.createElement('button');
+      btn.className = 'tarif-filter-tab';
+      btn.dataset.tarif = namaTarif;
+      btn.textContent = namaTarif;
+      btn.addEventListener('click', () => {
+        activeTarifFilter = namaTarif;
+        updateTarifFilterTabs();
+        renderSettingTable();
+      });
+      tabsContainer.appendChild(btn);
+    });
+
+    // Update active state
+    updateTarifFilterTabs();
+  };
+
+  const updateTarifFilterTabs = () => {
+    const tabsContainer = document.getElementById("tarifFilterTabs");
+    if (!tabsContainer) return;
+
+    tabsContainer.querySelectorAll('.tarif-filter-tab').forEach(btn => {
+      if (btn.dataset.tarif === activeTarifFilter) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  };
+
   const renderSettingTable = () => {
     if (!settingRows || !settingEmpty) return;
 
@@ -338,8 +382,13 @@
     settingEmpty.classList.add("hidden");
     settingEmpty.classList.remove("flex");
 
+    // Filter by active tarif if not "all"
+    const filtered = activeTarifFilter === 'all'
+      ? tarifRows
+      : tarifRows.filter(r => r.nama_tarif === activeTarifFilter);
+
     // Sort by nama_tarif, kategori_les, jenjang, klasifikasi
-    const sorted = [...tarifRows].sort((a, b) => {
+    const sorted = [...filtered].sort((a, b) => {
       // Sort by nama_tarif first
       if (a.nama_tarif !== b.nama_tarif) {
         return (a.nama_tarif || '').localeCompare(b.nama_tarif || '');
@@ -414,6 +463,7 @@
       });
 
       tarifRows = rows || [];
+      renderTarifFilterTabs();
       renderSettingTable();
 
       const kategoriLabel = kategoriLes === 'privat' ? 'Privat' : 'Kelas';
@@ -661,6 +711,7 @@
       const rows = await fetchJson("/api/penggajian/setting");
       tarifRows = rows || [];
       renderTarifCards();
+      renderTarifFilterTabs();
       renderSettingTable();
     } catch (err) {
       console.error(err);
@@ -707,6 +758,19 @@
   tabButtons.forEach((button) => {
     button.addEventListener("click", () => setActiveTab(button.dataset.target));
   });
+
+  // Tarif Filter "Semua Tarif" button
+  const tarifFilterTabs = document.getElementById('tarifFilterTabs');
+  if (tarifFilterTabs) {
+    tarifFilterTabs.addEventListener('click', (e) => {
+      const btn = e.target.closest('.tarif-filter-tab[data-tarif="all"]');
+      if (btn) {
+        activeTarifFilter = 'all';
+        updateTarifFilterTabs();
+        renderSettingTable();
+      }
+    });
+  }
 
   // Add Tarif Modal
   if (addTarifBtn) {

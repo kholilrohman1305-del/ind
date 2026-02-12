@@ -110,6 +110,30 @@
       .tarif-gradient-4 { background: linear-gradient(135deg, #F59E0B, #D97706); }
       .tarif-gradient-5 { background: linear-gradient(135deg, #EC4899, #BE185D); }
       .tarif-gradient-6 { background: linear-gradient(135deg, #06B6D4, #0891B2); }
+
+      /* Tarif Filter Tabs */
+      .tarif-filter-tab {
+        padding: 0.625rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.813rem;
+        color: #64748B;
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
+        border-radius: 0.75rem;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+      .tarif-filter-tab:hover {
+        background: #E0E7FF;
+        color: #4F46E5;
+        border-color: #C7D2FE;
+      }
+      .tarif-filter-tab.active {
+        background: linear-gradient(135deg, #4F46E5, #6366F1);
+        color: white;
+        border-color: #4F46E5;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+      }
     </style>
   </head>
 
@@ -179,6 +203,17 @@
                 <h3 class="font-bold text-gray-800 text-lg">Tarif Aktif Saat Ini</h3>
                 <p class="text-xs text-gray-400">Digunakan untuk kalkulasi gaji bulan berjalan.</p>
             </div>
+
+            <!-- Tarif Filter Tabs -->
+            <div class="p-4 bg-gray-50 border-b border-gray-100">
+                <div id="tarifFilterTabs" class="flex flex-wrap gap-2">
+                    <button class="tarif-filter-tab active" data-tarif="all">
+                        <i class="fa-solid fa-list mr-1.5"></i>Semua Tarif
+                    </button>
+                    <!-- Dynamic tabs will be inserted here by JavaScript -->
+                </div>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse modern-table">
                     <thead>
@@ -409,6 +444,7 @@
     </div>
 
     <script src="/js/sidebar.js"></script>
+    <script src="/js/toast.js"></script>
     <script src="/js/penggajian.js"></script>
   </body>
 </html>
