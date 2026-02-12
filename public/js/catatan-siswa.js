@@ -87,11 +87,11 @@ async function fetchStudents() {
       catatanState.students = json.data || [];
       renderStudentCards();
     } else {
-      window.notifyError(json.message || "Gagal memuat data siswa");
+      window.toast.error(json.message || "Gagal memuat data siswa");
     }
   } catch (err) {
     console.error("Error fetching students:", err);
-    window.notifyError("Gagal memuat data siswa");
+    window.toast.error("Gagal memuat data siswa");
     catatanState.students = [];
     renderStudentCards();
   } finally {
@@ -249,11 +249,11 @@ async function fetchNotes(siswaId) {
       catatanState.notes = json.data || [];
       renderNoteHistory();
     } else {
-      window.notifyError(json.message || "Gagal memuat catatan");
+      window.toast.error(json.message || "Gagal memuat catatan");
     }
   } catch (err) {
     console.error("Error fetching notes:", err);
-    window.notifyError("Gagal memuat catatan");
+    window.toast.error("Gagal memuat catatan");
     catatanState.notes = [];
     renderNoteHistory();
   }
@@ -339,7 +339,7 @@ async function handleCatatanSubmit(e) {
   const catatan = document.getElementById("catatan_text").value.trim();
 
   if (!catatan) {
-    window.notifyError("Catatan tidak boleh kosong");
+    window.toast.error("Catatan tidak boleh kosong");
     return;
   }
 
@@ -374,16 +374,16 @@ async function handleCatatanSubmit(e) {
 
     const json = await res.json();
     if (json.success) {
-      window.notifySuccess(mode === "edit" ? "Catatan berhasil diperbarui" : "Catatan berhasil ditambahkan");
+      window.toast.success(mode === "edit" ? "Catatan berhasil diperbarui" : "Catatan berhasil ditambahkan");
       resetCatatanForm();
       fetchNotes(siswaId);
       fetchStudents(); // Refresh student list to update counts
     } else {
-      window.notifyError(json.message || "Gagal menyimpan catatan");
+      window.toast.error(json.message || "Gagal menyimpan catatan");
     }
   } catch (err) {
     console.error("Error saving note:", err);
-    window.notifyError(err.message || "Gagal menyimpan catatan");
+    window.toast.error(err.message || "Gagal menyimpan catatan");
   }
 }
 
@@ -424,16 +424,16 @@ window.deleteCatatan = async function(noteId) {
 
     const json = await res.json();
     if (json.success) {
-      window.notifySuccess("Catatan berhasil dihapus");
+      window.toast.success("Catatan berhasil dihapus");
       const siswaId = catatanState.selectedStudent.siswa_id;
       fetchNotes(siswaId);
       fetchStudents(); // Refresh student list to update counts
     } else {
-      window.notifyError(json.message || "Gagal menghapus catatan");
+      window.toast.error(json.message || "Gagal menghapus catatan");
     }
   } catch (err) {
     console.error("Error deleting note:", err);
-    window.notifyError(err.message || "Gagal menghapus catatan");
+    window.toast.error(err.message || "Gagal menghapus catatan");
   }
 };
 

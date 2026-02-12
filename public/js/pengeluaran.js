@@ -232,7 +232,7 @@
             body: JSON.stringify(payload),
           });
           
-          if(window.notifySuccess) window.notifySuccess("Berhasil", "Pengeluaran tercatat.");
+          if(window.toast.success) window.toast.success("Berhasil", "Pengeluaran tercatat.");
           form.reset();
           
           // Set tanggal kembali ke hari ini
@@ -240,7 +240,7 @@
           
           await loadRows();
       } catch (err) {
-          if(window.notifyError) window.notifyError("Gagal", err.message);
+          if(window.toast.error) window.toast.error("Gagal", err.message);
       }
     });
   }
@@ -279,10 +279,10 @@
           if (!confirm("Hapus data pengeluaran ini?")) return;
           try {
               await fetchJson(`/api/pengeluaran/${button.dataset.id}`, { method: "DELETE" });
-              if(window.notifySuccess) window.notifySuccess("Terhapus", "Data pengeluaran dihapus.");
+              if(window.toast.success) window.toast.success("Terhapus", "Data pengeluaran dihapus.");
               await loadRows();
           } catch (err) {
-              if(window.notifyError) window.notifyError("Gagal Hapus", err.message);
+              if(window.toast.error) window.toast.error("Gagal Hapus", err.message);
           }
       }
     });

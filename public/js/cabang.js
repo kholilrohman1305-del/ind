@@ -385,7 +385,7 @@
   if (useMyLocationBtn) {
     useMyLocationBtn.addEventListener("click", () => {
       if (!navigator.geolocation) {
-        if (window.notifyError) window.notifyError("Lokasi", "Browser tidak mendukung lokasi.");
+        if (window.toast.error) window.toast.error("Lokasi", "Browser tidak mendukung lokasi.");
         return;
       }
       navigator.geolocation.getCurrentPosition(
@@ -395,7 +395,7 @@
           setMarker(lat, lng);
         },
         () => {
-          if (window.notifyError) window.notifyError("Lokasi", "Izin lokasi ditolak.");
+          if (window.toast.error) window.toast.error("Lokasi", "Izin lokasi ditolak.");
         }
       );
     });
@@ -421,10 +421,10 @@
       if (action === "toggle") {
         try {
           await saveCabang({ is_active: !cabang.is_active }, id);
-          if (window.notifySuccess) window.notifySuccess("Status diperbarui", cabang.nama);
+          if (window.toast.success) window.toast.success("Status diperbarui", cabang.nama);
           fetchCabang();
         } catch (err) {
-          if (window.notifyError) window.notifyError("Gagal", err.message);
+          if (window.toast.error) window.toast.error("Gagal", err.message);
         }
       }
 
@@ -432,10 +432,10 @@
         if (!confirm(`Hapus cabang "${cabang.nama}"? Data tidak bisa dikembalikan.`)) return;
         try {
           await deleteCabang(id);
-          if (window.notifySuccess) window.notifySuccess("Terhapus", "Cabang berhasil dihapus");
+          if (window.toast.success) window.toast.success("Terhapus", "Cabang berhasil dihapus");
           fetchCabang();
         } catch (err) {
-          if (window.notifyError) window.notifyError("Gagal", err.message);
+          if (window.toast.error) window.toast.error("Gagal", err.message);
         }
       }
     });
@@ -460,8 +460,8 @@
 
         await saveCabang(payload, fields.id.value || null);
         
-        if (window.notifySuccess) {
-          window.notifySuccess(
+        if (window.toast.success) {
+          window.toast.success(
             state.mode === "edit" ? "Berhasil Diperbarui" : "Berhasil Ditambahkan",
             payload.nama
           );
@@ -470,7 +470,7 @@
         close();
         fetchCabang();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Error", err.message);
+        if (window.toast.error) window.toast.error("Error", err.message);
         else alert(err.message);
       } finally {
         submitBtn.innerHTML = originalText;

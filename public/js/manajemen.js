@@ -310,7 +310,7 @@
             });
           }
           
-          if(window.notifySuccess) window.notifySuccess("Berhasil", "Jabatan baru ditambahkan.");
+          if(window.toast.success) window.toast.success("Berhasil", "Jabatan baru ditambahkan.");
           
           inputNama.value = "";
           if (inputGaji) inputGaji.value = "";
@@ -318,7 +318,7 @@
           closeModal(jabatanModal);
           
       } catch(err) {
-          if(window.notifyError) window.notifyError("Gagal", err.message);
+          if(window.toast.error) window.toast.error("Gagal", err.message);
       }
     });
   }
@@ -335,11 +335,11 @@
         
         try {
             await fetchJson(`/api/manajemen/${id}`, { method: "DELETE" });
-            if(window.notifySuccess) window.notifySuccess("Terhapus", "Jabatan dihapus.");
+            if(window.toast.success) window.toast.success("Terhapus", "Jabatan dihapus.");
             await loadRows();
             await loadEdukator(); // Refresh tabel assign karena status jabatan user berubah
         } catch(err) {
-            if(window.notifyError) window.notifyError("Gagal Hapus", err.message);
+            if(window.toast.error) window.toast.error("Gagal Hapus", err.message);
         }
       }
     });
@@ -388,11 +388,11 @@
                     }),
                   });
                   
-                  if(window.notifySuccess) window.notifySuccess("Berhasil", "Jabatan dicopot.");
+                  if(window.toast.success) window.toast.success("Berhasil", "Jabatan dicopot.");
                   await loadEdukator();
                   
               } catch(err) {
-                  if(window.notifyError) window.notifyError("Gagal", err.message);
+                  if(window.toast.error) window.toast.error("Gagal", err.message);
               }
           }
       });
@@ -417,7 +417,7 @@
             }),
           });
           
-          if(window.notifySuccess) window.notifySuccess("Update Berhasil", "Struktur organisasi diperbarui.");
+          if(window.toast.success) window.toast.success("Update Berhasil", "Struktur organisasi diperbarui.");
           
           // Reset form (opsional)
           assignEdukator.value = "";
@@ -427,7 +427,7 @@
           closeModal(assignModal);
           
       } catch(err) {
-          if(window.notifyError) window.notifyError("Gagal Update", err.message);
+          if(window.toast.error) window.toast.error("Gagal Update", err.message);
       }
     });
   }

@@ -329,10 +329,10 @@
       if (action === "toggle") {
         try {
           await saveMapel({ is_active: !mapel.is_active }, id);
-          if (window.notifySuccess) window.notifySuccess("Status diperbarui", mapel.nama);
+          if (window.toast.success) window.toast.success("Status diperbarui", mapel.nama);
           fetchMapel();
         } catch (err) {
-          if (window.notifyError) window.notifyError("Gagal", err.message);
+          if (window.toast.error) window.toast.error("Gagal", err.message);
         }
       }
 
@@ -340,10 +340,10 @@
         if (!confirm(`Hapus mapel "${mapel.nama}"?`)) return;
         try {
           await deleteMapel(id);
-          if (window.notifySuccess) window.notifySuccess("Terhapus", "Mapel berhasil dihapus");
+          if (window.toast.success) window.toast.success("Terhapus", "Mapel berhasil dihapus");
           fetchMapel();
         } catch (err) {
-          if (window.notifyError) window.notifyError("Gagal", err.message);
+          if (window.toast.error) window.toast.error("Gagal", err.message);
         }
       }
     });
@@ -368,8 +368,8 @@
 
         await saveMapel(payload, fields.id.value || null);
         
-        if (window.notifySuccess) {
-          window.notifySuccess(
+        if (window.toast.success) {
+          window.toast.success(
             state.mode === "edit" ? "Berhasil Diperbarui" : "Berhasil Ditambahkan",
             payload.nama
           );
@@ -378,7 +378,7 @@
         close();
         fetchMapel();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Error", err.message);
+        if (window.toast.error) window.toast.error("Error", err.message);
         else alert(err.message);
       } finally {
         submitBtn.innerHTML = originalText;

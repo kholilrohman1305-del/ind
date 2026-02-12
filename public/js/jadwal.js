@@ -889,8 +889,8 @@
             body: JSON.stringify({ enrollment_id: enrollmentId, slots: filledSlots }),
           });
 
-          if (window.notifySuccess) {
-            window.notifySuccess("Jadwal disimpan", "Slot terisi diperbarui.");
+          if (window.toast.success) {
+            window.toast.success("Jadwal disimpan", "Slot terisi diperbarui.");
           }
         } else {
           // Submit kelas jadwal
@@ -937,8 +937,8 @@
             }),
           });
 
-          if (window.notifySuccess) {
-            window.notifySuccess("Jadwal kelas disimpan", "Slot mingguan diperbarui.");
+          if (window.toast.success) {
+            window.toast.success("Jadwal kelas disimpan", "Slot mingguan diperbarui.");
           }
 
           // Refresh kelas groups
@@ -953,8 +953,8 @@
         closeModal(jadwalModal);
       } catch (err) {
         error.textContent = err.message;
-        if (window.notifyError) {
-          window.notifyError("Gagal menyimpan jadwal", err.message);
+        if (window.toast.error) {
+          window.toast.error("Gagal menyimpan jadwal", err.message);
         }
       }
     });
@@ -1007,8 +1007,8 @@
             mapel_id: document.getElementById("editMapel").value,
           }),
         });
-        if (window.notifySuccess) {
-          window.notifySuccess("Jadwal diperbarui", "Perubahan tersimpan.");
+        if (window.toast.success) {
+          window.toast.success("Jadwal diperbarui", "Perubahan tersimpan.");
         }
         // Close edit modal first, then refresh detail
         closeModal(editModal);
@@ -1018,8 +1018,8 @@
         }
       } catch (err) {
         error.textContent = err.message;
-        if (window.notifyError) {
-          window.notifyError("Gagal memperbarui jadwal", err.message);
+        if (window.toast.error) {
+          window.toast.error("Gagal memperbarui jadwal", err.message);
         }
       }
     });
@@ -1082,13 +1082,13 @@
               ? `/api/jadwal/privat/enrollment/${id}`
               : `/api/jadwal/kelas/${id}`;
             await fetchJson(url, { method: "DELETE" });
-            if (window.notifySuccess) {
-              window.notifySuccess("Jadwal dihapus", "Silakan tambah jadwal baru.");
+            if (window.toast.success) {
+              window.toast.success("Jadwal dihapus", "Silakan tambah jadwal baru.");
             }
             await loadLists();
           } catch (err) {
-            if (window.notifyError) {
-              window.notifyError("Gagal menghapus jadwal", err.message);
+            if (window.toast.error) {
+              window.toast.error("Gagal menghapus jadwal", err.message);
             }
           }
         }
@@ -1116,8 +1116,8 @@
 
   const openEditModal = (row) => {
     if (row.status_jadwal === JADWAL_STATUS.COMPLETED) {
-      if (window.notifyError) {
-        window.notifyError("Tidak bisa diedit", "Jadwal yang sudah selesai tidak dapat diubah.");
+      if (window.toast.error) {
+        window.toast.error("Tidak bisa diedit", "Jadwal yang sudah selesai tidak dapat diubah.");
       }
       return;
     }

@@ -697,10 +697,10 @@
     if (action === "toggle") {
       try {
         await saveEdukator({ is_active: !edukator.is_active }, id);
-        if (window.notifySuccess) window.notifySuccess("Status Diperbarui", `Edukator kini ${!edukator.is_active ? 'Aktif' : 'Nonaktif'}`);
+        if (window.toast.success) window.toast.success("Status Diperbarui", `Edukator kini ${!edukator.is_active ? 'Aktif' : 'Nonaktif'}`);
         fetchEdukator();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Gagal update", err.message);
+        if (window.toast.error) window.toast.error("Gagal update", err.message);
       }
     }
 
@@ -708,10 +708,10 @@
       if (!confirm(`Hapus data edukator: ${edukator.nama}?`)) return;
       try {
         await deleteEdukator(id);
-        if (window.notifySuccess) window.notifySuccess("Terhapus", "Data edukator berhasil dihapus.");
+        if (window.toast.success) window.toast.success("Terhapus", "Data edukator berhasil dihapus.");
         fetchEdukator();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Gagal hapus", err.message);
+        if (window.toast.error) window.toast.error("Gagal hapus", err.message);
       }
     }
   };
@@ -735,7 +735,7 @@
 
         await saveEdukator(payload, fields.edukator_id.value || null);
         
-        if (window.notifySuccess) window.notifySuccess("Berhasil", "Data tersimpan.");
+        if (window.toast.success) window.toast.success("Berhasil", "Data tersimpan.");
         close();
         fetchEdukator();
       } catch (err) {

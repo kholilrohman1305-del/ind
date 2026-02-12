@@ -616,7 +616,7 @@
       
       Promise.all([loadChart(), loadLanjutan()])
         .catch((err) => {
-            if (window.notifyError) window.notifyError("Gagal memuat laporan", err.message);
+            if (window.toast.error) window.toast.error("Gagal memuat laporan", err.message);
         })
         .finally(() => {
              applyButton.innerHTML = '<i class="fa-solid fa-filter"></i> Terapkan';
@@ -631,8 +631,8 @@
   // Initial Load
   initFilters().then(() => {
       Promise.all([loadChart(), loadLanjutan()]).catch((err) => {
-        if (window.notifyError) {
-          window.notifyError("Gagal memuat laporan", err.message);
+        if (window.toast.error) {
+          window.toast.error("Gagal memuat laporan", err.message);
         }
       });
   });

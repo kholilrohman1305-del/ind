@@ -199,7 +199,7 @@
         cachedRows = rows || [];
         applyFilter();
     } catch (e) {
-        if(window.notifyError) window.notifyError("Data Gagal Dimuat", e.message);
+        if(window.toast.error) window.toast.error("Data Gagal Dimuat", e.message);
     }
   };
 
@@ -257,20 +257,20 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
           });
-          if (window.notifySuccess) window.notifySuccess("Sukses", "Data promo berhasil diperbarui.");
+          if (window.toast.success) window.toast.success("Sukses", "Data promo berhasil diperbarui.");
         } else {
           await fetchJson("/api/promo", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
           });
-          if (window.notifySuccess) window.notifySuccess("Sukses", "Promo baru berhasil dibuat.");
+          if (window.toast.success) window.toast.success("Sukses", "Promo baru berhasil dibuat.");
         }
         toggleModal(false);
         resetForm();
         await loadPromo();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Gagal Menyimpan", err.message);
+        if (window.toast.error) window.toast.error("Gagal Menyimpan", err.message);
       }
     });
   }
@@ -308,10 +308,10 @@
         if (!confirm(`Yakin ingin menghapus promo "${row.nama}"?`)) return;
         try {
           await fetchJson(`/api/promo/${row.id}`, { method: "DELETE" });
-          if (window.notifySuccess) window.notifySuccess("Terhapus", "Promo telah dihapus dari sistem.");
+          if (window.toast.success) window.toast.success("Terhapus", "Promo telah dihapus dari sistem.");
           await loadPromo();
         } catch (err) {
-          if (window.notifyError) window.notifyError("Gagal Menghapus", err.message);
+          if (window.toast.error) window.toast.error("Gagal Menghapus", err.message);
         }
       }
     });

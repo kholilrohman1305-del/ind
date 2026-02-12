@@ -80,11 +80,11 @@ async function fetchPengajuan() {
       renderStats();
       renderPengajuanList();
     } else {
-      window.notifyError(json.message || "Gagal memuat data");
+      window.toast.error(json.message || "Gagal memuat data");
     }
   } catch (err) {
     console.error("Error fetching pengajuan:", err);
-    window.notifyError("Gagal memuat data pengajuan");
+    window.toast.error("Gagal memuat data pengajuan");
     adminPengajuanState.pengajuanList = [];
     renderPengajuanList();
   } finally {
@@ -286,7 +286,7 @@ async function handleApprovalSubmit(e) {
   const catatan = document.getElementById("approval_catatan").value.trim();
 
   if (action === "reject" && !catatan) {
-    window.notifyError("Catatan wajib diisi saat menolak");
+    window.toast.error("Catatan wajib diisi saat menolak");
     return;
   }
 
@@ -306,15 +306,15 @@ async function handleApprovalSubmit(e) {
 
     const json = await res.json();
     if (json.success) {
-      window.notifySuccess(json.message || `Pengajuan berhasil ${action === "approve" ? "disetujui" : "ditolak"}`);
+      window.toast.success(json.message || `Pengajuan berhasil ${action === "approve" ? "disetujui" : "ditolak"}`);
       closeApprovalModal();
       fetchPengajuan();
     } else {
-      window.notifyError(json.message || "Gagal memproses pengajuan");
+      window.toast.error(json.message || "Gagal memproses pengajuan");
     }
   } catch (err) {
     console.error("Error processing approval:", err);
-    window.notifyError(err.message || "Gagal memproses pengajuan");
+    window.toast.error(err.message || "Gagal memproses pengajuan");
   }
 }
 

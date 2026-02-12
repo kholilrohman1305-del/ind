@@ -126,13 +126,13 @@ async function fetchRincianGaji() {
       render();
     } else {
       console.error("API Error:", json.message);
-      if (window.notifyError) window.notifyError("Gagal memuat data", json.message || "Terjadi kesalahan");
+      if (window.toast.error) window.toast.error("Gagal memuat data", json.message || "Terjadi kesalahan");
       state.data = null;
       renderEmpty();
     }
   } catch (err) {
     console.error("Error fetching rincian gaji:", err);
-    if (window.notifyError) window.notifyError("Gagal memuat data rincian gaji", err.message || "Periksa koneksi internet");
+    if (window.toast.error) window.toast.error("Gagal memuat data rincian gaji", err.message || "Periksa koneksi internet");
     state.data = null;
     renderEmpty();
   } finally {

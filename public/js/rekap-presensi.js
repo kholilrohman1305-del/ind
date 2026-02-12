@@ -77,11 +77,11 @@ async function fetchRekap() {
       state.data = json.data;
       render();
     } else {
-      window.notifyError(json.message || "Gagal memuat data");
+      window.toast.error(json.message || "Gagal memuat data");
     }
   } catch (err) {
     console.error("Error fetching rekap:", err);
-    window.notifyError("Gagal memuat data rekap");
+    window.toast.error("Gagal memuat data rekap");
     state.data = null;
     renderEmpty();
   } finally {

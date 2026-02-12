@@ -95,7 +95,7 @@
     } catch (err) {
       state.rows = [];
       renderRows();
-      if (window.notifyError) window.notifyError("Gagal memuat", err.message);
+      if (window.toast.error) window.toast.error("Gagal memuat", err.message);
     }
   };
 
@@ -107,7 +107,7 @@
     if (input === null) return;
     const password = String(input).trim();
     if (password.length < 6) {
-      if (window.notifyError) window.notifyError("Gagal", "Password minimal 6 karakter.");
+      if (window.toast.error) window.toast.error("Gagal", "Password minimal 6 karakter.");
       return;
     }
     await fetchJson(`/api/user-management/${userId}/reset-password`, {
@@ -115,7 +115,7 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password }),
     });
-    if (window.notifySuccess) window.notifySuccess("Berhasil", "Password diperbarui.");
+    if (window.toast.success) window.toast.success("Berhasil", "Password diperbarui.");
   };
 
   const toggleStatus = async (userId, currentActive) => {
@@ -129,8 +129,8 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ is_active: nextActive }),
     });
-    if (window.notifySuccess) {
-      window.notifySuccess("Status diperbarui", nextActive ? "Akun diaktifkan." : "Akun dinonaktifkan.");
+    if (window.toast.success) {
+      window.toast.success("Status diperbarui", nextActive ? "Akun diaktifkan." : "Akun dinonaktifkan.");
     }
   };
 
@@ -159,7 +159,7 @@
         }
         await loadRows();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Gagal", err.message);
+        if (window.toast.error) window.toast.error("Gagal", err.message);
       }
     });
   }

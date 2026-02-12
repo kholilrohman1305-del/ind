@@ -192,7 +192,7 @@
         cachedRows = entries || [];
         applyFilter(); // This calls renderTable
     } catch (err) {
-        if (window.notifyError) window.notifyError("Gagal memuat data", err.message);
+        if (window.toast.error) window.toast.error("Gagal memuat data", err.message);
     }
   };
 
@@ -229,11 +229,11 @@
             nominal: Number(saldoNominalInput.value || 0),
           }),
         });
-        if (window.notifySuccess) window.notifySuccess("Saldo Tersimpan", "Data saldo awal diperbarui.");
+        if (window.toast.success) window.toast.success("Saldo Tersimpan", "Data saldo awal diperbarui.");
         setModalVisible(false);
         await loadKas();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Gagal menyimpan saldo", err.message);
+        if (window.toast.error) window.toast.error("Gagal menyimpan saldo", err.message);
       }
     });
   }

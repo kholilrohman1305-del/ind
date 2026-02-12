@@ -310,8 +310,8 @@
               catatan,
             }),
           });
-          if (window.notifySuccess) {
-            window.notifySuccess("Pembayaran tersimpan", "Data pembayaran berhasil dibuat.");
+          if (window.toast.success) {
+            window.toast.success("Pembayaran tersimpan", "Data pembayaran berhasil dibuat.");
           }
           closeModal();
           await load();
@@ -319,8 +319,8 @@
           window.dispatchEvent(new CustomEvent("pembayaran:updated"));
         } catch (err) {
           if (error) error.textContent = err.message;
-          if (window.notifyError) {
-            window.notifyError("Gagal menyimpan pembayaran", err.message);
+          if (window.toast.error) {
+            window.toast.error("Gagal menyimpan pembayaran", err.message);
           }
         }
       });

@@ -280,8 +280,8 @@
       body: JSON.stringify({ ...payload, materi }),
     });
 
-    if (window.notifySuccess) {
-      window.notifySuccess("Absensi tersimpan", "Status jadwal diperbarui.");
+    if (window.toast.success) {
+      window.toast.success("Absensi tersimpan", "Status jadwal diperbarui.");
     } else {
       alert("Absensi berhasil disimpan!");
     }
@@ -311,8 +311,8 @@
       body: JSON.stringify({ ...payload, materi, kehadiran }),
     });
 
-    if (window.notifySuccess) {
-      window.notifySuccess("Absensi tersimpan", "Status jadwal dan kehadiran siswa diperbarui.");
+    if (window.toast.success) {
+      window.toast.success("Absensi tersimpan", "Status jadwal dan kehadiran siswa diperbarui.");
     } else {
       alert("Absensi berhasil disimpan!");
     }
@@ -489,8 +489,8 @@
             kelasModal.classList.remove("hidden");
           }
         } catch (err) {
-          if (window.notifyError) {
-            window.notifyError("Gagal memuat data", err.message);
+          if (window.toast.error) {
+            window.toast.error("Gagal memuat data", err.message);
           } else {
             alert("Gagal memuat data siswa: " + err.message);
           }

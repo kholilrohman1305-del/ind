@@ -24,12 +24,12 @@
   };
 
   const notify = (type, message) => {
-    if (type === "success" && window.notifySuccess) {
-      window.notifySuccess("Berhasil", message);
+    if (type === "success" && window.toast.success) {
+      window.toast.success("Berhasil", message);
       return;
     }
-    if (type === "error" && window.notifyError) {
-      window.notifyError("Gagal", message);
+    if (type === "error" && window.toast.error) {
+      window.toast.error("Gagal", message);
       return;
     }
     if (window.notify) {

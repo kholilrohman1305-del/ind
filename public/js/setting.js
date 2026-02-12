@@ -56,7 +56,7 @@
         const data = await fetchJson("/api/settings/cabang");
         applyData(data);
     } catch (err) {
-        if(window.notifyError) window.notifyError("Gagal memuat data", err.message);
+        if(window.toast.error) window.toast.error("Gagal memuat data", err.message);
     }
   };
 
@@ -106,8 +106,8 @@
       });
 
       applyData(data);
-      if (window.notifySuccess) {
-        window.notifySuccess("Berhasil", "Pengaturan cabang telah diperbarui.");
+      if (window.toast.success) {
+        window.toast.success("Berhasil", "Pengaturan cabang telah diperbarui.");
       }
       
       // Clear password field visual
@@ -118,8 +118,8 @@
           errorEl.textContent = err.message;
           errorEl.classList.remove('hidden');
       }
-      if (window.notifyError) {
-        window.notifyError("Gagal menyimpan", err.message);
+      if (window.toast.error) {
+        window.toast.error("Gagal menyimpan", err.message);
       }
     } finally {
         // Reset Button

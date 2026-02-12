@@ -187,13 +187,13 @@
             await loadInfaqList();
             loadSlip();
           } catch (err) {
-            if (window.notifyError) window.notifyError("Gagal", err.message);
+            if (window.toast.error) window.toast.error("Gagal", err.message);
           }
         });
         infaqListBody.appendChild(tr);
       });
     } catch (err) {
-      if (window.notifyError) window.notifyError("Gagal", "Tidak bisa memuat infaq.");
+      if (window.toast.error) window.toast.error("Gagal", "Tidak bisa memuat infaq.");
     }
   };
 
@@ -417,9 +417,9 @@
       renderSettingTable();
 
       const kategoriLabel = kategoriLes === 'privat' ? 'Privat' : 'Kelas';
-      if (window.notifySuccess) window.notifySuccess("Berhasil", `Tarif ${namaTarif} (${kategoriLabel}) telah diperbarui.`);
+      if (window.toast.success) window.toast.success("Berhasil", `Tarif ${namaTarif} (${kategoriLabel}) telah diperbarui.`);
     } catch (err) {
-      if (window.notifyError) window.notifyError("Gagal Menyimpan", err.message);
+      if (window.toast.error) window.toast.error("Gagal Menyimpan", err.message);
     }
   };
 
@@ -436,9 +436,9 @@
     try {
       await fetchJson(`/api/penggajian/setting/tarif?nama_tarif=${encodeURIComponent(namaTarif)}&kategori_les=${encodeURIComponent(kategoriLes)}`, { method: "DELETE" });
       await loadTarifNames();
-      if (window.notifySuccess) window.notifySuccess("Berhasil", `Tarif "${namaTarif}" (${kategoriLabel}) telah dihapus.`);
+      if (window.toast.success) window.toast.success("Berhasil", `Tarif "${namaTarif}" (${kategoriLabel}) telah dihapus.`);
     } catch (err) {
-      if (window.notifyError) window.notifyError("Gagal Menghapus", err.message);
+      if (window.toast.error) window.toast.error("Gagal Menghapus", err.message);
     }
   };
 
@@ -492,7 +492,7 @@
       addTarifForm.reset();
       await loadTarifNames();
       const kategoriLabel = kategoriLes === 'privat' ? 'Privat' : 'Kelas';
-      if (window.notifySuccess) window.notifySuccess("Berhasil", `Tarif "${namaTarif}" (${kategoriLabel}) telah ditambahkan.`);
+      if (window.toast.success) window.toast.success("Berhasil", `Tarif "${namaTarif}" (${kategoriLabel}) telah ditambahkan.`);
     } catch (err) {
       if (tarifFormError) {
         tarifFormError.textContent = err.message;
@@ -694,7 +694,7 @@
       renderSlipTable(filtered);
     } catch (err) {
       console.error(err);
-      if (window.notifyError) window.notifyError("Error", "Gagal memuat data gaji.");
+      if (window.toast.error) window.toast.error("Error", "Gagal memuat data gaji.");
     } finally {
       if (slipButton) {
         slipButton.innerHTML = '<i class="fa-solid fa-rotate"></i> Load Data';
@@ -744,7 +744,7 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
-        if (window.notifySuccess) window.notifySuccess("Berhasil", isEdit ? "Infaq berhasil diperbarui." : "Infaq berhasil ditambahkan.");
+        if (window.toast.success) window.toast.success("Berhasil", isEdit ? "Infaq berhasil diperbarui." : "Infaq berhasil ditambahkan.");
         resetInfaqForm();
         await loadInfaqList();
         loadSlip();
@@ -784,7 +784,7 @@
           body: JSON.stringify(payload),
         });
         setModalVisible(infaqMassalModal, false);
-        if (window.notifySuccess) window.notifySuccess("Berhasil", "Infaq massal berhasil ditambahkan.");
+        if (window.toast.success) window.toast.success("Berhasil", "Infaq massal berhasil ditambahkan.");
         loadSlip();
       } catch (err) {
         if (infaqMassalFormError) {
@@ -1188,8 +1188,8 @@
 
         } catch (err) {
             console.error("Anomaly Check Error:", err);
-            if(window.notifyError) {
-                window.notifyError("Gagal", err.message);
+            if(window.toast.error) {
+                window.toast.error("Gagal", err.message);
             } else {
                 alert("Gagal: " + err.message);
             }

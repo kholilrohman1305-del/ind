@@ -1171,12 +1171,12 @@
         });
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.message || "Gagal aktivasi.");
-        if (window.notifySuccess) {
-          window.notifySuccess("Aktivasi Berhasil", `${siswa.nama} - ${data.jadwal_created || 0} jadwal dibuat`);
+        if (window.toast.success) {
+          window.toast.success("Aktivasi Berhasil", `${siswa.nama} - ${data.jadwal_created || 0} jadwal dibuat`);
         }
         fetchSiswa();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Gagal aktivasi", err.message);
+        if (window.toast.error) window.toast.error("Gagal aktivasi", err.message);
         button.disabled = false;
         button.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Aktivasi';
       }
@@ -1185,20 +1185,20 @@
     if (action === "toggle") {
       try {
         await saveSiswa({ is_active: !siswa.is_active }, id);
-        if (window.notifySuccess) window.notifySuccess("Status diperbarui", `${siswa.nama} sekarang ${!siswa.is_active ? 'Aktif' : 'Nonaktif'}`);
+        if (window.toast.success) window.toast.success("Status diperbarui", `${siswa.nama} sekarang ${!siswa.is_active ? 'Aktif' : 'Nonaktif'}`);
         fetchSiswa();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Gagal update status", err.message);
+        if (window.toast.error) window.toast.error("Gagal update status", err.message);
       }
     }
     if (action === "delete") {
       if (!confirm(`Hapus data siswa: ${siswa.nama}?`)) return;
       try {
         await deleteSiswa(id);
-        if (window.notifySuccess) window.notifySuccess("Siswa dihapus", siswa.nama);
+        if (window.toast.success) window.toast.success("Siswa dihapus", siswa.nama);
         fetchSiswa();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Gagal menghapus", err.message);
+        if (window.toast.error) window.toast.error("Gagal menghapus", err.message);
       }
     }
   };
@@ -1261,12 +1261,12 @@
           if (!payload.program_id) throw new Error("Silakan pilih program bimbingan.");
         }
         await saveSiswa(payload, fields.siswaId.value || null);
-        if (window.notifySuccess) window.notifySuccess(state.mode === "edit" ? "Data Diperbarui" : "Siswa Ditambahkan", payload.nama);
+        if (window.toast.success) window.toast.success(state.mode === "edit" ? "Data Diperbarui" : "Siswa Ditambahkan", payload.nama);
         close();
         fetchSiswa();
       } catch (err) {
         if (formError) { formError.textContent = err.message; formError.classList.remove('hidden'); }
-        if (window.notifyError) window.notifyError("Gagal menyimpan", err.message);
+        if (window.toast.error) window.toast.error("Gagal menyimpan", err.message);
       }
     });
   }
@@ -1287,12 +1287,12 @@
         });
         const data = await res.json();
         if (!res.ok || !data.success) throw new Error(data.message || "Gagal renew.");
-        if (window.notifySuccess) window.notifySuccess("Berhasil", "Program berhasil diperpanjang.");
+        if (window.toast.success) window.toast.success("Berhasil", "Program berhasil diperpanjang.");
         closeRenew();
         fetchSiswa();
       } catch (err) {
         if (renewError) { renewError.textContent = err.message; renewError.classList.remove('hidden'); }
-        if (window.notifyError) window.notifyError("Gagal renew", err.message);
+        if (window.toast.error) window.toast.error("Gagal renew", err.message);
       }
     });
   }

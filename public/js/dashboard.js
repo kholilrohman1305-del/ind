@@ -1,5 +1,5 @@
 (() => {
-  const { TIPE_LES } = window.APP_CONSTANTS;
+  const { TIPE_LES } = window.APP_CONSTANTS || { TIPE_LES: { KELAS: 'KELAS', PRIVAT: 'PRIVAT' } }; // Fallback safe
   const requester = window.api?.request || fetch;
 
   // --- Helpers ---
@@ -12,7 +12,7 @@
     if (el) el.textContent = value;
   };
 
-  // Fungsi Render List Generic (Diperbarui untuk Tailwind)
+  // Fungsi Render List Generic
   const renderList = (rows, containerId, emptyId, formatter) => {
     const container = document.getElementById(containerId);
     const empty = document.getElementById(emptyId);
@@ -25,7 +25,7 @@
     // Handle Empty State
     if (!rows || !rows.length) {
       if (empty) {
-          empty.style.display = "flex"; // Gunakan flex agar centering alignment CSS berfungsi
+          empty.style.display = "flex";
           empty.classList.remove("hidden");
       }
       return;
@@ -38,14 +38,13 @@
     }
 
     rows.forEach((row) => {
-      // Kita langsung append string HTML agar styling Tailwind lebih fleksibel
       container.insertAdjacentHTML('beforeend', formatter(row));
     });
   };
 
   // --- Main Render Function ---
   const render = (data) => {
-    // 1. Set Statistik Kartu Atas
+    // 1. Set Statistik
     setText("statSiswaAktif", formatNumber(data.siswa_aktif));
     setText("statSiswaPrivat", formatNumber(data.siswa_privat));
     setText("statSiswaKelas", formatNumber(data.siswa_kelas));
@@ -60,61 +59,56 @@
       "jadwalList",
       "jadwalEmpty",
       (row) => {
-        // Logika Judul (Siswa/Kelas) & Detail (Program + Edukator)
         const title = row.siswa_nama || row.kelas_nama || row.program_nama || "Tanpa Nama";
         const programName = row.program_nama || "-";
         const educatorName = row.edukator_nama || row.pengajar_nama || "-";
         const mapelName = row.mapel_nama || row.tipe_les || "Umum";
         const time = row.jam_mulai ? row.jam_mulai.substring(0, 5) : "--:--";
 
-        // HTML Template Modern (Tailwind)
+        // Modern Row Design
         return `
-          <div class="flex items-center gap-4 p-4 border-b border-slate-50 last:border-0 hover:bg-slate-50/80 transition-colors duration-200 group">
-            <div class="flex-shrink-0">
-                <div class="flex flex-col items-center justify-center w-12 h-12 bg-violet-50 text-violet-600 rounded-xl border border-violet-100 shadow-sm group-hover:scale-105 transition-transform">
-                    <span class="text-xs font-bold leading-none">${time}</span>
-                </div>
+          <div class="group flex items-center gap-5 p-5 hover:bg-slate-50 transition-all duration-200 cursor-default">
+            
+            <div class="flex-shrink-0 flex flex-col items-center justify-center w-14 h-14 rounded-2xl bg-white border border-slate-100 shadow-sm text-slate-700 group-hover:border-violet-200 group-hover:text-violet-600 transition-colors">
+                <span class="text-sm font-bold font-mono">${time}</span>
             </div>
 
             <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-0.5">
+                <div class="flex items-center gap-2 mb-1">
                     <h4 class="text-sm font-bold text-slate-800 truncate" title="${title}">
                         ${title}
                     </h4>
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200">${mapelName}</span>
                 </div>
-                <div class="flex items-center gap-2 text-xs text-slate-500">
-                    <span class="truncate">${mapelName}</span>
-                    <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-                    <span class="truncate">Program: ${programName}</span>
-                </div>
-                <div class="text-[11px] text-slate-400 mt-1 truncate">
-                    Edukator: ${educatorName}
+                
+                <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-slate-500">
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                        <span class="truncate">${programName}</span>
+                    </div>
+                    <div class="hidden sm:block w-1 h-1 bg-slate-300 rounded-full"></div>
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                        <span class="truncate">${educatorName}</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex-shrink-0">
-                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-600 border border-blue-100">
-                    Belum
-                </span>
+            <div class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button class="p-2 text-slate-400 hover:text-violet-600 bg-transparent hover:bg-violet-50 rounded-lg transition-all">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                </button>
             </div>
           </div>
         `;
       }
     );
 
-    // 3. Set Program Terbanyak
+    // 3. Program Terbanyak
     const top = data.program_terbanyak;
     const programEl = document.getElementById("programTerbanyak");
     if (programEl) {
-        // Kita hanya mengubah text content, styling container (gradient) sudah ada di HTML
-        programEl.textContent = top
-            ? `${top.nama}` 
-            : "-";
-        
-        // Opsional: Update footer card jika ingin menampilkan jumlah detail
-        // Anda bisa menambahkan ID ke elemen footer di HTML jika ingin dinamis juga
-        // const footerEl = document.querySelector(".highlight-foot");
-        // if(footerEl && top) footerEl.textContent = `${formatNumber(top.total_siswa)} Siswa aktif`;
+        programEl.textContent = top ? `${top.nama}` : "-";
     }
 
     // 4. Render List: Sisa Pertemuan < 3
@@ -123,63 +117,63 @@
       "sisaPertemuanList",
       "sisaPertemuanEmpty",
       (row) => `
-        <div class="flex items-center justify-between p-4 border-b border-slate-50 last:border-0 hover:bg-rose-50/30 transition-colors">
+        <div class="flex items-center justify-between p-3 rounded-xl hover:bg-rose-50/50 border border-transparent hover:border-rose-100 transition-all group">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold">
+                <div class="w-9 h-9 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center text-xs font-extrabold shadow-sm group-hover:bg-white group-hover:text-rose-500 transition-colors">
                     ${(row.siswa_nama || "S")[0]}
                 </div>
                 <div>
-                    <div class="text-xs font-bold text-slate-700">${row.siswa_nama || "-"}</div>
+                    <div class="text-xs font-bold text-slate-700 group-hover:text-slate-900">${row.siswa_nama || "-"}</div>
                     <div class="text-[10px] text-slate-400">${row.program_nama || "-"}</div>
                 </div>
             </div>
-
-            <div class="flex-shrink-0">
-                <span class="px-2 py-1 bg-rose-100 text-rose-600 text-xs font-bold rounded-lg border border-rose-200">
-                    Sisa: ${row.sisa_pertemuan}
-                </span>
-            </div>
+            <span class="px-2.5 py-1 bg-white text-rose-600 text-[10px] font-bold rounded-lg border border-slate-100 shadow-sm group-hover:border-rose-200">
+               ${row.sisa_pertemuan} Sesi
+            </span>
         </div>
       `
     );
 
-    // 5. Render Siswa Menunggu Jadwal (show only if count > 0)
+    // 5. Render Siswa Menunggu Jadwal
     const menungguCount = data.siswa_menunggu_jadwal || 0;
     const menungguCard = document.getElementById("statMenungguJadwalCard");
     const menungguPanel = document.getElementById("menungguJadwalPanel");
 
     if (menungguCount > 0) {
       setText("statMenungguJadwal", formatNumber(menungguCount));
-      if (menungguCard) menungguCard.classList.remove("hidden");
-      if (menungguPanel) menungguPanel.classList.remove("hidden");
+      if (menungguCard) {
+          menungguCard.classList.remove("hidden");
+          menungguCard.classList.add("block");
+      }
+      if (menungguPanel) {
+          menungguPanel.classList.remove("hidden");
+          menungguPanel.classList.add("flex");
+      }
 
       renderList(
         data.siswa_menunggu_jadwal_list || [],
         "menungguJadwalList",
         "menungguJadwalEmpty",
         (row) => {
-          const tipeBadge = row.tipe_les === TIPE_LES.KELAS
-            ? `<span class="px-1.5 py-0.5 bg-purple-100 text-purple-600 text-[9px] font-bold rounded">Kelas</span>`
-            : `<span class="px-1.5 py-0.5 bg-blue-100 text-blue-600 text-[9px] font-bold rounded">Privat</span>`;
+          const isKelas = row.tipe_les === (window.APP_CONSTANTS?.TIPE_LES?.KELAS || 'KELAS');
+          const badgeColor = isKelas ? 'bg-purple-100 text-purple-700' : 'bg-sky-100 text-sky-700';
 
           return `
-            <a href="/jadwal" class="flex items-center justify-between p-4 border-b border-slate-50 last:border-0 hover:bg-orange-50/50 transition-colors cursor-pointer">
+            <a href="/jadwal" class="flex items-center justify-between p-3 rounded-xl bg-slate-50/50 hover:bg-orange-50 border border-transparent hover:border-orange-200 transition-all cursor-pointer group">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold">
+                    <div class="w-9 h-9 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-extrabold shadow-sm group-hover:scale-105 transition-transform">
                         ${(row.siswa_nama || "S")[0]}
                     </div>
                     <div>
-                        <div class="text-xs font-bold text-slate-700">${row.siswa_nama || "-"}</div>
+                        <div class="text-xs font-bold text-slate-700 group-hover:text-orange-900 transition-colors">${row.siswa_nama || "-"}</div>
                         <div class="flex items-center gap-1.5 mt-0.5">
                             <span class="text-[10px] text-slate-400">${row.program_nama || "-"}</span>
-                            ${tipeBadge}
+                            <span class="px-1.5 py-0.5 ${badgeColor} text-[9px] font-bold rounded">${isKelas ? 'Kelas' : 'Privat'}</span>
                         </div>
                     </div>
                 </div>
-                <div class="flex-shrink-0">
-                    <span class="px-2 py-1 bg-orange-100 text-orange-600 text-[10px] font-bold rounded-lg border border-orange-200">
-                        Atur Jadwal
-                    </span>
+                <div class="flex items-center text-orange-400 group-hover:text-orange-600">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                 </div>
             </a>
           `;
@@ -187,11 +181,14 @@
       );
     } else {
       if (menungguCard) menungguCard.classList.add("hidden");
-      if (menungguPanel) menungguPanel.classList.add("hidden");
+      if (menungguPanel) {
+          menungguPanel.classList.add("hidden");
+          menungguPanel.classList.remove("flex");
+      }
     }
   };
 
-  // --- Data Fetching ---
+  // --- Init ---
   const init = async () => {
     try {
       const res = await requester("/api/dashboard/summary", { credentials: "same-origin" });
@@ -201,7 +198,6 @@
       }
     } catch (err) {
       console.error("Gagal memuat dashboard:", err);
-      // Opsional: Tampilkan state error di UI jika fetch gagal total
     }
   };
 

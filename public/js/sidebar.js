@@ -78,8 +78,8 @@
 
   if (!window.notify) {
     window.notify = buildNotification;
-    window.notifySuccess = (title, subtitle) => buildNotification({ type: "success", title, subtitle });
-    window.notifyError = (title, subtitle) =>
+    window.toast.success = (title, subtitle) => buildNotification({ type: "success", title, subtitle });
+    window.toast.error = (title, subtitle) =>
       buildNotification({ type: "error", title, subtitle, timeout: 5000 });
     window.notifyWarning = (title, subtitle) => buildNotification({ type: "warning", title, subtitle });
     window.notifyLoading = (title = "Memproses", subtitle = "Mohon tunggu sebentar") =>
@@ -90,14 +90,14 @@
         .then((result) => {
           if (loading) loading.close();
           if (messages.successTitle || messages.successSubtitle) {
-            window.notifySuccess(messages.successTitle || "Berhasil", messages.successSubtitle || "");
+            window.toast.success(messages.successTitle || "Berhasil", messages.successSubtitle || "");
           }
           return result;
         })
         .catch((error) => {
           if (loading) loading.close();
           if (messages.errorTitle || messages.errorSubtitle) {
-            window.notifyError(messages.errorTitle || "Gagal", messages.errorSubtitle || "");
+            window.toast.error(messages.errorTitle || "Gagal", messages.errorSubtitle || "");
           }
           throw error;
         });

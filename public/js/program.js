@@ -628,10 +628,10 @@
     if (action === "toggle") {
       try {
         await saveProgram({ is_active: !program.is_active }, id);
-        if (window.notifySuccess) window.notifySuccess("Status diperbarui", program.nama);
+        if (window.toast.success) window.toast.success("Status diperbarui", program.nama);
         fetchProgram();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Gagal update", err.message);
+        if (window.toast.error) window.toast.error("Gagal update", err.message);
       }
     }
 
@@ -639,10 +639,10 @@
       if (!confirm(`Hapus program: ${program.nama}?`)) return;
       try {
         await deleteProgram(id);
-        if (window.notifySuccess) window.notifySuccess("Terhapus", "Program berhasil dihapus.");
+        if (window.toast.success) window.toast.success("Terhapus", "Program berhasil dihapus.");
         fetchProgram();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Gagal hapus", err.message);
+        if (window.toast.error) window.toast.error("Gagal hapus", err.message);
       }
     }
   };
@@ -665,8 +665,8 @@
 
         await saveProgram(payload, fields.program_id.value || null);
 
-        if (window.notifySuccess) {
-          window.notifySuccess(
+        if (window.toast.success) {
+          window.toast.success(
             fields.program_id.value ? "Program Diperbarui" : "Program Ditambahkan",
             payload.nama
           );

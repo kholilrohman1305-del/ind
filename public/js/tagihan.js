@@ -61,10 +61,10 @@
       if (!confirm("Hapus tagihan ini secara permanen?")) return;
       try {
         await fetchJson(`/api/tagihan/${id}`, { method: "DELETE" });
-        if (window.notifySuccess) window.notifySuccess("Dihapus", "Tagihan berhasil dihapus.");
+        if (window.toast.success) window.toast.success("Dihapus", "Tagihan berhasil dihapus.");
         await load();
       } catch (err) {
-        if (window.notifyError) window.notifyError("Gagal menghapus", err.message);
+        if (window.toast.error) window.toast.error("Gagal menghapus", err.message);
       }
     }
   };
@@ -561,7 +561,7 @@
             }),
           });
           
-          if (window.notifySuccess) window.notifySuccess("Tagihan tersimpan", "Data tagihan berhasil dibuat.");
+          if (window.toast.success) window.toast.success("Tagihan tersimpan", "Data tagihan berhasil dibuat.");
           
           toggleModal('tagihanModal', false);
           await load();
@@ -570,7 +570,7 @@
              error.querySelector('span').textContent = err.message;
              error.classList.remove('hidden');
           }
-          if (window.notifyError) window.notifyError("Gagal menyimpan tagihan", err.message);
+          if (window.toast.error) window.toast.error("Gagal menyimpan tagihan", err.message);
         } finally {
             saveBtn.innerText = btnText;
             saveBtn.disabled = false;
