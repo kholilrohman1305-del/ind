@@ -45,6 +45,7 @@
     program_transport_edukator: document.getElementById("program_transport_edukator"),
     program_transport_ilhami: document.getElementById("program_transport_ilhami"),
     program_deskripsi: document.getElementById("program_deskripsi"),
+    program_gambar: document.getElementById("program_gambar"),
     program_active: document.getElementById("program_active"),
     program_tarif_tidak_hadir: document.getElementById("program_tarif_tidak_hadir"),
   };
@@ -514,6 +515,17 @@
     fields.program_deskripsi.value = data?.deskripsi || "";
     fields.program_active.checked = data ? (data.is_active ? true : false) : true;
 
+    // Image preview
+    const gambarPreview = document.getElementById("programGambarPreview");
+    const gambarPreviewImg = document.getElementById("programGambarPreviewImg");
+    if (fields.program_gambar) fields.program_gambar.value = "";
+    if (data?.gambar && gambarPreview && gambarPreviewImg) {
+      gambarPreviewImg.src = data.gambar;
+      gambarPreview.classList.remove("hidden");
+    } else if (gambarPreview) {
+      gambarPreview.classList.add("hidden");
+    }
+
     // Transport fields
     if (fields.program_transport_edukator) {
       fields.program_transport_edukator.value = data?.transport_edukator || "";
@@ -574,13 +586,25 @@
   const saveProgram = async (payload, id) => {
     const url = id ? `/api/program/${id}` : "/api/program";
     const method = id ? "PUT" : "POST";
+    const fileInput = fields.program_gambar;
+    const hasFile = fileInput && fileInput.files && fileInput.files[0];
 
-    const res = await requester(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-      body: JSON.stringify(payload),
-    });
+    let res;
+    if (hasFile) {
+      const formData = new FormData();
+      formData.append("gambar", fileInput.files[0]);
+      for (const [key, val] of Object.entries(payload)) {
+        if (val !== null && val !== undefined) formData.append(key, val);
+      }
+      res = await requester(url, { method, credentials: "same-origin", body: formData });
+    } else {
+      res = await requester(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(payload),
+      });
+    }
 
     const data = await res.json();
     if (!res.ok || !data.success) {
@@ -679,6 +703,22 @@
           formError.classList.remove('hidden');
         }
         if (window.notifyWarning) window.notifyWarning("Validasi Gagal", err.message);
+      }
+    });
+  }
+
+  // --- Image Preview ---
+  if (fields.program_gambar) {
+    fields.program_gambar.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      const preview = document.getElementById("programGambarPreview");
+      const previewImg = document.getElementById("programGambarPreviewImg");
+      if (file && preview && previewImg) {
+        const reader = new FileReader();
+        reader.onload = (ev) => { previewImg.src = ev.target.result; preview.classList.remove("hidden"); };
+        reader.readAsDataURL(file);
+      } else if (preview) {
+        preview.classList.add("hidden");
       }
     });
   }

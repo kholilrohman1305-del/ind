@@ -12,6 +12,7 @@ const menuMap = {
     "user-management",
     "analisis-sentimen",
     "analisa-cabang",
+    "banner-management",
   ],
   [ROLES.ADMIN_CABANG]: [
     "dashboard",

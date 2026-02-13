@@ -4,7 +4,7 @@ const { ROLES, PENDAFTARAN_STATUS } = require("../config/constants");
 
 const getPublicPrograms = async () => {
   const [rows] = await db.query(`
-    SELECT p.id, p.cabang_id, p.nama, p.jenjang, p.tipe_les, p.harga, p.deskripsi, p.jumlah_pertemuan,
+    SELECT p.id, p.cabang_id, p.nama, p.jenjang, p.tipe_les, p.harga, p.deskripsi, p.gambar, p.jumlah_pertemuan,
            c.nama AS cabang_nama, c.alamat AS cabang_alamat, c.kode AS cabang_kode
     FROM program p
     JOIN cabang c ON c.id = p.cabang_id
@@ -177,4 +177,28 @@ const registerSiswa = async (payload) => {
   }
 };
 
-module.exports = { getPublicPrograms, getRegistrationOptions, registerEdukator, registerSiswa };
+const getActiveBanners = async () => {
+  const [rows] = await db.query(
+    "SELECT id, gambar, judul, link_url FROM banner WHERE is_active = 1 ORDER BY urutan ASC, id ASC"
+  );
+  return rows;
+};
+
+const getFeaturedEdukators = async () => {
+  const [rows] = await db.query(`
+    SELECT e.id, e.nama, e.pendidikan_terakhir, e.foto,
+           GROUP_CONCAT(m.nama SEPARATOR ', ') AS mapel_nama,
+           c.nama AS cabang_nama
+    FROM edukator e
+    LEFT JOIN edukator_mapel em ON em.edukator_id = e.id
+    LEFT JOIN mapel m ON m.id = em.mapel_id
+    LEFT JOIN cabang c ON c.id = e.cabang_utama_id
+    WHERE e.is_active = 1
+    GROUP BY e.id
+    ORDER BY e.created_at DESC
+    LIMIT 8
+  `);
+  return rows;
+};
+
+module.exports = { getPublicPrograms, getRegistrationOptions, registerEdukator, registerSiswa, getActiveBanners, getFeaturedEdukators };

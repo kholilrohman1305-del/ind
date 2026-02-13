@@ -42,7 +42,7 @@ const listProgram = async (cabangId) => {
     [rows] = await db.query(
       `SELECT p.id, p.cabang_id, p.jenjang, p.mapel_id, p.nama, p.tipe_les, p.tarif_id,
               p.jumlah_pertemuan, p.harga, p.gaji_per_pertemuan, p.transport_edukator,
-              p.transport_ilhami, p.tarif_tidak_hadir, p.deskripsi, p.is_active, p.created_at,
+              p.transport_ilhami, p.tarif_tidak_hadir, p.deskripsi, p.gambar, p.is_active, p.created_at,
               gs.nama_tarif, gs.kategori_les
        FROM program p
        LEFT JOIN gaji_setting gs ON gs.id = p.tarif_id
@@ -54,7 +54,7 @@ const listProgram = async (cabangId) => {
     [rows] = await db.query(
       `SELECT p.id, p.cabang_id, p.jenjang, p.mapel_id, p.nama, p.tipe_les, p.tarif_id,
               p.jumlah_pertemuan, p.harga, p.gaji_per_pertemuan, p.transport_edukator,
-              p.transport_ilhami, p.tarif_tidak_hadir, p.deskripsi, p.is_active, p.created_at,
+              p.transport_ilhami, p.tarif_tidak_hadir, p.deskripsi, p.gambar, p.is_active, p.created_at,
               gs.nama_tarif, gs.kategori_les
        FROM program p
        LEFT JOIN gaji_setting gs ON gs.id = p.tarif_id
@@ -111,6 +111,7 @@ const createProgram = async (payload) => {
     transport_ilhami,
     tarif_tidak_hadir,
     deskripsi,
+    gambar,
     is_active,
   } = payload;
 
@@ -131,8 +132,8 @@ const createProgram = async (payload) => {
     const [result] = await conn.query(
       `INSERT INTO program
         (cabang_id, jenjang, nama, tipe_les, tarif_id, jumlah_pertemuan, harga,
-         gaji_per_pertemuan, transport_edukator, transport_ilhami, tarif_tidak_hadir, deskripsi, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         gaji_per_pertemuan, transport_edukator, transport_ilhami, tarif_tidak_hadir, deskripsi, gambar, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         cabang_id,
         jenjangValue,
@@ -146,6 +147,7 @@ const createProgram = async (payload) => {
         Number(transport_ilhami || 0),
         tarifTidakHadirValue,
         deskripsi || null,
+        gambar || null,
         activeFlag,
       ]
     );
@@ -211,7 +213,7 @@ const updateProgram = async (id, payload, existing) => {
       `UPDATE program SET
         jenjang = ?, nama = ?, tipe_les = ?, tarif_id = ?, jumlah_pertemuan = ?, harga = ?,
         gaji_per_pertemuan = ?, transport_edukator = ?, transport_ilhami = ?, tarif_tidak_hadir = ?,
-        deskripsi = ?, is_active = ?
+        deskripsi = ?, gambar = ?, is_active = ?
        WHERE id = ?`,
       [
         jenjangValue,
@@ -225,6 +227,7 @@ const updateProgram = async (id, payload, existing) => {
         transportIlhami,
         tarifTidakHadir,
         typeof payload.deskripsi !== "undefined" ? payload.deskripsi : existing.deskripsi,
+        typeof payload.gambar !== "undefined" ? payload.gambar : existing.gambar || null,
         activeFlag,
         id,
       ]

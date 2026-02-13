@@ -1,0 +1,2 @@
+ALTER TABLE program
+  ADD COLUMN gambar VARCHAR(255) DEFAULT NULL AFTER deskripsi;

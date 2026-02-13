@@ -29,6 +29,7 @@ const iconMap = {
   "analisis-sentimen": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-width="1.5" stroke-linecap="round"/><path d="M22 4 12 14.01l-3-3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   "analisa-cabang": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18" stroke-width="1.5" stroke-linecap="round"/><path d="M7 15l3-3 3 2 4-5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   "pemetaan-cabang": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 21s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z" stroke-width="1.5"/><circle cx="12" cy="9" r="2.5" stroke-width="1.5"/></svg>',
+  "banner-management": '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="4" width="20" height="16" rx="2" stroke-width="1.5"/><path d="M2 8h20" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="14" r="2" stroke-width="1.5"/><path d="M14 20l-4-4 8-6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 };
 
 const labelMap = {
@@ -58,6 +59,7 @@ const labelMap = {
   "analisis-sentimen": "Analisis Sentimen",
   "analisa-cabang": "Analisa Cabang",
   "pemetaan-cabang": "Pemetaan Cabang",
+  "banner-management": "Banner Landing",
 };
 
 const groupOrder = ["general", "akademik", "keuangan", "manajemen", "lainnya"];
@@ -98,6 +100,7 @@ const groupMap = {
   "analisis-sentimen": "manajemen",
   "analisa-cabang": "manajemen",
   "pemetaan-cabang": "manajemen",
+  "banner-management": "manajemen",
 };
 
 const roleLabelMap = {

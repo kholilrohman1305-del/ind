@@ -36,6 +36,7 @@ const publicRoutes = require("./routes/public.routes");
 const forecastingRoutes = require("./routes/forecasting.routes");
 const analysisRoutes = require("./routes/analysis.routes");
 const feedbackRoutes = require("./routes/feedback.routes");
+const bannerRoutes = require("./routes/banner.routes");
 
 const app = express();
 
@@ -111,6 +112,7 @@ app.use("/api/public", publicRoutes);
 app.use("/api/forecasting", forecastingRoutes);
 app.use("/api/analysis", analysisRoutes);
 app.use("/api/feedback", feedbackRoutes);
+app.use("/api/banner", bannerRoutes);
 
 const pages = [
   "cabang",
@@ -150,6 +152,7 @@ const pages = [
   "analisis-sentimen",
   "analisa-cabang",
   "pemetaan-cabang",
+  "banner-management",
 ];
 
 const injectSidebar = (html, role, user) => {

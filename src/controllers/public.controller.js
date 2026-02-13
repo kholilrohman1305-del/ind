@@ -41,4 +41,22 @@ const registerEdukator = async (req, res) => {
   }
 };
 
-module.exports = { getPrograms, getOptions, registerSiswa, registerEdukator };
+const getBanners = async (req, res) => {
+  try {
+    const data = await publicService.getActiveBanners();
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const getEdukators = async (req, res) => {
+  try {
+    const data = await publicService.getFeaturedEdukators();
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+module.exports = { getPrograms, getOptions, registerSiswa, registerEdukator, getBanners, getEdukators };

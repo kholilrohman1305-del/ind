@@ -1,5 +1,6 @@
 const programService = require("../services/program.service");
 const { ROLES } = require("../config/constants");
+const { deleteFile } = require("../middlewares/upload.middleware");
 
 const getAll = async (req, res) => {
   try {
@@ -19,7 +20,8 @@ const create = async (req, res) => {
     if (!cabangId) {
       return res.status(400).json({ success: false, message: "Cabang wajib diisi." });
     }
-    const payload = { ...req.body, cabang_id: cabangId };
+    const gambar = req.file?.savedPath || null;
+    const payload = { ...req.body, cabang_id: cabangId, gambar };
     const result = await programService.createProgram(payload);
     return res.json({ success: true, data: result });
   } catch (err) {
@@ -38,7 +40,11 @@ const update = async (req, res) => {
     if (role === ROLES.ADMIN_CABANG && existing.cabang_id !== req.session.user.cabang_id) {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
-    const result = await programService.updateProgram(id, req.body, existing);
+    const gambar = req.file?.savedPath || undefined;
+    if (gambar && existing.gambar) {
+      deleteFile(existing.gambar);
+    }
+    const result = await programService.updateProgram(id, { ...req.body, gambar }, existing);
     return res.json({ success: true, data: result });
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });

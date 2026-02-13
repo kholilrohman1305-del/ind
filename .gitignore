@@ -14,5 +14,9 @@ Desktop.ini
 # Build artifacts
 nul
 
+# Uploaded files (keep .gitkeep)
+public/uploads/**
+!public/uploads/**/.gitkeep
+
 # Claude
 .claude/
