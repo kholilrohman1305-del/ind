@@ -224,15 +224,23 @@
 
                 </form>
 
+                <!-- Error Display -->
+                <div id="loginError" class="hidden opacity-0 mt-4">
+                    <div class="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-medium">
+                        <i class="fa-solid fa-circle-exclamation"></i>
+                        <span id="errorText"></span>
+                    </div>
+                </div>
+
                 <div class="mt-8 text-center fade-in-up delay-400">
                     <p class="text-slate-500 text-sm">
-                        Belum punya akun? 
+                        Belum punya akun?
                         <a href="/register" class="text-indigo-600 font-bold hover:text-indigo-700 transition-colors">
                             Daftar Siswa Baru
                         </a>
                     </p>
                 </div>
-                
+
                 <div class="mt-auto pt-8 text-center lg:hidden">
                     <p class="text-xs text-slate-400">&copy; 2026 ILHAMI Indonesia.</p>
                 </div>
@@ -240,43 +248,7 @@
         </div>
     </div>
 
-    <script>
-        // Toggle Password Logic
-        const togglePassword = document.querySelector('#togglePassword');
-        const password = document.querySelector('#password');
-        const eyeIcon = togglePassword.querySelector('i');
-
-        togglePassword.addEventListener('click', function (e) {
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-            
-            if(type === 'text'){
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
-                eyeIcon.classList.add('text-indigo-500');
-            } else {
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
-                eyeIcon.classList.remove('text-indigo-500');
-            }
-        });
-
-        // Simple Form Submission Animation
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('loginButton');
-            const originalText = btn.innerHTML;
-            
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses...';
-            btn.classList.add('opacity-75', 'cursor-not-allowed');
-            
-            // Simulation
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.classList.remove('opacity-75', 'cursor-not-allowed');
-                alert('Login Demo Berhasil!');
-            }, 1500);
-        });
-    </script>
+    <script src="/js/api.js"></script>
+    <script src="/js/login.js"></script>
 </body>
 </html>

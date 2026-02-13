@@ -50,7 +50,7 @@
             button.classList.add("opacity-70", "cursor-wait");
         } else {
             button.disabled = false;
-            button.innerHTML = `Masuk Sekarang <i class="fa-solid fa-arrow-right ml-2 mt-0.5"></i>`;
+            button.innerHTML = `Masuk Sekarang`;
             button.classList.remove("opacity-70", "cursor-wait");
         }
     };

@@ -32,15 +32,17 @@
   const fetchBanners = async () => {
     try {
       const res = await fetch("/api/public/banners");
+      if (!res.ok) { showFallbackHero(); return; }
       const json = await res.json();
-      if (json.success && json.data.length > 0) {
+      if (json.success && json.data && json.data.length > 0) {
         banners = json.data;
         renderBannerSlider();
         startAutoplay();
       } else {
         showFallbackHero();
       }
-    } catch {
+    } catch (err) {
+      console.error("Banner fetch error:", err);
       showFallbackHero();
     }
   };
@@ -253,13 +255,15 @@
   const fetchEdukators = async () => {
     try {
       const res = await fetch("/api/public/edukators");
+      if (!res.ok) { renderEdukatorsFallback(); return; }
       const json = await res.json();
-      if (json.success && json.data.length > 0) {
+      if (json.success && json.data && json.data.length > 0) {
         renderEdukators(json.data);
       } else {
         renderEdukatorsFallback();
       }
-    } catch {
+    } catch (err) {
+      console.error("Edukator fetch error:", err);
       renderEdukatorsFallback();
     }
   };
