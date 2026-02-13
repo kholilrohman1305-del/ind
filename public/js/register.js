@@ -37,17 +37,18 @@
         const iconContainer = els.toast.querySelector('#toastIcon');
         const tTitle = els.toast.querySelector('#toastTitle');
         const tMsg = els.toast.querySelector('#toastMessage');
-        const toastEl = els.toast.querySelector('.glass-panel');
+        const toastEl = els.toast.querySelector('.glass-panel'); // Note: classname retained for selection, style updated in CSS
 
         tTitle.textContent = title;
         tMsg.textContent = message;
 
         if (type === 'success') {
-            toastEl.style.borderColor = '#10b981'; // Emerald
-            iconContainer.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>';
+            // Colors Updated for Light Mode
+            toastEl.style.borderLeft = '4px solid #10b981'; // Emerald
+            iconContainer.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-500"></i>';
         } else {
-            toastEl.style.borderColor = '#f43f5e'; // Rose
-            iconContainer.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-500 text-lg"></i>';
+            toastEl.style.borderLeft = '4px solid #f43f5e'; // Rose
+            iconContainer.innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-500"></i>';
         }
 
         // Animation In
@@ -63,9 +64,11 @@
     window.setRole = (role) => {
         els.role.value = role;
         
-        // CSS Classes for Active vs Inactive Buttons
-        const activeClasses = ['bg-primary-600', 'text-white', 'shadow-lg'];
-        const inactiveClasses = ['text-slate-400', 'hover:text-white', 'hover:bg-white/5'];
+        // CSS Classes for Active vs Inactive Buttons (UPDATED FOR LIGHT THEME)
+        // Active: Primary Gradient/Color, White Text, Shadow
+        const activeClasses = ['bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-200'];
+        // Inactive: Transparent, Slate Text
+        const inactiveClasses = ['text-slate-500', 'hover:text-slate-700', 'bg-transparent'];
 
         if (role === 'siswa') {
             // Update Buttons
@@ -133,31 +136,31 @@
     };
 
     const renderOptions = () => {
-        // Render Branches
-        const branchOptions = `<option value="" class="bg-slate-900">-- Pilih Cabang --</option>` +
-            dataCache.branches.map(b => `<option value="${b.id}" class="bg-slate-900">${b.nama}</option>`).join("");
+        // Render Branches (UPDATED: White Background)
+        const branchOptions = `<option value="" class="bg-white text-slate-400">-- Pilih Cabang --</option>` +
+            dataCache.branches.map(b => `<option value="${b.id}" class="bg-white text-slate-800">${b.nama}</option>`).join("");
 
         els.cabang.innerHTML = branchOptions;
         els.eduCabang.innerHTML = branchOptions;
 
-        // Render Mapels for Edukator (Styled Chips)
+        // Render Mapels for Edukator (Styled Chips - UPDATED: Light Theme)
         if (els.mapelContainer) {
             els.mapelContainer.innerHTML = dataCache.mapels.map(m => `
                 <label class="cursor-pointer select-none group">
                     <input type="checkbox" name="mapel_ids" value="${m.id}" class="mapel-checkbox sr-only">
-                    <div class="px-3 py-1.5 rounded-lg border border-white/10 bg-slate-800 text-slate-400 text-xs font-bold transition-all hover:border-primary-500/50 hover:text-white">
+                    <div class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-xs font-bold transition-all hover:border-indigo-400 hover:text-indigo-600 shadow-sm">
                         ${m.nama}
                     </div>
                 </label>
             `).join("");
         }
 
-        // Render Mapels for Siswa (Styled Chips)
+        // Render Mapels for Siswa (Styled Chips - UPDATED: Light Theme)
         if (els.siswaMapelContainer) {
             els.siswaMapelContainer.innerHTML = dataCache.mapels.map(m => `
                 <label class="cursor-pointer select-none group">
                     <input type="checkbox" name="siswa_mapel_ids" value="${m.id}" class="mapel-checkbox sr-only">
-                    <div class="px-3 py-1.5 rounded-lg border border-white/10 bg-slate-800 text-slate-400 text-xs font-bold transition-all hover:border-primary-500/50 hover:text-white">
+                    <div class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-slate-500 text-xs font-bold transition-all hover:border-indigo-400 hover:text-indigo-600 shadow-sm">
                         ${m.nama}
                     </div>
                 </label>
@@ -179,7 +182,7 @@
         els.togglePass.addEventListener('click', () => {
             const isPass = els.passInput.type === 'password';
             els.passInput.type = isPass ? 'text' : 'password';
-            els.togglePass.innerHTML = isPass ? '<i class="fa-regular fa-eye-slash text-primary-400"></i>' : '<i class="fa-regular fa-eye"></i>';
+            els.togglePass.innerHTML = isPass ? '<i class="fa-regular fa-eye-slash text-indigo-500"></i>' : '<i class="fa-regular fa-eye"></i>';
         });
     }
 
@@ -270,8 +273,8 @@
             if (json.success) {
                 showToast("Berhasil!", "Akun dibuat. Mengalihkan ke login...", "success");
                 els.submitBtn.innerHTML = `<i class="fa-solid fa-check text-lg"></i> <span class="ml-2">Sukses!</span>`;
-                els.submitBtn.classList.replace('from-primary-600', 'from-emerald-600');
-                els.submitBtn.classList.replace('to-indigo-600', 'to-emerald-500');
+                els.submitBtn.classList.replace('from-indigo-600', 'from-emerald-600');
+                els.submitBtn.classList.replace('to-purple-600', 'to-emerald-500');
                 
                 setTimeout(() => window.location.href = "/login", 1500);
             } else {

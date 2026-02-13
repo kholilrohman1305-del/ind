@@ -1,191 +1,282 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Masuk - ILHAMI INDONESIA</title>
-    <link rel="stylesheet" href="/css/tailwind.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            background-color: #020617;
-            overflow: hidden; 
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+            overflow: hidden;
         }
 
-        /* Modern Gradient Background */
-        .ambient-light {
+        /* --- Aurora Background Animation --- */
+        .aurora-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .blob {
             position: absolute;
             border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.4;
-            z-index: -1;
-            transition: all 0.5s ease;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 10s infinite ease-in-out alternate;
         }
 
-        /* Glass Panel Premium */
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #C4B5FD; animation-delay: 0s; } /* Violet */
+        .blob-2 { bottom: -10%; right: -10%; width: 600px; height: 600px; background: #BAE6FD; animation-delay: -2s; } /* Sky */
+        .blob-3 { top: 40%; left: 40%; width: 400px; height: 400px; background: #FBCFE8; animation-delay: -4s; } /* Pink */
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 50px) scale(1.1); }
+        }
+
+        /* --- Modern Card Glass (Light) --- */
         .glass-card {
-            background: rgba(15, 23, 42, 0.3);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 
+                0 20px 50px -12px rgba(0, 0, 0, 0.05),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
         }
 
-        /* Input Style */
-        .input-group { position: relative; transition: all 0.3s ease; }
-        .input-group:focus-within { transform: translateX(5px); }
-        .input-group:focus-within i { color: #818cf8; filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5)); }
-        
+        /* --- Inputs --- */
         .modern-input {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
+            background: #F1F5F9;
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .modern-input:focus {
-            background: rgba(30, 41, 59, 0.8);
-            border-color: #6366f1;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+            background: #FFFFFF;
+            border-color: #6366F1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            transform: translateY(-1px);
         }
+        .modern-input::placeholder { color: #94A3B8; }
 
-        /* Button Gradient Animation */
-        .btn-gradient {
+        /* --- Button Animation --- */
+        .btn-primary {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
             background-size: 200% auto;
-            background-image: linear-gradient(to right, #4f46e5 0%, #7e22ce 51%, #4f46e5 100%);
-            transition: 0.5s;
+            transition: all 0.4s ease;
         }
-        .btn-gradient:hover { background-position: right center; }
+        .btn-primary:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+        }
 
-        /* Entrance Animations (ensure opacity becomes visible) */
-        .animate-slide-up {
-            animation: slide-up 0.6s ease forwards;
+        /* --- 2D Illustration CSS Art --- */
+        .circle-art {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            transition: all 0.5s ease;
         }
-        @keyframes slide-up {
-            from { opacity: 0; transform: translateY(16px); }
+        
+        .floating-card {
+            animation: floating-y 4s ease-in-out infinite;
+        }
+        .floating-card-delayed {
+            animation: floating-y 5s ease-in-out infinite reverse;
+        }
+
+        @keyframes floating-y {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Entrance */
+        .fade-in-up {
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        @keyframes fadeInUp {
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Staggered Animation Helper */
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
-        .delay-400 { animation-delay: 400ms; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
     </style>
 </head>
-<body class="h-screen flex items-center justify-center relative text-slate-200" id="mainBody">
+<body class="h-screen flex items-center justify-center relative text-slate-800">
 
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="ambient-light bg-indigo-600 w-[500px] h-[500px] top-[-100px] left-[-100px] animate-pulse-glow" id="orb1"></div>
-        <div class="ambient-light bg-purple-600 w-[400px] h-[400px] bottom-[-50px] right-[-50px] animate-pulse-glow delay-1000" id="orb2"></div>
-        <div class="ambient-light bg-blue-600 w-[300px] h-[300px] top-[40%] left-[40%] opacity-20" id="orb3"></div>
-        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 brightness-100 contrast-150"></div>
+    <div class="aurora-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+        <div class="absolute inset-0" style="background-image: radial-gradient(#64748b 0.5px, transparent 0.5px); background-size: 24px 24px; opacity: 0.1;"></div>
     </div>
 
-    <div class="w-full max-w-6xl p-4 sm:p-6 relative z-10">
-        <div class="glass-card rounded-3xl overflow-hidden grid lg:grid-cols-2 min-h-[600px]">
+    <div class="w-full max-w-5xl p-4 sm:p-6 relative z-10">
+        <div class="glass-card rounded-[2rem] overflow-hidden grid lg:grid-cols-2 min-h-[640px] shadow-2xl">
             
-            <div class="relative hidden lg:flex flex-col justify-center items-center p-12 bg-slate-900/40 overflow-hidden group">
-                <div class="absolute inset-0 opacity-10" 
-                     style="background-image: radial-gradient(#6366f1 1px, transparent 1px); background-size: 32px 32px;">
+            <div class="relative hidden lg:flex flex-col justify-between p-12 bg-white/40 overflow-hidden group">
+                <div class="relative z-10 fade-in-up">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-lg font-bold shadow-lg shadow-indigo-200">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <span class="text-xl font-bold tracking-tight text-slate-800">ILHAMI <span class="text-indigo-600">ID</span></span>
+                    </div>
                 </div>
 
-                <div class="relative z-10 animate-float">
-                    <div class="w-48 h-48 rounded-full bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 backdrop-blur-md border border-white/10 flex items-center justify-center relative">
-                        <div class="absolute inset-0 rounded-full border border-indigo-500/30 animate-spin-slow border-dashed"></div>
-                        <i class="fa-solid fa-graduation-cap text-6xl text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]"></i>
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div class="w-80 h-80 rounded-full bg-gradient-to-tr from-indigo-100 to-purple-50 border border-white flex items-center justify-center relative floating-card">
                         
-                        <div class="absolute -top-4 -right-4 w-12 h-12 glass-card rounded-xl flex items-center justify-center animate-bounce">
-                            <i class="fa-solid fa-book text-indigo-300"></i>
+                        <div class="absolute w-[85%] h-[85%] rounded-full border border-indigo-200/50 animate-[spin_10s_linear_infinite]"></div>
+                        <div class="absolute w-[65%] h-[65%] rounded-full border border-purple-200/50 animate-[spin_15s_linear_infinite_reverse]"></div>
+
+                        <div class="w-24 h-24 bg-white rounded-2xl shadow-xl flex items-center justify-center text-4xl text-indigo-600 z-10">
+                            <i class="fa-solid fa-user-graduate"></i>
                         </div>
-                        <div class="absolute -bottom-2 -left-6 w-10 h-10 glass-card rounded-xl flex items-center justify-center animate-bounce delay-700">
-                            <i class="fa-solid fa-lightbulb text-yellow-300"></i>
+
+                        <div class="absolute -right-8 top-10 w-16 h-16 bg-white rounded-xl shadow-lg flex items-center justify-center text-orange-400 text-xl floating-card-delayed">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                        <div class="absolute -left-6 bottom-16 w-14 h-14 bg-white rounded-xl shadow-lg flex items-center justify-center text-emerald-500 text-lg floating-card-delayed" style="animation-delay: 1s;">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </div>
+                        <div class="absolute right-8 bottom-4 px-4 py-2 bg-white rounded-full shadow-md text-xs font-bold text-slate-600 floating-card" style="animation-delay: 2s;">
+                            <span class="w-2 h-2 bg-green-500 rounded-full inline-block mr-1"></span> Active
                         </div>
                     </div>
                 </div>
 
-                <div class="relative z-10 mt-12 text-center">
-                    <h2 class="text-3xl font-bold text-white tracking-tight mb-2">ILHAMI <span class="text-indigo-400">INDONESIA</span></h2>
-                    <p class="text-slate-400 text-sm max-w-xs mx-auto leading-relaxed">
-                        Platform pendidikan terintegrasi untuk masa depan yang lebih cerah.
+                <div class="relative z-10 fade-in-up delay-200">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">Platform Pendidikan Masa Depan.</h2>
+                    <p class="text-slate-500 text-sm leading-relaxed">
+                        Bergabunglah dengan ekosistem belajar yang terintegrasi, modern, dan menyenangkan.
                     </p>
                 </div>
             </div>
 
-            <div class="relative flex flex-col justify-center p-8 sm:p-12 lg:p-16 bg-slate-950/50">
+            <div class="relative flex flex-col justify-center p-8 sm:p-12 lg:p-16 bg-white/60">
                 
-                <div class="mb-10 opacity-0 animate-slide-up">
-                    <div class="flex items-center gap-2 mb-2 lg:hidden">
-                        <i class="fa-solid fa-graduation-cap text-indigo-500"></i>
-                        <span class="font-bold text-white tracking-widest text-xs">ILHAMI ID</span>
+                <div class="mb-10 fade-in-up">
+                    <div class="flex items-center gap-2 mb-6 lg:hidden">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <span class="font-bold text-slate-800">ILHAMI ID</span>
                     </div>
-                    <h1 class="text-4xl font-extrabold text-white mb-2">Welcome Back.</h1>
-                    <p class="text-slate-500">Silakan masuk ke akun Anda untuk melanjutkan.</p>
+                    <h1 class="text-3xl font-extrabold text-slate-900 mb-2">Selamat Datang! 👋</h1>
+                    <p class="text-slate-500">Silakan masuk untuk mengakses dashboard siswa.</p>
                 </div>
 
-                <div id="loginError" class="hidden opacity-0 mb-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-3 transition-all duration-300">
-                    <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>
-                    <span class="text-sm text-rose-200 font-medium" id="errorText">Error message</span>
-                </div>
-
-                <form id="loginForm" class="space-y-6">
+                <form id="loginForm" class="space-y-5">
                     
-                    <div class="input-group opacity-0 animate-slide-up delay-100">
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 ml-1">Email Address</label>
-                        <div class="relative">
+                    <div class="fade-in-up delay-100">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1">Email Sekolah</label>
+                        <div class="relative group">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <i class="fa-regular fa-envelope text-slate-500 transition-colors duration-300"></i>
+                                <i class="fa-regular fa-envelope text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
                             </div>
                             <input id="email" type="email" required 
-                                class="modern-input block w-full pl-11 pr-4 py-4 rounded-xl text-white placeholder-slate-600 focus:outline-none sm:text-sm" 
-                                placeholder="name@example.com">
+                                class="modern-input block w-full pl-11 pr-4 py-3.5 rounded-xl text-slate-800 focus:outline-none text-sm font-medium" 
+                                placeholder="siswa@ilhami.sch.id">
                         </div>
                     </div>
 
-                    <div class="input-group opacity-0 animate-slide-up delay-200">
+                    <div class="fade-in-up delay-200">
                         <div class="flex justify-between items-center mb-2 ml-1">
-                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Password</label>
-                            <a href="#" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors">Lupa Password?</a>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Password</label>
+                            <a href="#" class="text-xs font-bold text-indigo-600 hover:text-indigo-500 transition-colors hover:underline">Lupa Password?</a>
                         </div>
-                        <div class="relative">
+                        <div class="relative group">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <i class="fa-solid fa-lock text-slate-500 transition-colors duration-300"></i>
+                                <i class="fa-solid fa-lock text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
                             </div>
                             <input id="password" type="password" required 
-                                class="modern-input block w-full pl-11 pr-12 py-4 rounded-xl text-white placeholder-slate-600 focus:outline-none sm:text-sm" 
+                                class="modern-input block w-full pl-11 pr-12 py-3.5 rounded-xl text-slate-800 focus:outline-none text-sm font-medium" 
                                 placeholder="••••••••">
-                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-white cursor-pointer transition-colors">
+                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer transition-colors">
                                 <i class="fa-regular fa-eye"></i>
                             </button>
                         </div>
                     </div>
 
-                    <div class="opacity-0 animate-slide-up delay-300 pt-2">
+                    <div class="fade-in-up delay-300 pt-4">
                         <button type="submit" id="loginButton" 
-                            class="btn-gradient w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-slate-900 transform active:scale-[0.98] transition-all">
-                            Masuk Sekarang <i class="fa-solid fa-arrow-right ml-2 mt-0.5"></i>
+                            class="btn-primary w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-lg shadow-indigo-500/30 text-sm font-bold text-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 active:scale-[0.98]">
+                            Masuk Sekarang
                         </button>
                     </div>
 
                 </form>
 
-                <div class="mt-8 text-center opacity-0 animate-slide-up delay-400">
+                <div class="mt-8 text-center fade-in-up delay-400">
                     <p class="text-slate-500 text-sm">
-                        Belum memiliki akun siswa? 
-                        <a href="/register" class="text-white font-bold hover:text-indigo-400 transition-colors underline decoration-indigo-500/30 decoration-2 underline-offset-4 hover:decoration-indigo-400">
-                            Daftar Sekarang
+                        Belum punya akun? 
+                        <a href="/register" class="text-indigo-600 font-bold hover:text-indigo-700 transition-colors">
+                            Daftar Siswa Baru
                         </a>
                     </p>
                 </div>
-
+                
+                <div class="mt-auto pt-8 text-center lg:hidden">
+                    <p class="text-xs text-slate-400">&copy; 2026 ILHAMI Indonesia.</p>
+                </div>
             </div>
-        </div>
-        
-        <div class="text-center mt-8 text-slate-600 text-xs font-medium">
-            &copy; 2026 ILHAMI Indonesia. Secure Login System.
         </div>
     </div>
 
-    <script src="/js/api.js"></script>
-    <script src="/js/login.js"></script>
+    <script>
+        // Toggle Password Logic
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+        const eyeIcon = togglePassword.querySelector('i');
+
+        togglePassword.addEventListener('click', function (e) {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            
+            if(type === 'text'){
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+                eyeIcon.classList.add('text-indigo-500');
+            } else {
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+                eyeIcon.classList.remove('text-indigo-500');
+            }
+        });
+
+        // Simple Form Submission Animation
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginButton');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Memproses...';
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            
+            // Simulation
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                alert('Login Demo Berhasil!');
+            }, 1500);
+        });
+    </script>
 </body>
 </html>
