@@ -332,6 +332,37 @@
       ? '<span class="status-active text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">Aktif</span>'
       : '<span class="status-inactive text-xs font-bold text-slate-500 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">Nonaktif</span>';
 
+    const manajemenList = d.manajemen || [];
+    const manajemenHtml = manajemenList.length > 0 ? `
+      <div class="mt-6">
+        <h4 class="text-sm font-bold text-slate-700 mb-3"><i class="fa-solid fa-sitemap text-indigo-500 mr-1"></i> Struktur Manajemen</h4>
+        <div class="space-y-3">
+          ${manajemenList.map(m => `
+            <div class="bg-white border border-slate-200 rounded-xl p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-bold text-indigo-700">${m.jabatan}</span>
+                <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full">+${formatCurrency(m.gaji_tambahan)}</span>
+              </div>
+              ${m.edukators.length > 0 ? `
+                <div class="space-y-2">
+                  ${m.edukators.map(e => `
+                    <div class="flex items-center gap-3 bg-slate-50 rounded-lg p-2">
+                      <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        ${e.foto ? `<img src="${e.foto}" class="w-8 h-8 object-cover rounded-full" alt="">` : `<i class="fa-solid fa-user text-indigo-400 text-xs"></i>`}
+                      </div>
+                      <div class="min-w-0">
+                        <p class="text-sm font-semibold text-slate-700 truncate">${e.nama}</p>
+                        <p class="text-[10px] text-slate-400">${e.pendidikan_terakhir || "-"}</p>
+                      </div>
+                    </div>
+                  `).join("")}
+                </div>
+              ` : '<p class="text-xs text-slate-400 italic">Belum ada edukator yang ditugaskan</p>'}
+            </div>
+          `).join("")}
+        </div>
+      </div>` : '<div class="mt-6"><p class="text-xs text-slate-400 italic">Belum ada data manajemen</p></div>';
+
     drawerContent.innerHTML = `
       <div class="space-y-5">
         <div class="flex items-center justify-between">
@@ -361,6 +392,7 @@
           </div>
         </div>
         ${c.latitude && c.longitude ? '<div id="drawerMapWrap"><h4 class="text-sm font-bold text-slate-700 mb-2 mt-2">Lokasi</h4><div id="drawerMap"></div></div>' : ""}
+        ${manajemenHtml}
       </div>`;
 
     if (c.latitude && c.longitude) {
@@ -606,8 +638,9 @@
       if (res.ok) {
         const json = await res.json();
         const d = json.data || json;
-        if (totalSiswaEl) totalSiswaEl.textContent = d.total_siswa || 0;
-        if (totalRevenueEl) totalRevenueEl.textContent = formatCurrency(d.pendapatan || 0);
+        const summary = d.summary || d;
+        if (totalSiswaEl) totalSiswaEl.textContent = summary.total_siswa || 0;
+        if (totalRevenueEl) totalRevenueEl.textContent = formatCurrency(summary.pendapatan || 0);
       }
     } catch (_) { /* silent */ }
   };

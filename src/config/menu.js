@@ -7,7 +7,6 @@ const menuMap = {
     "mapel",
     "siswa",
     "edukator",
-    "manajemen",
     "user-management",
     "analisis-sentimen",
     "banner-management",
