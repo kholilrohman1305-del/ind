@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.get("/", requireRole(ROLES.SUPER_ADMIN), cabangController.getAll);
 router.get("/recommendations", requireRole(ROLES.SUPER_ADMIN), cabangController.getRecommendations);
+router.get("/:id/detail", requireRole(ROLES.SUPER_ADMIN), cabangController.getDetail);
 router.post("/", requireRole(ROLES.SUPER_ADMIN), validate(createCabangSchema), cabangController.create);
 router.put("/:id", requireRole(ROLES.SUPER_ADMIN), validate(updateCabangSchema), cabangController.update);
 router.delete("/:id", requireRole(ROLES.SUPER_ADMIN), cabangController.remove);

@@ -4,14 +4,12 @@ const menuMap = {
   [ROLES.SUPER_ADMIN]: [
     "dashboard",
     "cabang",
-    "pemetaan-cabang",
     "mapel",
     "siswa",
     "edukator",
     "manajemen",
     "user-management",
     "analisis-sentimen",
-    "analisa-cabang",
     "banner-management",
   ],
   [ROLES.ADMIN_CABANG]: [

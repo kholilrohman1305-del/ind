@@ -150,8 +150,6 @@ const pages = [
   "pengajuan-jadwal-admin",
   "feedback",
   "analisis-sentimen",
-  "analisa-cabang",
-  "pemetaan-cabang",
   "banner-management",
 ];
 

@@ -4,75 +4,65 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Manajemen Cabang - ILHAMI Pro</title>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    
+
     <link rel="stylesheet" href="/css/tailwind.css" />
-    
+
     <style>
-      :root {
-        --bg-app: #F8FAFC;
-      }
-      body { 
-        font-family: 'Plus Jakarta Sans', sans-serif; 
-        background-color: var(--bg-app); 
-        color: #1E293B; 
-      }
-      
-      /* Glass & Card Styles */
+      :root { --bg-app: #F8FAFC; }
+      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-app); color: #1E293B; }
+
       .cabang-card {
-        background: white;
-        border: 1px solid #F1F5F9;
-        border-radius: 1.25rem;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        overflow: hidden;
-        position: relative;
+        background: white; border: 1px solid #F1F5F9; border-radius: 1.25rem;
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        overflow: hidden; position: relative; cursor: pointer;
       }
-      .cabang-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.1);
-        border-color: #E2E8F0;
-      }
-      
-      /* Status Badge Pulse */
-      .status-active::before {
-        content: '';
-        display: inline-block;
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background-color: #10B981;
-        margin-right: 6px;
-        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-      }
-      .status-inactive::before {
-        content: '';
-        display: inline-block;
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background-color: #94A3B8;
-        margin-right: 6px;
-      }
+      .cabang-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.1); border-color: #E2E8F0; }
+
+      .status-active::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:#10B981; margin-right:6px; box-shadow:0 0 0 2px rgba(16,185,129,0.2); }
+      .status-inactive::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:#94A3B8; margin-right:6px; }
 
       .custom-scrollbar::-webkit-scrollbar { width: 6px; }
       .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
       .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
       #cabangMap { width: 100%; height: 240px; border-radius: 12px; border: 1px solid #e2e8f0; }
+      #drawerMap { width: 100%; height: 180px; border-radius: 12px; border: 1px solid #e2e8f0; }
+
+      /* Drawer */
+      .drawer-overlay { background: rgba(15,23,42,0.3); backdrop-filter: blur(4px); }
+      .drawer-panel {
+        transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+        box-shadow: -8px 0 30px rgba(0,0,0,0.08);
+      }
+      .drawer-panel.open { transform: translateX(0); }
+
+      /* Tabs */
+      .tab-btn { position: relative; transition: all 0.2s; }
+      .tab-btn.active { color: #4F46E5; font-weight: 700; }
+      .tab-btn.active::after {
+        content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+        height: 2px; background: #4F46E5; border-radius: 2px;
+      }
+
+      /* Star rating */
+      .star-filled { color: #F59E0B; }
+      .star-empty { color: #E2E8F0; }
     </style>
   </head>
 
   <body class="app h-screen flex flex-col overflow-hidden" data-page="cabang">
     <main class="content flex-1 overflow-y-auto p-4 md:p-8 w-full relative">
-      
+
       <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
          <div class="absolute -top-[10%] -right-[5%] w-[500px] h-[500px] bg-indigo-100/40 rounded-full blur-[80px]"></div>
          <div class="absolute top-[30%] -left-[5%] w-[400px] h-[400px] bg-blue-100/40 rounded-full blur-[80px]"></div>
       </div>
 
+      <!-- Header -->
       <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div class="flex items-center gap-4">
           <button class="p-2 rounded-xl hover:bg-white/50 text-slate-500 transition shadow-sm md:hidden" id="sidebarToggle">
@@ -83,7 +73,7 @@
               <span class="bg-indigo-100 text-indigo-600 p-2 rounded-xl text-xl shadow-sm"><i class="fa-solid fa-building"></i></span>
               Manajemen Cabang
             </h1>
-            <p class="text-slate-500 mt-1 text-sm font-medium">Kelola akses, lokasi, dan admin cabang.</p>
+            <p class="text-slate-500 mt-1 text-sm font-medium">Kelola cabang, lihat statistik, keuangan, dan feedback.</p>
           </div>
         </div>
 
@@ -92,8 +82,8 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="fa-solid fa-magnifying-glass text-slate-400 group-focus-within:text-indigo-500 transition-colors"></i>
                 </div>
-                <input type="text" id="searchCabang" 
-                    class="block w-full pl-10 pr-3 py-3 border-none rounded-xl leading-5 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all" 
+                <input type="text" id="searchCabang"
+                    class="block w-full pl-10 pr-3 py-3 border-none rounded-xl leading-5 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all"
                     placeholder="Cari nama atau kode cabang...">
             </div>
 
@@ -103,6 +93,7 @@
         </div>
       </div>
 
+      <!-- Summary Stats -->
       <div class="relative z-10">
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-3">
@@ -119,10 +110,24 @@
                       <h4 class="text-xl font-bold text-slate-800" id="activeCabang">0</h4>
                   </div>
               </div>
+              <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-users"></i></div>
+                  <div>
+                      <p class="text-xs text-slate-400 font-bold uppercase">Total Siswa</p>
+                      <h4 class="text-xl font-bold text-slate-800" id="totalSiswa">-</h4>
+                  </div>
+              </div>
+              <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-lg"><i class="fa-solid fa-coins"></i></div>
+                  <div>
+                      <p class="text-xs text-slate-400 font-bold uppercase">Revenue</p>
+                      <h4 class="text-xl font-bold text-slate-800" id="totalRevenue">-</h4>
+                  </div>
+              </div>
           </div>
 
-          <div id="cabangRows" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              </div>
+          <!-- Card Grid -->
+          <div id="cabangRows" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
 
           <div id="cabangPager" class="hidden mt-6 p-4 bg-white rounded-xl border border-slate-100 shadow-sm"></div>
 
@@ -137,9 +142,49 @@
 
     </main>
 
+    <!-- ==================== DRAWER DETAIL ==================== -->
+    <div id="drawerOverlay" class="fixed inset-0 z-40 hidden drawer-overlay"></div>
+    <aside id="drawerPanel" class="drawer-panel fixed top-0 right-0 z-50 h-full w-full md:w-[65%] lg:w-[55%] xl:w-[50%] bg-white flex flex-col">
+
+      <!-- Drawer Header -->
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 shrink-0">
+        <div class="flex items-center gap-3">
+          <div id="drawerAvatar" class="w-10 h-10 rounded-xl flex items-center justify-center text-base font-bold"></div>
+          <div>
+            <h3 id="drawerTitle" class="text-lg font-bold text-slate-800"></h3>
+            <p id="drawerSubtitle" class="text-xs text-slate-400 font-mono"></p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="drawerEdit" class="px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition">
+            <i class="fa-regular fa-pen-to-square mr-1"></i>Edit
+          </button>
+          <button id="drawerClose" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Drawer Tabs -->
+      <div class="px-6 border-b border-slate-100 flex gap-6 shrink-0">
+        <button class="tab-btn active py-3 text-sm text-slate-500" data-tab="profil">Profil</button>
+        <button class="tab-btn py-3 text-sm text-slate-500" data-tab="statistik">Statistik</button>
+        <button class="tab-btn py-3 text-sm text-slate-500" data-tab="keuangan">Keuangan</button>
+        <button class="tab-btn py-3 text-sm text-slate-500" data-tab="feedback">Feedback</button>
+      </div>
+
+      <!-- Drawer Content -->
+      <div id="drawerContent" class="flex-1 overflow-y-auto p-6 custom-scrollbar">
+        <div class="flex items-center justify-center py-20">
+          <div class="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==================== MODAL CREATE/EDIT (existing) ==================== -->
     <div id="cabangModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-slate-900/40 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none p-4">
       <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl transform scale-95 transition-transform duration-200 overflow-hidden modal-card flex flex-col max-h-[90vh]">
-        
+
         <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
           <div>
             <h3 class="text-lg font-bold text-slate-800 modal-title">Kelola Cabang</h3>
@@ -152,7 +197,7 @@
 
         <form id="cabangForm" class="p-6 space-y-5 overflow-y-auto custom-scrollbar">
             <input type="hidden" id="cabang_id" />
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase mb-1.5">Kode Cabang <span class="text-rose-500">*</span></label>
@@ -252,7 +297,7 @@
         </form>
       </div>
     </div>
-    
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="/js/sidebar.js"></script>
     <script src="/js/cabang.js"></script>
