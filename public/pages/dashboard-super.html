@@ -67,6 +67,7 @@
       }
       .animate-float { animation: float 3s ease-in-out infinite; }
     </style>
+    <link rel="stylesheet" href="/css/responsive.css" />
   </head>
 
   <body class="app h-screen flex flex-col overflow-hidden" data-page="dashboard">
@@ -74,7 +75,7 @@
       
       <div class="fixed top-0 left-0 right-0 h-64 bg-gradient-to-b from-indigo-50/50 to-transparent pointer-events-none z-0"></div>
 
-      <header class="relative z-10 px-8 py-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <header class="relative z-10 px-4 md:px-8 py-4 md:py-6 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
         <div class="flex items-center gap-4">
           <button class="p-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition shadow-sm border border-slate-200/60" id="sidebarToggle">
             <i class="fa-solid fa-bars-staggered"></i>
@@ -96,7 +97,7 @@
         </div>
       </header>
 
-      <div class="px-8 pb-8 relative z-10">
+      <div class="px-4 md:px-8 pb-6 md:pb-8 relative z-10">
         
         <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
             

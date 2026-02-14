@@ -1,0 +1,136 @@
+/* ======================================================
+   ILHAMI Pro - Responsive Overrides
+   Global CSS untuk mendukung tampilan tablet & smartphone
+   ====================================================== */
+
+/* ===== SMARTPHONE: < 768px ===== */
+@media (max-width: 767px) {
+
+  /* --- Content area: kurangi padding --- */
+  .content {
+    padding: 16px 12px 24px !important;
+  }
+
+  /* --- Header / Judul halaman --- */
+  header h1,
+  .page-title {
+    font-size: 1.25rem !important;
+  }
+
+  /* --- Stat angka besar: skala turun --- */
+  .text-5xl { font-size: 1.75rem !important; }
+  .text-4xl { font-size: 1.5rem !important; }
+  .text-3xl { font-size: 1.25rem !important; }
+
+  /* --- Header actions: stack vertikal --- */
+  header .flex-row,
+  header.flex {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* --- Tabel: lebih compact, smooth scroll --- */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .modern-table th,
+  .modern-table td,
+  .tarif-table th,
+  .tarif-table td {
+    padding: 0.625rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    white-space: nowrap;
+  }
+
+  .modern-table th {
+    font-size: 0.65rem !important;
+  }
+
+  /* --- Tab buttons: lebih kecil & bisa scroll --- */
+  .tab-btn {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .tarif-filter-tab {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  /* --- Modal: full-width di HP --- */
+  [class*="max-w-2xl"],
+  [class*="max-w-3xl"],
+  [class*="max-w-4xl"],
+  [class*="max-w-5xl"] {
+    max-width: calc(100% - 1rem) !important;
+    margin-left: 0.5rem !important;
+    margin-right: 0.5rem !important;
+  }
+
+  /* --- Glass panels: kurangi border radius --- */
+  .glass-panel {
+    border-radius: 0.75rem;
+  }
+
+  /* --- Card padding: lebih compact --- */
+  .glass-panel > .p-6 {
+    padding: 1rem !important;
+  }
+
+  /* --- Notifikasi: full-width --- */
+  .notification-container {
+    right: 8px !important;
+    left: 8px !important;
+  }
+  .notification {
+    width: 100% !important;
+  }
+
+  /* --- Drawer panel: full-width di HP --- */
+  #drawerPanel {
+    width: 100% !important;
+  }
+
+  /* --- Form grid: stack pada mobile --- */
+  .grid-cols-2:not(.stats-grid) {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* --- Search input: full width --- */
+  input[type="search"],
+  input[type="text"][id*="search" i],
+  input[id*="Search" i] {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* --- Button group: wrap --- */
+  .flex.gap-2,
+  .flex.gap-3 {
+    flex-wrap: wrap;
+  }
+}
+
+/* ===== TABLET: 768px - 1023px ===== */
+@media (min-width: 768px) and (max-width: 1023px) {
+
+  /* Stat values sedikit lebih kecil */
+  .text-5xl {
+    font-size: 2.25rem;
+  }
+
+  /* Tabel: padding sedikit lebih kecil */
+  .modern-table th,
+  .modern-table td {
+    padding: 0.875rem 1rem;
+  }
+
+  /* Drawer panel: lebih lebar di tablet */
+  #drawerPanel {
+    width: 75% !important;
+  }
+}

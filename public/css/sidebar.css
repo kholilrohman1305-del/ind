@@ -479,7 +479,7 @@ body[data-role="super_admin"] .sidebar.modern .nav-icon {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 767px) {
   .sidebar-toggle-floating {
     display: inline-flex;
   }

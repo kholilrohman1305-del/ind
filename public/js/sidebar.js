@@ -189,7 +189,7 @@
   const bindToggle = () => {
     if (!sidebar) return;
     const handler = () => {
-      if (window.innerWidth < 900) {
+      if (window.innerWidth < 768) {
         if (sidebar.classList.contains("open")) {
           closeMobileSidebar();
         } else {
@@ -211,14 +211,14 @@
 
     links.forEach((link) => {
       link.addEventListener("click", () => {
-        if (window.innerWidth < 900) {
+        if (window.innerWidth < 768) {
           closeMobileSidebar();
         }
       });
     });
 
     window.addEventListener("resize", () => {
-      if (window.innerWidth >= 900) {
+      if (window.innerWidth >= 768) {
         closeMobileSidebar();
       }
     });
