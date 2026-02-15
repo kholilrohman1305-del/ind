@@ -35,9 +35,13 @@
               </a>
             </div>
           </div>
-          <div class="relative">
-            <input type="text" id="profilSearch" placeholder="Cari pengaturan profil..." class="w-full py-3 px-4 pl-11 bg-white rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg" style="color: #374151;">
-            <i class="fa-solid fa-magnifying-glass w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <div class="flex gap-2 mt-3">
+            <button type="submit" form="profilForm" id="profilSaveBtn" class="flex-1 py-3 rounded-2xl font-semibold text-white shadow-lg" style="background: linear-gradient(135deg, #00A6B4 0%, #008891 100%);">
+              <i class="fa-solid fa-floppy-disk mr-2"></i>Simpan
+            </button>
+            <button type="button" id="logoutBtn" class="flex-1 py-3 rounded-2xl font-semibold bg-white/20 text-white hover:bg-white/30 shadow-lg">
+              <i class="fa-solid fa-right-from-bracket mr-2"></i>Logout
+            </button>
           </div>
         </header>
 
@@ -95,15 +99,6 @@
                 </label>
               </div>
               <p class="text-xs text-slate-500 mt-3">Kosongkan jika tidak ingin mengubah password.</p>
-            </section>
-
-            <section class="panel bg-white rounded-3xl p-5 shadow-lg flex flex-col gap-3">
-              <button type="submit" id="profilSaveBtn" class="w-full py-3 rounded-2xl font-semibold text-white shadow-lg" style="background: linear-gradient(135deg, #00A6B4 0%, #008891 100%);">
-                Simpan Perubahan
-              </button>
-              <button type="button" id="logoutBtn" class="w-full py-3 rounded-2xl font-semibold border border-slate-200 text-slate-500 hover:text-rose-600 hover:border-rose-200">
-                Logout
-              </button>
             </section>
           </form>
         </main>
