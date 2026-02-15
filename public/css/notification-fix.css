@@ -1,0 +1,18 @@
+/* Fix notification panel from blocking clicks when hidden */
+#notificationOverlay.hidden,
+#notificationPanel.hidden {
+  pointer-events: none !important;
+}
+
+#notificationOverlay:not(.hidden),
+#notificationPanel:not(.hidden) {
+  pointer-events: auto;
+}
+
+/* Ensure logout and other buttons are clickable */
+.sidebar .nav-link,
+.sidebar button,
+.topbar button {
+  position: relative;
+  z-index: 10;
+}

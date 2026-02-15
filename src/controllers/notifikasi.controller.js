@@ -8,14 +8,18 @@ const getNotifications = async (req, res) => {
     const userId = req.user.id;
     const { limit = 20, offset = 0, unread_only } = req.query;
 
+    // Check if is_read column exists
+    const [columns] = await db.query("SHOW COLUMNS FROM notifikasi LIKE 'is_read'");
+    const hasIsRead = columns.length > 0;
+
     let query = `
-      SELECT id, tipe_notifikasi, judul, pesan, data_ref, is_read, created_at
+      SELECT id, tipe_notifikasi, judul, pesan, data_ref, ${hasIsRead ? 'is_read,' : ''} created_at
       FROM notifikasi
       WHERE user_id = ?
     `;
     const params = [userId];
 
-    if (unread_only === 'true') {
+    if (unread_only === 'true' && hasIsRead) {
       query += ` AND is_read = 0`;
     }
 
@@ -25,19 +29,24 @@ const getNotifications = async (req, res) => {
     const [rows] = await db.query(query, params);
 
     // Get unread count
-    const [countRows] = await db.query(
-      `SELECT COUNT(*) as count FROM notifikasi WHERE user_id = ? AND is_read = 0`,
-      [userId]
-    );
+    let unreadCount = 0;
+    if (hasIsRead) {
+      const [countRows] = await db.query(
+        `SELECT COUNT(*) as count FROM notifikasi WHERE user_id = ? AND is_read = 0`,
+        [userId]
+      );
+      unreadCount = countRows[0]?.count || 0;
+    }
 
     res.json({
       success: true,
       data: {
         notifications: rows.map(row => ({
           ...row,
+          is_read: hasIsRead ? row.is_read : 0,
           data_ref: row.data_ref ? JSON.parse(row.data_ref) : null
         })),
-        unread_count: countRows[0]?.count || 0,
+        unread_count: unreadCount,
         total: rows.length
       }
     });
@@ -52,6 +61,14 @@ const markAsRead = async (req, res) => {
   try {
     const userId = req.user.id;
     const { notification_ids } = req.body; // array of IDs or "all"
+
+    // Check if is_read column exists
+    const [columns] = await db.query("SHOW COLUMNS FROM notifikasi LIKE 'is_read'");
+    const hasIsRead = columns.length > 0;
+
+    if (!hasIsRead) {
+      return res.json({ success: true, message: "Fitur ini memerlukan update database" });
+    }
 
     if (notification_ids === "all") {
       await db.query(
