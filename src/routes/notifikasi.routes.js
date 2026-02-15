@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { requireAuth, requireRole } = require("../middleware/auth");
+const { requireAuth, requireRole } = require("../middlewares/auth.middleware");
 const { ROLES } = require("../config/constants");
 const notifikasiController = require("../controllers/notifikasi.controller");
 
