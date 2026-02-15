@@ -3,30 +3,123 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Notifikasi - ILHAMI</title>
+    <title>Notifikasi & Pengumuman - ILHAMI</title>
     <link rel="stylesheet" href="/css/tailwind.css" />
     <link rel="stylesheet" href="/css/responsive.css" />
-      </head>
-  <body class="app" data-page="notifikasi">
-    <main class="content">
-      <header class="topbar">
-        <button class="icon-button" id="sidebarToggle" aria-label="Toggle menu">=</button>
-        <div class="topbar-title">
-          <div class="page-title">Notifikasi</div>
-          <div class="page-subtitle">Kelola data Notifikasi di cabang terpilih.</div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      body { font-family: 'Plus Jakarta Sans', sans-serif; }
+      .announcement-card { transition: all 0.2s ease; }
+      .announcement-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+    </style>
+  </head>
+  <body class="app h-screen flex flex-col overflow-hidden" data-page="notifikasi">
+    <main class="content flex-1 overflow-y-auto p-4 md:p-8">
+      <!-- Header -->
+      <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div class="flex items-center gap-4">
+          <button class="p-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition shadow-sm border border-slate-200/60 md:hidden" id="sidebarToggle">
+            <i class="fa-solid fa-bars-staggered"></i>
+          </button>
+          <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">Pengumuman</h1>
+            <p class="text-sm text-slate-500 mt-1">Buat dan kelola pengumuman untuk edukator & siswa</p>
+          </div>
         </div>
-        <div class="topbar-actions">
-          <div class="chip">Admin Cabang</div>
-          <div class="avatar">U</div>
-        </div>
+        <button id="createAnnouncementBtn" class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold text-sm shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
+          <i class="fa-solid fa-bullhorn"></i> Buat Pengumuman
+        </button>
       </header>
-      <section class="page">
-        <div class="panel">
-          <h2>Notifikasi</h2>
-          <p>Halaman ini masih kosong. Tambahkan tabel, form, dan aksi di sini.</p>
+
+      <!-- Announcements List -->
+      <section id="announcementsSection" class="grid gap-4">
+        <!-- Loading state -->
+        <div id="loadingState" class="text-center py-12">
+          <i class="fa-solid fa-spinner fa-spin text-2xl text-indigo-600 mb-3"></i>
+          <p class="font-semibold text-slate-600">Memuat pengumuman...</p>
         </div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="hidden text-center py-16">
+          <div class="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-bullhorn text-3xl text-indigo-300"></i>
+          </div>
+          <h3 class="text-lg font-bold text-slate-700 mb-1">Belum Ada Pengumuman</h3>
+          <p class="text-sm text-slate-400">Klik "Buat Pengumuman" untuk mengirim pengumuman pertama.</p>
+        </div>
+
+        <!-- Announcements container -->
+        <div id="announcementsList" class="hidden space-y-4"></div>
       </section>
     </main>
+
+    <!-- Modal Create Announcement -->
+    <div id="announcementModal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" id="modalOverlay"></div>
+      <div class="absolute inset-0 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div class="flex items-center justify-between p-5 border-b border-slate-100">
+            <h3 class="text-lg font-bold text-slate-900">Buat Pengumuman Baru</h3>
+            <button id="closeModalBtn" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <form id="announcementForm" class="p-5 space-y-4">
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">
+                Penerima <span class="text-red-500">*</span>
+              </label>
+              <div class="grid grid-cols-3 gap-2">
+                <label class="flex items-center gap-2 p-3 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-indigo-400 transition has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50">
+                  <input type="radio" name="target_role" value="all" checked class="text-indigo-600 focus:ring-indigo-500">
+                  <span class="text-sm font-semibold text-slate-700">Semua</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-indigo-400 transition has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50">
+                  <input type="radio" name="target_role" value="edukator" class="text-indigo-600 focus:ring-indigo-500">
+                  <span class="text-sm font-semibold text-slate-700">Edukator</span>
+                </label>
+                <label class="flex items-center gap-2 p-3 border-2 border-slate-200 rounded-xl cursor-pointer hover:border-indigo-400 transition has-[:checked]:border-indigo-600 has-[:checked]:bg-indigo-50">
+                  <input type="radio" name="target_role" value="siswa" class="text-indigo-600 focus:ring-indigo-500">
+                  <span class="text-sm font-semibold text-slate-700">Siswa</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">
+                Judul Pengumuman <span class="text-red-500">*</span>
+              </label>
+              <input type="text" id="announcementJudul" required maxlength="100"
+                     class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                     placeholder="Contoh: Libur Hari Raya" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">
+                Pesan <span class="text-red-500">*</span>
+              </label>
+              <textarea id="announcementPesan" required rows="5" maxlength="500"
+                        class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                        placeholder="Tulis pesan pengumuman di sini..."></textarea>
+              <p class="text-xs text-slate-400 mt-1">Maksimal 500 karakter</p>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+              <button type="button" id="cancelBtn" class="flex-1 py-2.5 rounded-xl font-semibold border border-slate-200 text-slate-600 hover:bg-slate-50 transition">
+                Batal
+              </button>
+              <button type="submit" class="flex-1 py-2.5 rounded-xl font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:shadow-lg transition">
+                <i class="fa-solid fa-paper-plane mr-2"></i>Kirim
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <script src="/js/sidebar.js"></script>
+    <script src="/js/toast.js"></script>
+    <script src="/js/notifikasi.js"></script>
   </body>
 </html>

@@ -37,6 +37,7 @@ const forecastingRoutes = require("./routes/forecasting.routes");
 const analysisRoutes = require("./routes/analysis.routes");
 const feedbackRoutes = require("./routes/feedback.routes");
 const bannerRoutes = require("./routes/banner.routes");
+const notifikasiRoutes = require("./routes/notifikasi.routes");
 
 const app = express();
 
@@ -113,6 +114,7 @@ app.use("/api/forecasting", forecastingRoutes);
 app.use("/api/analysis", analysisRoutes);
 app.use("/api/feedback", feedbackRoutes);
 app.use("/api/banner", bannerRoutes);
+app.use("/api/notifikasi", notifikasiRoutes);
 
 const pages = [
   "cabang",

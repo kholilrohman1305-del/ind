@@ -45,8 +45,9 @@
               </h1>
             </div>
             <div class="flex gap-3">
-              <button class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition card-hover" aria-label="Notifikasi">
+              <button id="notificationBellBtn" class="relative w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition card-hover" aria-label="Notifikasi">
                 <i class="fa-regular fa-bell"></i>
+                <span id="notificationBadge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
               </button>
               <a href="/profil-edukator" class="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden border-2 border-white/30 card-hover shadow-lg" aria-label="Profil">
                 <i class="fa-solid fa-user text-cyan-600"></i>
@@ -137,8 +138,22 @@
       </div>
     </div>
 
+    <!-- Notification Panel -->
+    <div id="notificationOverlay" class="hidden fixed inset-0 bg-black/20 z-40"></div>
+    <div id="notificationPanel" class="hidden fixed top-0 right-0 w-full max-w-md h-full bg-white shadow-2xl z-50 flex flex-col">
+      <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+        <h3 class="font-bold text-lg">Notifikasi</h3>
+        <button id="markAllReadBtn" class="text-xs px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition">
+          Tandai Dibaca Semua
+        </button>
+      </div>
+      <div id="notificationList" class="flex-1 overflow-y-auto"></div>
+    </div>
+
     <script src="/js/sidebar.js"></script>
     <script src="/js/edukator-footer.js"></script>
+    <script src="/js/notification-popup.js"></script>
+    <script src="/js/notification-bell.js"></script>
     <script src="/js/dashboard-edukator.js"></script>
   </body>
 </html>
