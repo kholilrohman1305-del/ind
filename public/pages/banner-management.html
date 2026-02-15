@@ -9,13 +9,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
-<body class="bg-gray-50 font-[Plus_Jakarta_Sans]" data-page="banner-management">
-    <main class="main-content p-4 md:p-8 max-w-7xl mx-auto">
+<body class="app h-screen flex flex-col overflow-hidden bg-gray-50 font-[Plus_Jakarta_Sans]" data-page="banner-management">
+    <main class="content flex-1 overflow-y-auto p-4 md:p-8">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-            <div>
-                <h1 class="text-2xl font-extrabold text-gray-900">Banner Landing Page</h1>
-                <p class="text-sm text-gray-500 mt-1">Kelola banner/slider yang tampil di halaman utama website.</p>
+            <div class="flex items-center gap-4">
+                <button class="p-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-500 hover:text-indigo-600 transition shadow-sm border border-slate-200/60 md:hidden" id="sidebarToggle">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                </button>
+                <div>
+                    <h1 class="text-2xl font-extrabold text-gray-900">Banner Landing Page</h1>
+                    <p class="text-sm text-gray-500 mt-1">Kelola banner/slider yang tampil di halaman utama website.</p>
+                </div>
             </div>
             <button id="addBannerBtn" class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold text-sm shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5">
                 <i class="fa-solid fa-plus"></i> Tambah Banner
@@ -119,6 +124,7 @@
         </div>
     </div>
 
+    <script src="/js/sidebar.js"></script>
     <script src="/js/toast.js"></script>
     <script src="/js/banner-management.js"></script>
 </body>
