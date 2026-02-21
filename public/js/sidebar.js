@@ -78,6 +78,37 @@
 
   if (!window.notify) {
     window.notify = buildNotification;
+
+    // Wrap toast.js to support (title, message) signature used by all admin pages
+    const originalToastSuccess = window.toast?.success;
+    const originalToastError = window.toast?.error;
+
+    if (originalToastSuccess) {
+      window.toast.success = (titleOrMessage, messageOrDuration) => {
+        // If second param is a string, treat as (title, message)
+        if (typeof messageOrDuration === 'string') {
+          const combined = messageOrDuration ? `${titleOrMessage}: ${messageOrDuration}` : titleOrMessage;
+          originalToastSuccess(combined);
+        } else {
+          // Otherwise treat as (message, duration)
+          originalToastSuccess(titleOrMessage, messageOrDuration);
+        }
+      };
+    }
+
+    if (originalToastError) {
+      window.toast.error = (titleOrMessage, messageOrDuration) => {
+        // If second param is a string, treat as (title, message)
+        if (typeof messageOrDuration === 'string') {
+          const combined = messageOrDuration ? `${titleOrMessage}: ${messageOrDuration}` : titleOrMessage;
+          originalToastError(combined);
+        } else {
+          // Otherwise treat as (message, duration)
+          originalToastError(titleOrMessage, messageOrDuration);
+        }
+      };
+    }
+
     window.notifyWarning = (title, subtitle) => buildNotification({ type: "warning", title, subtitle });
     window.notifyLoading = (title = "Memproses", subtitle = "Mohon tunggu sebentar") =>
       buildNotification({ type: "loading", title, subtitle, timeout: 0 });
