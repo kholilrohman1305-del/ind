@@ -78,9 +78,6 @@
 
   if (!window.notify) {
     window.notify = buildNotification;
-    window.toast.success = (title, subtitle) => buildNotification({ type: "success", title, subtitle });
-    window.toast.error = (title, subtitle) =>
-      buildNotification({ type: "error", title, subtitle, timeout: 5000 });
     window.notifyWarning = (title, subtitle) => buildNotification({ type: "warning", title, subtitle });
     window.notifyLoading = (title = "Memproses", subtitle = "Mohon tunggu sebentar") =>
       buildNotification({ type: "loading", title, subtitle, timeout: 0 });
