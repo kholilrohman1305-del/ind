@@ -563,6 +563,12 @@ body[data-role="siswa"] .content {
   width: 100%;
 }
 
+/* Ruang aman di bawah konten edukator agar tidak tertutup footer navigasi
+   (fixed). Tidak bergantung pada kelas utility Tailwind hasil build. */
+body[data-role="edukator"] main.content {
+  padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
 .edukator-footer {
   width: 100%;
   position: fixed;

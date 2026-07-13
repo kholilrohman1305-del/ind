@@ -130,6 +130,75 @@
     }
   };
 
+  // --- Pengaturan Login Biometrik ---
+  const setupBiometric = async () => {
+    const bio = window.ilhamiBiometric;
+    const statusText = document.getElementById("biometricStatusText");
+    const toggleBtn = document.getElementById("biometricToggleBtn");
+    if (!statusText || !toggleBtn) return;
+
+    if (!bio || !(await bio.isSupported())) {
+      statusText.textContent =
+        "Perangkat atau browser ini tidak mendukung login biometrik. Gunakan aplikasi ILHAMI atau browser Chrome dengan sidik jari/Windows Hello.";
+      return;
+    }
+
+    const renderState = () => {
+      const active = bio.isEnrolled();
+      statusText.textContent = active
+        ? "Login biometrik aktif di perangkat ini. Anda bisa masuk dengan sidik jari/wajah dari halaman login."
+        : "Aktifkan agar bisa masuk lebih cepat dengan sidik jari/wajah di perangkat ini.";
+      toggleBtn.textContent = active ? "Nonaktifkan Login Biometrik" : "Aktifkan Login Biometrik";
+      toggleBtn.style.background = active
+        ? "#EF4444"
+        : "linear-gradient(135deg, #00A6B4 0%, #008891 100%)";
+      toggleBtn.classList.remove("hidden");
+    };
+
+    renderState();
+
+    toggleBtn.addEventListener("click", async () => {
+      toggleBtn.disabled = true;
+      try {
+        if (bio.isEnrolled()) {
+          const token = bio.getToken();
+          await requester("/api/auth/biometric/unregister", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ token }),
+          });
+          bio.clearLocal();
+          notify("success", "Login biometrik dinonaktifkan.");
+        } else {
+          const result = await bio.enroll({ email: fields.email?.value });
+          if (!result.success) {
+            if (result.message) notify("error", result.message);
+            return;
+          }
+          const res = await requester("/api/auth/biometric/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ device_info: navigator.userAgent }),
+          });
+          const json = await res.json();
+          if (!res.ok || !json.success || !json.token) {
+            notify("error", json.message || "Gagal mengaktifkan login biometrik.");
+            return;
+          }
+          bio.setToken(json.token);
+          notify("success", "Login biometrik diaktifkan. Anda bisa masuk dengan biometrik dari halaman login.");
+        }
+      } catch (err) {
+        notify("error", err.message || "Gagal mengubah pengaturan biometrik.");
+      } finally {
+        toggleBtn.disabled = false;
+        renderState();
+      }
+    });
+  };
+
   const handleLogout = () => {
     requester("/api/auth/logout", { method: "POST" })
       .finally(() => {
@@ -141,6 +210,7 @@
     const ok = await checkSession();
     if (!ok) return;
     await loadProfile();
+    setupBiometric();
   });
 
   if (form) form.addEventListener("submit", handleSubmit);
