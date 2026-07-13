@@ -252,7 +252,12 @@
                     data-pengajuan-index="${index}"
                     title="Ajukan Perubahan">
               <i class="fa-solid fa-pen-to-square text-sm"></i>
-            </button>` : ''}
+            </button>` : `
+            <button type="button" class="w-9 h-9 rounded-full bg-slate-50 text-slate-300 flex items-center justify-center shadow-sm border border-slate-100 flex-shrink-0 opacity-50"
+                    data-pengajuan-done="1"
+                    title="Jadwal sudah selesai">
+              <i class="fa-solid fa-pen-to-square text-sm"></i>
+            </button>`}
           </div>
         `;
       })
@@ -338,6 +343,16 @@
     const calendarList = document.getElementById("calendarList");
     if (calendarList) {
       calendarList.addEventListener("click", (event) => {
+        const doneButton = event.target.closest("button[data-pengajuan-done]");
+        if (doneButton) {
+          const message = "Jadwal ini sudah selesai (presensi terisi), sehingga tidak bisa diajukan perubahan.";
+          if (window.notify) {
+            window.notify({ type: "info", title: "Tidak Bisa Diajukan", subtitle: message });
+          } else {
+            alert(message);
+          }
+          return;
+        }
         const button = event.target.closest("button[data-pengajuan-index]");
         if (!button) return;
         const row = renderedRows[Number(button.dataset.pengajuanIndex)];
