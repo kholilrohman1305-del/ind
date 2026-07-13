@@ -114,10 +114,19 @@ window.ilhamiBiometric = (() => {
       return { success: true, message: "" };
     } catch (e) {
       const cancelled = e && (e.name === "NotAllowedError" || e.name === "AbortError");
+      if (cancelled) {
+        // NotAllowedError juga muncul saat browser memblokir WebAuthn
+        // (mis. TWA yang belum terverifikasi), jadi tetap beri pesan.
+        return {
+          success: false,
+          message:
+            "Verifikasi biometrik dibatalkan atau diblokir browser. Jika memakai aplikasi dan muncul address bar di atas, instal ulang aplikasinya lalu coba lagi.",
+        };
+      }
       const detail = e && (e.message || e.name) ? ` (${e.message || e.name})` : "";
       return {
         success: false,
-        message: cancelled ? "" : `Gagal mendaftarkan biometrik di perangkat ini${detail}.`,
+        message: `Gagal mendaftarkan biometrik di perangkat ini${detail}.`,
       };
     }
   };

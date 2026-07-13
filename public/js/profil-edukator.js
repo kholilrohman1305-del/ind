@@ -169,6 +169,7 @@
 
     toggleBtn.addEventListener("click", async () => {
       toggleBtn.disabled = true;
+      toggleBtn.textContent = "Memverifikasi...";
       try {
         if (bio.isEnrolled()) {
           const token = bio.getToken();
@@ -183,7 +184,7 @@
         } else {
           const result = await bio.enroll({ email: fields.email?.value });
           if (!result.success) {
-            if (result.message) notify("error", result.message);
+            notify("error", result.message || "Verifikasi biometrik tidak selesai. Silakan coba lagi.");
             return;
           }
           const res = await requester("/api/auth/biometric/register", {
