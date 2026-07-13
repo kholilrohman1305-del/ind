@@ -28,9 +28,11 @@
     // --- Biometric (aplikasi Android via bridge, atau Chrome/browser via WebAuthn) ---
     const bio = window.ilhamiBiometric || null;
 
-    const updateBiometricVisibility = async () => {
+    // Tombol Login Biometrik selalu muncul jika biometrik sudah diaktifkan
+    // di perangkat ini (tidak menunggu/bergantung pada cek dukungan).
+    const updateBiometricVisibility = () => {
         if (!biometricSection) return;
-        const show = !!bio && bio.isEnrolled() && (await bio.isSupported());
+        const show = !!bio && bio.isEnrolled();
         biometricSection.classList.toggle("hidden", !show);
     };
 
