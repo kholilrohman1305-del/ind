@@ -9,6 +9,9 @@
     search: "",
   };
 
+  // Baris jadwal yang sedang tampil di list harian (untuk tombol Ajukan Perubahan)
+  let renderedRows = [];
+
   // Helper: Fetch dengan error handling aman
   const fetchJson = async (url, options = {}) => {
     try {
@@ -223,13 +226,13 @@
     }
 
     empty.style.display = "none";
+    renderedRows = rows;
     list.innerHTML = rows
-      .map((row) => {
+      .map((row, index) => {
         const isDone = row.status_jadwal === JADWAL_STATUS.COMPLETED;
         const pertemuan = row.pertemuan_ke ? `<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded ml-1">P${row.pertemuan_ke}</span>` : "";
         const typeLabel = row._type === TIPE_LES.KELAS ? "Kelas" : "Privat";
-        const jadwalData = JSON.stringify(row).replace(/"/g, '&quot;');
-        
+
         return `
           <div class="schedule-card group">
             <div class="time-box">
@@ -245,8 +248,8 @@
             </div>
             
             ${!isDone ? `
-            <button class="w-9 h-9 rounded-full bg-slate-50 hover:bg-orange-50 text-slate-400 hover:text-orange-500 flex items-center justify-center transition shadow-sm border border-slate-100 flex-shrink-0" 
-                    onclick='window.openPengajuanModal(${row.id}, ${jadwalData})'
+            <button type="button" class="w-9 h-9 rounded-full bg-slate-50 hover:bg-orange-50 text-slate-400 hover:text-orange-500 flex items-center justify-center transition shadow-sm border border-slate-100 flex-shrink-0"
+                    data-pengajuan-index="${index}"
                     title="Ajukan Perubahan">
               <i class="fa-solid fa-pen-to-square text-sm"></i>
             </button>` : ''}
@@ -326,6 +329,22 @@
         state.search = event.target.value || "";
         renderCalendar();
         renderList(state.selectedDate);
+      });
+    }
+
+    // Tombol "Ajukan Perubahan" pada tiap kartu jadwal (event delegation,
+    // data diambil dari renderedRows — aman untuk nama yang mengandung
+    // tanda kutip yang sebelumnya merusak atribut onclick inline).
+    const calendarList = document.getElementById("calendarList");
+    if (calendarList) {
+      calendarList.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-pengajuan-index]");
+        if (!button) return;
+        const row = renderedRows[Number(button.dataset.pengajuanIndex)];
+        if (!row) return;
+        if (typeof window.openPengajuanModal === "function") {
+          window.openPengajuanModal(row.id, row);
+        }
       });
     }
 
