@@ -216,13 +216,42 @@
                     </div>
 
                     <div class="fade-in-up delay-300 pt-4">
-                        <button type="submit" id="loginButton" 
+                        <button type="submit" id="loginButton"
                             class="btn-primary w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-lg shadow-indigo-500/30 text-sm font-bold text-white focus:outline-none focus:ring-4 focus:ring-indigo-500/20 active:scale-[0.98]">
                             Masuk Sekarang
                         </button>
                     </div>
 
                 </form>
+
+                <!-- Biometric Login (Edukator, via aplikasi) -->
+                <div id="biometricSection" class="hidden mt-4">
+                    <div class="flex items-center gap-3 my-3">
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                        <span class="text-xs text-slate-400 font-semibold">atau</span>
+                        <div class="flex-1 h-px bg-slate-200"></div>
+                    </div>
+                    <button type="button" id="biometricButton"
+                        class="w-full flex items-center justify-center gap-2 py-4 px-4 rounded-xl border-2 border-indigo-200 bg-white text-sm font-bold text-indigo-600 hover:bg-indigo-50 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 active:scale-[0.98] transition-all">
+                        <i class="fa-solid fa-fingerprint text-lg"></i>
+                        Masuk dengan Biometrik
+                    </button>
+                </div>
+
+                <!-- Modal Aktivasi Biometrik (Edukator) -->
+                <div id="biometricEnrollModal" class="hidden fixed inset-0 z-50 items-center justify-center p-6 bg-slate-900/50 backdrop-blur-sm">
+                    <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+                        <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl mb-4">
+                            <i class="fa-solid fa-fingerprint"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 text-center mb-1">Aktifkan Login Biometrik?</h3>
+                        <p class="text-sm text-slate-500 text-center mb-5">Masuk lebih cepat menggunakan sidik jari atau wajah di perangkat ini.</p>
+                        <div class="flex gap-3">
+                            <button type="button" id="biometricEnrollSkip" class="flex-1 py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50">Nanti</button>
+                            <button type="button" id="biometricEnrollConfirm" class="flex-1 py-3 rounded-xl bg-indigo-600 text-sm font-bold text-white hover:bg-indigo-700">Aktifkan</button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Error Display -->
                 <div id="loginError" class="hidden opacity-0 mt-4">

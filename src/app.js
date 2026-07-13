@@ -61,6 +61,7 @@ const authLimiter = rateLimit({
 
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
+app.use("/api/auth/biometric/login", authLimiter);
 
 app.get("/api/csrf-token", (req, res) => {
   if (!req.session.csrfToken) {
@@ -73,7 +74,7 @@ const csrfProtection = (req, res, next) => {
   const safeMethods = ["GET", "HEAD", "OPTIONS"];
   if (safeMethods.includes(req.method)) return next();
 
-  const csrfExemptPaths = ["/api/auth/login", "/api/auth/register", "/api/public"];
+  const csrfExemptPaths = ["/api/auth/login", "/api/auth/register", "/api/auth/biometric/login", "/api/public"];
   if (csrfExemptPaths.some((p) => req.path.startsWith(p))) return next();
 
   const token = req.headers["x-csrf-token"] || req.body?._csrf;

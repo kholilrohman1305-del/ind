@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <!-- Circle background -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,50m-45,0a45,45 0,1 1,90 0a45,45 0,1 1,-90 0" />
+    <!-- Graduation cap / book icon -->
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M50,25 L20,40 L50,55 L80,40 Z" />
+    <path
+        android:fillColor="@color/primary_dark"
+        android:pathData="M30,45 L30,62 L50,72 L70,62 L70,45 L50,55 Z" />
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M78,40 L78,60"
+        android:strokeWidth="3"
+        android:strokeColor="@color/primary" />
+</vector>

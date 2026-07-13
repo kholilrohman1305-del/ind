@@ -19,6 +19,61 @@
     const errorText = document.getElementById("errorText");
     const button = document.getElementById("loginButton");
     const togglePassword = document.getElementById("togglePassword");
+    const biometricSection = document.getElementById("biometricSection");
+    const biometricButton = document.getElementById("biometricButton");
+    const enrollModal = document.getElementById("biometricEnrollModal");
+    const enrollConfirm = document.getElementById("biometricEnrollConfirm");
+    const enrollSkip = document.getElementById("biometricEnrollSkip");
+
+    // --- Biometric (Edukator via aplikasi Android) ---
+    const BIOMETRIC_TOKEN_KEY = "ilhami_biometric_token";
+
+    const biometricBridge = window.IlhamiBiometric || null;
+
+    const bridgeAvailable = () => {
+        try {
+            return !!biometricBridge && biometricBridge.isAvailable();
+        } catch (e) {
+            return false;
+        }
+    };
+
+    const getBiometricToken = () => {
+        try { return localStorage.getItem(BIOMETRIC_TOKEN_KEY); } catch (e) { return null; }
+    };
+
+    const setBiometricToken = (token) => {
+        try {
+            if (token) localStorage.setItem(BIOMETRIC_TOKEN_KEY, token);
+            else localStorage.removeItem(BIOMETRIC_TOKEN_KEY);
+        } catch (e) { /* storage tidak tersedia */ }
+    };
+
+    // Meminta verifikasi biometrik ke aplikasi Android, hasilnya lewat callback global.
+    let biometricResolve = null;
+    window.__onBiometricResult = (success, message) => {
+        if (biometricResolve) {
+            const resolve = biometricResolve;
+            biometricResolve = null;
+            resolve({ success: !!success, message: message || "" });
+        }
+    };
+
+    const promptBiometric = () => new Promise((resolve) => {
+        biometricResolve = resolve;
+        try {
+            biometricBridge.authenticate();
+        } catch (e) {
+            biometricResolve = null;
+            resolve({ success: false, message: "Biometrik tidak tersedia di perangkat ini." });
+        }
+    });
+
+    const updateBiometricVisibility = () => {
+        if (!biometricSection) return;
+        const show = bridgeAvailable() && !!getBiometricToken();
+        biometricSection.classList.toggle("hidden", !show);
+    };
 
     // --- UI Logic ---
 
@@ -113,12 +168,114 @@
                 button.innerHTML = `<i class="fa-solid fa-check-circle mr-2"></i> Berhasil!`;
                 button.classList.remove("btn-gradient");
                 button.classList.add("bg-emerald-500", "hover:bg-emerald-600");
-                
-                setTimeout(() => redirectUser(data.user.role), 500);
+
+                // Tawarkan aktivasi biometrik untuk edukator di aplikasi
+                if (data.user.role === "edukator" && bridgeAvailable() && !getBiometricToken()) {
+                    offerBiometricEnrollment(data.user.role);
+                } else {
+                    setTimeout(() => redirectUser(data.user.role), 500);
+                }
 
             } catch (err) {
                 showError(err.message || "Terjadi kesalahan pada server.");
                 setLoading(false);
+            }
+        });
+    }
+
+    // --- Biometric Enrollment (setelah login password edukator) ---
+    const hideEnrollModal = () => {
+        if (!enrollModal) return;
+        enrollModal.classList.add("hidden");
+        enrollModal.classList.remove("flex");
+    };
+
+    const offerBiometricEnrollment = (role) => {
+        if (!enrollModal || !enrollConfirm || !enrollSkip) {
+            redirectUser(role);
+            return;
+        }
+        enrollModal.classList.remove("hidden");
+        enrollModal.classList.add("flex");
+
+        enrollSkip.onclick = () => {
+            hideEnrollModal();
+            redirectUser(role);
+        };
+
+        enrollConfirm.onclick = async () => {
+            enrollConfirm.disabled = true;
+            enrollConfirm.textContent = "Memverifikasi...";
+            try {
+                const result = await promptBiometric();
+                if (result.success) {
+                    const requester = window.api?.request || fetch;
+                    const res = await requester("/api/auth/biometric/register", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ device_info: navigator.userAgent }),
+                    });
+                    const json = await res.json();
+                    if (res.ok && json.success && json.token) {
+                        setBiometricToken(json.token);
+                    }
+                }
+            } catch (e) { /* gagal aktivasi tidak menghalangi login */ }
+            hideEnrollModal();
+            redirectUser(role);
+        };
+    };
+
+    // --- Biometric Login ---
+    if (biometricButton) {
+        biometricButton.addEventListener("click", async () => {
+            hideError();
+            const token = getBiometricToken();
+            if (!token || !bridgeAvailable()) {
+                updateBiometricVisibility();
+                return;
+            }
+
+            biometricButton.disabled = true;
+            const originalHtml = biometricButton.innerHTML;
+            biometricButton.innerHTML = '<i class="fa-solid fa-fingerprint text-lg animate-pulse"></i> Memverifikasi...';
+
+            const restore = () => {
+                biometricButton.disabled = false;
+                biometricButton.innerHTML = originalHtml;
+            };
+
+            try {
+                const result = await promptBiometric();
+                if (!result.success) {
+                    if (result.message) showError(result.message);
+                    restore();
+                    return;
+                }
+
+                const requester = window.api?.request || fetch;
+                const response = await requester("/api/auth/biometric/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "same-origin",
+                    body: JSON.stringify({ token }),
+                });
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    if (response.status === 401) {
+                        // Token tidak berlaku lagi — hapus dan minta login password
+                        setBiometricToken(null);
+                        updateBiometricVisibility();
+                    }
+                    throw new Error(data.message || "Login biometrik gagal. Silakan masuk dengan password.");
+                }
+
+                biometricButton.innerHTML = '<i class="fa-solid fa-check-circle text-lg"></i> Berhasil!';
+                setTimeout(() => redirectUser(data.user.role), 500);
+            } catch (err) {
+                showError(err.message || "Login biometrik gagal. Silakan masuk dengan password.");
+                restore();
             }
         });
     }
@@ -146,5 +303,6 @@
     });
 
     // Init
+    updateBiometricVisibility();
     checkSession();
 })();

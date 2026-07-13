@@ -145,4 +145,16 @@
 
   if (form) form.addEventListener("submit", handleSubmit);
   if (logoutBtn) logoutBtn.addEventListener("click", handleLogout);
+
+  // Pastikan input yang sedang diisi (mis. konfirmasi password) tidak tertutup
+  // footer navigasi atau keyboard di layar kecil.
+  if (form) {
+    form.addEventListener("focusin", (event) => {
+      const target = event.target;
+      if (!target || !target.matches("input, textarea")) return;
+      setTimeout(() => {
+        target.scrollIntoView({ block: "center", behavior: "smooth" });
+      }, 300);
+    });
+  }
 })();

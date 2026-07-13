@@ -82,8 +82,20 @@ const registerEdukatorSchema = z.object({
   }),
 });
 
+/**
+ * Schema untuk login biometrik (token perangkat)
+ */
+const biometricLoginSchema = z.object({
+  body: z.object({
+    token: z
+      .string({ error: "Token biometrik wajib diisi." })
+      .min(32, "Token biometrik tidak valid."),
+  }),
+});
+
 module.exports = {
   loginSchema,
   registerSiswaSchema,
   registerEdukatorSchema,
+  biometricLoginSchema,
 };
