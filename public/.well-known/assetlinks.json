@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ilhami.twa",
+      "sha256_cert_fingerprints": [
+        "ED:E8:37:7F:10:4B:55:97:14:96:64:3A:06:5F:76:10:11:28:AA:34:13:BC:89:00:26:F3:D8:70:30:A2:36:E1"
+      ]
+    }
+  }
+]

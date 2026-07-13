@@ -51,6 +51,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(sessionConfig);
 app.use(express.static(publicDir, { index: false }));
 
+// Digital Asset Links untuk aplikasi Android TWA (express.static
+// mengabaikan folder berawalan titik, jadi dilayani eksplisit).
+app.get("/.well-known/assetlinks.json", (req, res) => {
+  res.type("application/json");
+  res.sendFile(path.join(publicDir, ".well-known", "assetlinks.json"), { dotfiles: "allow" });
+});
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
