@@ -257,11 +257,18 @@
 
         <div id="tab-jadwal-view" class="tab-content-jadwal active space-y-6">
           <section>
-            <div class="flex items-center justify-between mb-3 px-1">
+            <div class="flex items-center justify-between mb-2 px-1">
               <h3 class="text-slate-800 font-bold text-lg">Detail Jadwal</h3>
               <span id="selectedDateLabel" class="text-xs font-medium text-slate-500 bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100">-</span>
             </div>
-            
+
+            <p class="text-xs text-slate-500 mb-3 px-1 flex items-center gap-1.5">
+              <span class="inline-flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0" style="background: linear-gradient(135deg, #F59E0B 0%, #FB923C 100%); color: #fff;">
+                <i class="fa-solid fa-pen-to-square text-[9px]"></i>
+              </span>
+              Tekan tombol oranye untuk <span class="font-bold text-orange-600">ajukan perubahan jadwal</span>
+            </p>
+
             <div id="calendarList" class="space-y-1"></div>
             
             <div id="calendarEmpty" class="flex flex-col items-center justify-center py-10 text-center opacity-60">

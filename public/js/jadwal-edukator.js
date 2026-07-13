@@ -248,12 +248,13 @@
             </div>
             
             ${!isDone ? `
-            <button type="button" class="w-9 h-9 rounded-full bg-slate-50 hover:bg-orange-50 text-slate-400 hover:text-orange-500 flex items-center justify-center transition shadow-sm border border-slate-100 flex-shrink-0"
+            <button type="button" class="w-10 h-10 rounded-full flex items-center justify-center transition flex-shrink-0"
+                    style="background: linear-gradient(135deg, #F59E0B 0%, #FB923C 100%); color: #fff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);"
                     data-pengajuan-index="${index}"
-                    title="Ajukan Perubahan">
+                    title="Ajukan Perubahan Jadwal">
               <i class="fa-solid fa-pen-to-square text-sm"></i>
             </button>` : `
-            <button type="button" class="w-9 h-9 rounded-full bg-slate-50 text-slate-300 flex items-center justify-center shadow-sm border border-slate-100 flex-shrink-0 opacity-50"
+            <button type="button" class="w-10 h-10 rounded-full bg-slate-100 text-slate-300 flex items-center justify-center shadow-sm border border-slate-100 flex-shrink-0"
                     data-pengajuan-done="1"
                     title="Jadwal sudah selesai">
               <i class="fa-solid fa-pen-to-square text-sm"></i>
