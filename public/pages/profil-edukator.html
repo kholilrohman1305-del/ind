@@ -46,6 +46,17 @@
         </header>
 
         <main class="content flex-1 px-5 -mt-2 pb-40 overflow-auto hide-scrollbar space-y-4">
+          <section class="panel bg-white rounded-3xl p-5 shadow-lg">
+            <div class="flex items-center gap-2 mb-4 text-slate-700 font-bold">
+              <i class="fa-solid fa-fingerprint"></i>
+              <span>Login Biometrik</span>
+            </div>
+            <p id="biometricStatusText" class="text-sm text-slate-500 mb-4">Masuk lebih cepat dengan sidik jari/wajah di perangkat ini.</p>
+            <button type="button" id="biometricToggleBtn" class="w-full py-3 rounded-2xl font-semibold text-white shadow-lg" style="background: linear-gradient(135deg, #00A6B4 0%, #008891 100%);">
+              Aktifkan Login Biometrik
+            </button>
+          </section>
+
           <form id="profilForm" class="space-y-4">
             <section class="panel bg-white rounded-3xl p-5 shadow-lg">
               <div class="flex items-center gap-2 mb-4 text-slate-700 font-bold">
@@ -101,17 +112,6 @@
               <p class="text-xs text-slate-500 mt-3">Kosongkan jika tidak ingin mengubah password.</p>
             </section>
           </form>
-
-          <section class="panel bg-white rounded-3xl p-5 shadow-lg">
-            <div class="flex items-center gap-2 mb-4 text-slate-700 font-bold">
-              <i class="fa-solid fa-fingerprint"></i>
-              <span>Login Biometrik</span>
-            </div>
-            <p id="biometricStatusText" class="text-sm text-slate-500 mb-4">Memeriksa dukungan perangkat...</p>
-            <button type="button" id="biometricToggleBtn" class="hidden w-full py-3 rounded-2xl font-semibold text-white shadow-lg" style="background: linear-gradient(135deg, #00A6B4 0%, #008891 100%);">
-              Aktifkan Login Biometrik
-            </button>
-          </section>
         </main>
 
         <footer class="edukator-footer" id="edukatorFooterNav" aria-label="Navigasi Edukator"></footer>

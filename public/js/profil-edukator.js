@@ -21,11 +21,11 @@
   };
 
   const notify = (type, message) => {
-    if (type === "success" && window.toast.success) {
+    if (type === "success" && window.toast?.success) {
       window.toast.success("Berhasil", message);
       return;
     }
-    if (type === "error" && window.toast.error) {
+    if (type === "error" && window.toast?.error) {
       window.toast.error("Gagal", message);
       return;
     }
@@ -131,15 +131,16 @@
   };
 
   // --- Pengaturan Login Biometrik ---
-  const setupBiometric = async () => {
+  const setupBiometric = () => {
     const bio = window.ilhamiBiometric;
     const statusText = document.getElementById("biometricStatusText");
     const toggleBtn = document.getElementById("biometricToggleBtn");
     if (!statusText || !toggleBtn) return;
 
-    if (!bio || !(await bio.isSupported())) {
-      statusText.textContent =
-        "Perangkat atau browser ini tidak mendukung login biometrik. Gunakan aplikasi ILHAMI atau browser Chrome dengan sidik jari/Windows Hello.";
+    if (!bio) {
+      statusText.textContent = "Fitur biometrik gagal dimuat. Muat ulang halaman ini.";
+      toggleBtn.disabled = true;
+      toggleBtn.style.opacity = "0.5";
       return;
     }
 
@@ -152,10 +153,20 @@
       toggleBtn.style.background = active
         ? "#EF4444"
         : "linear-gradient(135deg, #00A6B4 0%, #008891 100%)";
-      toggleBtn.classList.remove("hidden");
     };
 
+    // Tampilkan tombol langsung; cek dukungan berjalan di latar belakang.
     renderState();
+    bio.isSupported()
+      .then((supported) => {
+        if (!supported) {
+          statusText.textContent =
+            "Perangkat atau browser ini tidak mendukung login biometrik. Gunakan aplikasi ILHAMI atau browser Chrome dengan sidik jari/Windows Hello.";
+          toggleBtn.disabled = true;
+          toggleBtn.style.opacity = "0.5";
+        }
+      })
+      .catch(() => { /* biarkan tombol tetap aktif */ });
 
     toggleBtn.addEventListener("click", async () => {
       toggleBtn.disabled = true;
@@ -207,10 +218,14 @@
   };
 
   document.addEventListener("DOMContentLoaded", async () => {
+    setupBiometric();
     const ok = await checkSession();
     if (!ok) return;
-    await loadProfile();
-    setupBiometric();
+    try {
+      await loadProfile();
+    } catch (err) {
+      notify("error", "Gagal memuat profil.");
+    }
   });
 
   if (form) form.addEventListener("submit", handleSubmit);
