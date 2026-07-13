@@ -28,11 +28,15 @@
     // --- Biometric (aplikasi Android via bridge, atau Chrome/browser via WebAuthn) ---
     const bio = window.ilhamiBiometric || null;
 
-    // Tombol Login Biometrik selalu muncul jika biometrik sudah diaktifkan
-    // di perangkat ini (tidak menunggu/bergantung pada cek dukungan).
-    const updateBiometricVisibility = () => {
+    // Tombol Login Biometrik muncul jika biometrik sudah aktif di perangkat
+    // ini, atau perangkatnya mendukung biometrik (agar fitur mudah ditemukan;
+    // klik saat belum aktif akan memberi petunjuk cara mengaktifkan).
+    const updateBiometricVisibility = async () => {
         if (!biometricSection) return;
-        const show = !!bio && bio.isEnrolled();
+        let show = !!bio && bio.isEnrolled();
+        if (!show && bio) {
+            try { show = await bio.isSupported(); } catch (e) { show = false; }
+        }
         biometricSection.classList.toggle("hidden", !show);
     };
 
@@ -193,11 +197,11 @@
     if (biometricButton) {
         biometricButton.addEventListener("click", async () => {
             hideError();
-            const token = bio?.getToken();
-            if (!token || !bio.isEnrolled()) {
-                updateBiometricVisibility();
+            if (!bio || !bio.isEnrolled()) {
+                showError("Login biometrik belum aktif di perangkat ini. Masuk dengan email & password terlebih dahulu, lalu aktifkan lewat pop-up atau menu Profil (khusus edukator).");
                 return;
             }
+            const token = bio.getToken();
 
             biometricButton.disabled = true;
             const originalHtml = biometricButton.innerHTML;
