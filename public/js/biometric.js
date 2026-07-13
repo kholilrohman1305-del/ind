@@ -114,9 +114,10 @@ window.ilhamiBiometric = (() => {
       return { success: true, message: "" };
     } catch (e) {
       const cancelled = e && (e.name === "NotAllowedError" || e.name === "AbortError");
+      const detail = e && (e.message || e.name) ? ` (${e.message || e.name})` : "";
       return {
         success: false,
-        message: cancelled ? "" : "Gagal mendaftarkan biometrik di perangkat ini.",
+        message: cancelled ? "" : `Gagal mendaftarkan biometrik di perangkat ini${detail}.`,
       };
     }
   };

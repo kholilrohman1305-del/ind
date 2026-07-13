@@ -155,15 +155,14 @@
         : "linear-gradient(135deg, #00A6B4 0%, #008891 100%)";
     };
 
-    // Tampilkan tombol langsung; cek dukungan berjalan di latar belakang.
+    // Tampilkan tombol langsung dan biarkan selalu bisa diklik; cek dukungan
+    // hanya memperbarui teks info, tidak menonaktifkan tombol.
     renderState();
     bio.isSupported()
       .then((supported) => {
-        if (!supported) {
+        if (!supported && !bio.isEnrolled()) {
           statusText.textContent =
-            "Perangkat atau browser ini tidak mendukung login biometrik. Gunakan aplikasi ILHAMI atau browser Chrome dengan sidik jari/Windows Hello.";
-          toggleBtn.disabled = true;
-          toggleBtn.style.opacity = "0.5";
+            "Perangkat/browser ini tampaknya tidak mendukung biometrik, tetapi Anda tetap bisa mencoba mengaktifkannya.";
         }
       })
       .catch(() => { /* biarkan tombol tetap aktif */ });

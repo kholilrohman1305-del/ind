@@ -59,9 +59,7 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
-app.use("/api/auth/biometric/login", authLimiter);
 
 app.get("/api/csrf-token", (req, res) => {
   if (!req.session.csrfToken) {
