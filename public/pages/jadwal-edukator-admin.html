@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Jadwal Edukator - ILHAMI Pro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+
+    <style>
+      :root {
+        --primary: #4F46E5;
+        --bg-app: #F8FAFC;
+      }
+      body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-app); color: #334155; }
+
+      .glass-panel {
+        background: #ffffff;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        border-radius: 1rem;
+      }
+
+      .custom-input {
+        width: 100%;
+        padding: 0.6rem 0.9rem;
+        border: 1px solid #E2E8F0;
+        border-radius: 0.75rem;
+        font-size: 0.875rem;
+        background: #fff;
+      }
+      .custom-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+
+      .status-pill {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+
+      .modal {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+      .modal.show { opacity: 1; pointer-events: auto; }
+      .modal-card {
+        background: #fff;
+        border-radius: 1rem;
+        width: min(680px, calc(100vw - 2rem));
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        transform: translateY(12px);
+        transition: transform 0.2s;
+      }
+      .modal.show .modal-card { transform: translateY(0); }
+    </style>
+  </head>
+
+  <body class="app h-screen flex flex-col overflow-hidden" data-page="jadwal-edukator-admin">
+    <main class="content flex-1 overflow-y-auto p-4 md:p-8">
+      <div class="max-w-6xl mx-auto space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-slate-800">Jadwal Edukator</h1>
+            <p class="text-sm text-slate-500 mt-1">Rekap jadwal mengajar seluruh edukator per bulan.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <label class="text-sm font-semibold text-slate-600" for="filterBulan">Bulan</label>
+            <input type="month" id="filterBulan" class="custom-input" style="width: 180px;" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass-panel p-4">
+            <div class="text-xs text-slate-500">Edukator Mengajar</div>
+            <div id="statEdukator" class="text-2xl font-bold text-slate-800 mt-1">0</div>
+          </div>
+          <div class="glass-panel p-4">
+            <div class="text-xs text-slate-500">Total Jadwal</div>
+            <div id="statTotal" class="text-2xl font-bold text-slate-800 mt-1">0</div>
+          </div>
+          <div class="glass-panel p-4">
+            <div class="text-xs text-slate-500">Selesai</div>
+            <div id="statSelesai" class="text-2xl font-bold text-emerald-600 mt-1">0</div>
+          </div>
+          <div class="glass-panel p-4">
+            <div class="text-xs text-slate-500">Terjadwal</div>
+            <div id="statTerjadwal" class="text-2xl font-bold text-indigo-600 mt-1">0</div>
+          </div>
+        </div>
+
+        <div class="glass-panel overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
+                  <th class="px-5 py-3">Edukator</th>
+                  <th class="px-5 py-3 text-center">Total Jadwal</th>
+                  <th class="px-5 py-3 text-center">Privat</th>
+                  <th class="px-5 py-3 text-center">Kelas</th>
+                  <th class="px-5 py-3 text-center">Selesai</th>
+                  <th class="px-5 py-3">Periode</th>
+                  <th class="px-5 py-3 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="edukatorRows" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+          <div id="edukatorEmpty" class="hidden py-12 text-center text-slate-400">
+            <i class="fa-regular fa-calendar text-3xl mb-3 block"></i>
+            <p class="text-sm">Tidak ada jadwal edukator pada bulan ini.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal Detail -->
+    <div id="detailModal" class="modal">
+      <div class="modal-card">
+        <div class="flex items-start justify-between p-5 border-b border-slate-100">
+          <div>
+            <h3 id="detailTitle" class="text-lg font-bold text-slate-800">Detail Jadwal</h3>
+            <p id="detailSubtitle" class="text-sm text-slate-500 mt-0.5">-</p>
+          </div>
+          <button id="closeDetailModal" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div id="detailBody" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
+      </div>
+    </div>
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/jadwal-edukator-admin.js"></script>
+  </body>
+</html>

@@ -131,6 +131,24 @@
     return parseData(data);
   };
 
+  // Tampilkan hasil simpan: sukses biasa, atau sukses dengan peringatan
+  // bentrok yang rinci (jadwal tetap tersimpan).
+  const notifySaveResult = (result, successTitle, successSubtitle) => {
+    const warnings = result && Array.isArray(result.warnings) ? result.warnings : [];
+    if (warnings.length) {
+      const detail = warnings.join(" | ");
+      if (window.notify) {
+        window.notify({ type: "warning", title: "Tersimpan, tapi ada bentrok", subtitle: detail, timeout: 15000 });
+      } else if (window.toast?.error) {
+        window.toast.error("Tersimpan, tapi ada bentrok", detail);
+      }
+      return;
+    }
+    if (window.toast?.success) {
+      window.toast.success(successTitle, successSubtitle);
+    }
+  };
+
   const buildOptions = (items, placeholder) => {
     if (!items.length) {
       return `<option value="">${placeholder}</option>`;
@@ -500,9 +518,9 @@
           <input type="text" class="slot-selesai custom-input" placeholder="HH:MM" pattern="[0-2][0-9]:[0-5][0-9]" maxlength="5" />
         </div>
         <div class="col-span-2">
-          <label class="block text-gray-600 text-xs font-medium mb-1">Edukator Slot Ini</label>
-          <select class="slot-edukator custom-select text-sm">
-            ${buildOptions(state.edukator, "Ikut edukator utama")}
+          <label class="block text-gray-600 text-xs font-medium mb-1">Edukator</label>
+          <select class="slot-edukator custom-select text-sm" required>
+            ${buildOptions(state.edukator, "Pilih edukator")}
           </select>
         </div>
       </div>
@@ -889,22 +907,19 @@
             throw new Error("Lengkapi jam mulai dan selesai.");
           }
 
-          await fetchJson("/api/jadwal/privat", {
+          const privatResult = await fetchJson("/api/jadwal/privat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ enrollment_id: enrollmentId, slots: filledSlots }),
           });
 
-          if (window.toast.success) {
-            window.toast.success("Jadwal disimpan", "Slot terisi diperbarui.");
-          }
+          notifySaveResult(privatResult, "Jadwal disimpan", "Slot terisi diperbarui.");
         } else {
           // Submit kelas jadwal
           const kelasValue = jadwalKelas.value;
           const kelasId = kelasValue && kelasValue !== "__new__" ? kelasValue : null;
           const kelasNama = kelasValue === "__new__" ? document.getElementById("kelasNamaBaru").value.trim() : null;
           const programIds = kelasValue === "__new__" ? getSelectedProgramIds() : [];
-          const edukatorId = document.getElementById("kelasEdukator").value;
           const tanggalMulai = document.getElementById("kelasTanggalMulai").value;
           const tanggalAkhir = document.getElementById("kelasTanggalAkhir").value;
 
@@ -921,8 +936,8 @@
               edukator_id: card.querySelector(".slot-edukator")?.value || null,
             })
           );
-          if (!edukatorId && slots.some((slot) => !slot.edukator_id)) {
-            throw new Error("Pilih edukator utama, atau isi edukator di setiap slot hari.");
+          if (slots.some((slot) => !slot.edukator_id)) {
+            throw new Error("Pilih edukator di setiap slot hari.");
           }
           const invalidTime = slots.some(
             (slot) =>
@@ -932,23 +947,21 @@
             throw new Error("Jam mulai dan selesai harus diisi bersama.");
           }
 
-          await fetchJson("/api/jadwal/kelas", {
+          const kelasResult = await fetchJson("/api/jadwal/kelas", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               kelas_id: kelasId,
               kelas_nama: kelasNama,
               program_ids: programIds,
-              edukator_id: edukatorId || null,
+              edukator_id: null,
               tanggal_mulai: tanggalMulai,
               tanggal_akhir: tanggalAkhir,
               slots,
             }),
           });
 
-          if (window.toast.success) {
-            window.toast.success("Jadwal kelas disimpan", "Slot mingguan diperbarui.");
-          }
+          notifySaveResult(kelasResult, "Jadwal kelas disimpan", "Slot mingguan diperbarui.");
 
           // Refresh kelas groups
           const updatedGroups = await fetchJson("/api/jadwal/kelas/groups");
@@ -1016,17 +1029,7 @@
             mapel_id: document.getElementById("editMapel").value,
           }),
         });
-        const warnings = result && Array.isArray(result.warnings) ? result.warnings : [];
-        if (warnings.length) {
-          const detail = warnings.join(" | ");
-          if (window.notifyWarning) {
-            window.notifyWarning("Tersimpan, tapi ada bentrok", detail);
-          } else if (window.toast?.error) {
-            window.toast.error("Tersimpan, tapi ada bentrok", detail);
-          }
-        } else if (window.toast.success) {
-          window.toast.success("Jadwal diperbarui", "Perubahan tersimpan.");
-        }
+        notifySaveResult(result, "Jadwal diperbarui", "Perubahan tersimpan.");
         // Close edit modal first, then refresh detail
         closeModal(editModal);
         await loadLists();
@@ -1336,10 +1339,6 @@
         renderKelasGroups();
         renderKelasProgramChecklist();
 
-        document.getElementById("kelasEdukator").innerHTML = buildOptions(
-          state.edukator,
-          "Pilih edukator"
-        );
         document.getElementById("editEdukator").innerHTML = buildOptions(
           state.edukator,
           "Pilih edukator"

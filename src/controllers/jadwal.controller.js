@@ -114,6 +114,42 @@ const listKelasSiswa = async (req, res) => {
   }
 };
 
+const currentMonth = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+};
+
+const resolveBulan = (raw) =>
+  /^\d{4}-(0[1-9]|1[0-2])$/.test(String(raw || "")) ? raw : currentMonth();
+
+const listEdukatorBulanan = async (req, res) => {
+  try {
+    const role = req.session.user.role;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
+    const bulan = resolveBulan(req.query.bulan);
+    const rows = await jadwalService.listEdukatorBulanan({ cabangId, bulan });
+    return res.json({ success: true, data: rows, bulan });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const listEdukatorBulananDetail = async (req, res) => {
+  try {
+    const role = req.session.user.role;
+    const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
+    const bulan = resolveBulan(req.query.bulan);
+    const rows = await jadwalService.listEdukatorBulananDetail({
+      edukatorId: req.params.edukatorId,
+      cabangId,
+      bulan,
+    });
+    return res.json({ success: true, data: rows, bulan });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 const createPrivat = async (req, res) => {
   try {
     const role = req.session.user.role;
@@ -180,6 +216,8 @@ module.exports = {
   listPrivatSiswa,
   listKelasSiswa,
   listKelasSiswaByPrograms,
+  listEdukatorBulanan,
+  listEdukatorBulananDetail,
   createPrivat,
   createKelas,
   update,

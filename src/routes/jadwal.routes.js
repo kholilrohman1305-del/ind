@@ -48,6 +48,16 @@ router.get(
   requireAnyRole([ROLES.SUPER_ADMIN, ROLES.ADMIN_CABANG]),
   jadwalController.listKelasSiswa
 );
+router.get(
+  "/edukator-bulanan",
+  requireAnyRole([ROLES.SUPER_ADMIN, ROLES.ADMIN_CABANG]),
+  jadwalController.listEdukatorBulanan
+);
+router.get(
+  "/edukator-bulanan/:edukatorId",
+  requireAnyRole([ROLES.SUPER_ADMIN, ROLES.ADMIN_CABANG]),
+  jadwalController.listEdukatorBulananDetail
+);
 router.post(
   "/privat",
   requireAnyRole([ROLES.SUPER_ADMIN, ROLES.ADMIN_CABANG]),

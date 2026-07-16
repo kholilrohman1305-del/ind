@@ -141,6 +141,7 @@ const pages = [
   "presensi-edukator",
   "dashboard-edukator",
   "jadwal-edukator",
+  "jadwal-edukator-admin",
   "rekap-presensi-edukator",
   "rincian-gaji-edukator",
   "profil-edukator",

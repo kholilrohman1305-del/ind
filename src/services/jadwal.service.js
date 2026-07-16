@@ -439,9 +439,12 @@ const createPrivatJadwal = async ({ enrollment_id, slots }, cabangId) => {
 
     if (filledSlots.length === 0) {
       await conn.commit();
-      return { inserted: 0 };
+      return { inserted: 0, warnings: [] };
     }
 
+    // Bentrok ditolerir: jadwal tetap dibuat, tetapi detail bentroknya
+    // dikembalikan sebagai peringatan.
+    const warnings = [];
     for (const slot of filledSlots) {
       if (
         (slot.jam_mulai && !slot.jam_selesai) ||
@@ -452,7 +455,7 @@ const createPrivatJadwal = async ({ enrollment_id, slots }, cabangId) => {
       if (slot.jam_mulai && slot.jam_selesai && !isValidTimeRange(slot.jam_mulai, slot.jam_selesai)) {
         throw new Error("Jam mulai harus sebelum jam selesai.");
       }
-      if (slot.tanggal && slot.jam_mulai && slot.jam_selesai) {
+      if (slot.tanggal && slot.jam_mulai && slot.jam_selesai && warnings.length < 10) {
         const conflicts = await findConflicts({
           tanggal: slot.tanggal,
           jam_mulai: slot.jam_mulai,
@@ -460,12 +463,9 @@ const createPrivatJadwal = async ({ enrollment_id, slots }, cabangId) => {
           edukator_id: slot.edukator_id,
           siswa_id: enrollment.siswa_id,
         });
-        if (conflicts.length) {
-          const details = conflicts
-            .map((row) => describeConflict(row, { edukator_id: slot.edukator_id, siswa_id: enrollment.siswa_id }))
-            .join("; ");
-          throw new Error(`Jadwal bentrok: ${details}`);
-        }
+        conflicts.forEach((row) => {
+          warnings.push(describeConflict(row, { edukator_id: slot.edukator_id, siswa_id: enrollment.siswa_id }));
+        });
       }
     }
 
@@ -500,7 +500,7 @@ const createPrivatJadwal = async ({ enrollment_id, slots }, cabangId) => {
     );
 
     await conn.commit();
-    return { inserted: values.length };
+    return { inserted: values.length, warnings };
   } catch (err) {
     await conn.rollback();
     throw err;
@@ -725,9 +725,11 @@ const createKelasJadwal = async (
       }
     }
 
-    const conflictMessages = [];
+    // Bentrok ditolerir: jadwal tetap dibuat, detail bentroknya dikembalikan
+    // sebagai peringatan (maksimal 10 agar pesan tidak membanjir).
+    const warnings = [];
     for (const slot of scheduleEntries) {
-      if (slot.jam_mulai && slot.jam_selesai) {
+      if (slot.jam_mulai && slot.jam_selesai && warnings.length < 10) {
         const slotEdukatorId = slot.edukator_id || edukator_id;
         const conflicts = await findConflicts({
           tanggal: slot.tanggal,
@@ -736,13 +738,9 @@ const createKelasJadwal = async (
           edukator_id: slotEdukatorId,
         });
         conflicts.forEach((row) => {
-          conflictMessages.push(describeConflict(row, { edukator_id: slotEdukatorId }));
+          warnings.push(describeConflict(row, { edukator_id: slotEdukatorId }));
         });
-        if (conflictMessages.length >= 5) break;
       }
-    }
-    if (conflictMessages.length) {
-      throw new Error(`Jadwal bentrok: ${conflictMessages.slice(0, 5).join("; ")}`);
     }
 
     const primaryProgramId = programs[0].id;
@@ -832,7 +830,7 @@ const createKelasJadwal = async (
     }
 
     await conn.commit();
-    return { inserted: values.length };
+    return { inserted: values.length, warnings };
   } catch (err) {
     await conn.rollback();
     throw err;
@@ -906,6 +904,61 @@ const updateJadwal = async (id, payload, cabangId) => {
   return { id, warnings };
 };
 
+// Ringkasan jadwal per edukator dalam satu bulan (untuk menu Jadwal Edukator
+// di kantor cabang). bulan format 'YYYY-MM'.
+const listEdukatorBulanan = async ({ cabangId, bulan }) => {
+  const params = [bulan];
+  let where = "WHERE DATE_FORMAT(j.tanggal, '%Y-%m') = ?";
+  if (cabangId) {
+    where += " AND j.cabang_id = ?";
+    params.push(cabangId);
+  }
+
+  const [rows] = await db.query(
+    `SELECT e.id AS edukator_id, e.nama AS edukator_nama,
+            COUNT(j.id) AS total_jadwal,
+            SUM(CASE WHEN j.tipe_les = '${TIPE_LES.KELAS}' THEN 1 ELSE 0 END) AS total_kelas,
+            SUM(CASE WHEN j.tipe_les != '${TIPE_LES.KELAS}' THEN 1 ELSE 0 END) AS total_privat,
+            SUM(CASE WHEN j.status_jadwal = '${JADWAL_STATUS.COMPLETED}' THEN 1 ELSE 0 END) AS total_selesai,
+            MIN(j.tanggal) AS tanggal_pertama,
+            MAX(j.tanggal) AS tanggal_terakhir
+     FROM jadwal j
+     JOIN edukator e ON e.id = j.edukator_id
+     ${where}
+     GROUP BY e.id, e.nama
+     ORDER BY e.nama ASC`,
+    params
+  );
+  return rows;
+};
+
+// Detail seluruh jadwal satu edukator dalam satu bulan.
+const listEdukatorBulananDetail = async ({ edukatorId, cabangId, bulan }) => {
+  const params = [edukatorId, bulan];
+  let where = "WHERE j.edukator_id = ? AND DATE_FORMAT(j.tanggal, '%Y-%m') = ?";
+  if (cabangId) {
+    where += " AND j.cabang_id = ?";
+    params.push(cabangId);
+  }
+
+  const [rows] = await db.query(
+    `SELECT j.id, j.tanggal, j.jam_mulai, j.jam_selesai, j.tipe_les, j.status_jadwal,
+            s.nama AS siswa_nama, k.nama AS kelas_nama, m.nama AS mapel_nama,
+            p.nama AS program_nama, e.nama AS edukator_nama
+     FROM jadwal j
+     LEFT JOIN enrollment en ON en.id = j.enrollment_id
+     LEFT JOIN siswa s ON s.id = en.siswa_id
+     LEFT JOIN kelas k ON k.id = j.kelas_id
+     LEFT JOIN mapel m ON m.id = j.mapel_id
+     LEFT JOIN program p ON p.id = j.program_id
+     LEFT JOIN edukator e ON e.id = j.edukator_id
+     ${where}
+     ORDER BY j.tanggal ASC, j.jam_mulai ASC`,
+    params
+  );
+  return rows;
+};
+
 const deletePrivatByEnrollment = async (enrollmentId, cabangId) => {
   const [rows] = await db.query(
     `SELECT en.id, s.cabang_id
@@ -951,6 +1004,8 @@ module.exports = {
   createPrivatJadwal,
   createKelasJadwal,
   updateJadwal,
+  listEdukatorBulanan,
+  listEdukatorBulananDetail,
   deletePrivatByEnrollment,
   deleteKelasByKelas,
 };

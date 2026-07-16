@@ -17,6 +17,7 @@ const menuMap = {
     "edukator",
     "program",
     "jadwal",
+    "jadwal-edukator-admin",
     "presensi",
     "pengajuan-jadwal",
     "tagihan",
