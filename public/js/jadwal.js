@@ -1094,16 +1094,23 @@
       }
       if (action === "delete") {
         const confirmMsg = tipe === "privat"
-          ? "Hapus seluruh jadwal untuk siswa ini?"
-          : "Hapus seluruh jadwal untuk kelas ini?";
+          ? "Hapus jadwal yang belum terlaksana untuk siswa ini? (Jadwal yang sudah selesai/dipresensi tetap tersimpan sebagai riwayat.)"
+          : "Hapus jadwal yang belum terlaksana untuk kelas ini? (Jadwal yang sudah selesai/dipresensi tetap tersimpan sebagai riwayat.)";
         if (window.confirm(confirmMsg)) {
           try {
             const url = tipe === "privat"
               ? `/api/jadwal/privat/enrollment/${id}`
               : `/api/jadwal/kelas/${id}`;
-            await fetchJson(url, { method: "DELETE" });
-            if (window.toast.success) {
-              window.toast.success("Jadwal dihapus", "Silakan tambah jadwal baru.");
+            const result = await fetchJson(url, { method: "DELETE" });
+            const deleted = Number(result?.deleted ?? 0);
+            const kept = Number(result?.kept ?? 0);
+            const subtitle = kept > 0
+              ? `${deleted} jadwal dihapus. ${kept} jadwal yang sudah selesai tetap tersimpan (riwayat presensi & rekam mengajar edukator aman).`
+              : `${deleted} jadwal dihapus. Silakan tambah jadwal baru.`;
+            if (kept > 0 && window.notify) {
+              window.notify({ type: "info", title: "Jadwal dihapus", subtitle, timeout: 10000 });
+            } else if (window.toast.success) {
+              window.toast.success("Jadwal dihapus", subtitle);
             }
             await loadLists();
           } catch (err) {

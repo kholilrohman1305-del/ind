@@ -187,8 +187,8 @@ const removePrivat = async (req, res) => {
   try {
     const role = req.session.user.role;
     const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
-    await jadwalService.deletePrivatByEnrollment(req.params.enrollmentId, cabangId);
-    return res.json({ success: true });
+    const result = await jadwalService.deletePrivatByEnrollment(req.params.enrollmentId, cabangId);
+    return res.json({ success: true, data: result });
   } catch (err) {
     return res.status(400).json({ success: false, message: err.message });
   }
@@ -198,8 +198,8 @@ const removeKelas = async (req, res) => {
   try {
     const role = req.session.user.role;
     const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
-    await jadwalService.deleteKelasByKelas(req.params.kelasId, cabangId);
-    return res.json({ success: true });
+    const result = await jadwalService.deleteKelasByKelas(req.params.kelasId, cabangId);
+    return res.json({ success: true, data: result });
   } catch (err) {
     return res.status(400).json({ success: false, message: err.message });
   }

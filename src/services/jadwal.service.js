@@ -841,7 +841,7 @@ const createKelasJadwal = async (
 
 const updateJadwal = async (id, payload, cabangId) => {
   const [rows] = await db.query(
-    `SELECT j.id, j.cabang_id, j.enrollment_id, j.tipe_les, en.siswa_id
+    `SELECT j.id, j.cabang_id, j.enrollment_id, j.tipe_les, j.status_jadwal, en.siswa_id
      FROM jadwal j
      LEFT JOIN enrollment en ON en.id = j.enrollment_id
      WHERE j.id = ?`,
@@ -853,6 +853,13 @@ const updateJadwal = async (id, payload, cabangId) => {
   }
   if (cabangId && existing.cabang_id !== cabangId) {
     throw new Error("Cabang tidak sesuai.");
+  }
+  // Jadwal yang sudah terlaksana adalah rekam mengajar edukator (terkait
+  // presensi & penggajian) — tidak boleh diubah atau dialihkan lagi.
+  if (existing.status_jadwal === JADWAL_STATUS.COMPLETED) {
+    throw new Error(
+      "Jadwal ini sudah selesai (presensi sudah terekam), sehingga tidak bisa diubah atau dialihkan ke edukator lain. Riwayat mengajar edukator tetap tersimpan."
+    );
   }
 
   const tanggal = payload.tanggal;
@@ -974,7 +981,18 @@ const deletePrivatByEnrollment = async (enrollmentId, cabangId) => {
   if (cabangId && enrollment.cabang_id !== cabangId) {
     throw new Error("Cabang tidak sesuai.");
   }
-  await db.query("DELETE FROM jadwal WHERE enrollment_id = ?", [enrollmentId]);
+  // Hanya jadwal yang belum terlaksana yang dihapus. Jadwal selesai
+  // dipertahankan agar riwayat presensi & rekam mengajar edukator tidak
+  // ikut hilang (presensi ber-ON DELETE CASCADE terhadap jadwal).
+  const [result] = await db.query(
+    `DELETE FROM jadwal WHERE enrollment_id = ? AND status_jadwal = '${JADWAL_STATUS.SCHEDULED}'`,
+    [enrollmentId]
+  );
+  const [[{ kept }]] = await db.query(
+    "SELECT COUNT(*) AS kept FROM jadwal WHERE enrollment_id = ?",
+    [enrollmentId]
+  );
+  return { deleted: result.affectedRows, kept };
 };
 
 const deleteKelasByKelas = async (kelasId, cabangId) => {
@@ -986,8 +1004,18 @@ const deleteKelasByKelas = async (kelasId, cabangId) => {
   if (cabangId && kelas.cabang_id !== cabangId) {
     throw new Error("Cabang tidak sesuai.");
   }
-  await db.query(`DELETE FROM jadwal WHERE kelas_id = ? AND tipe_les = '${TIPE_LES.KELAS}'`, [kelasId]);
-  return { id: kelasId };
+  // Hanya jadwal yang belum terlaksana yang dihapus; jadwal selesai
+  // dipertahankan agar riwayat presensi & rekam mengajar edukator aman.
+  const [result] = await db.query(
+    `DELETE FROM jadwal WHERE kelas_id = ? AND tipe_les = '${TIPE_LES.KELAS}'
+       AND status_jadwal = '${JADWAL_STATUS.SCHEDULED}'`,
+    [kelasId]
+  );
+  const [[{ kept }]] = await db.query(
+    `SELECT COUNT(*) AS kept FROM jadwal WHERE kelas_id = ? AND tipe_les = '${TIPE_LES.KELAS}'`,
+    [kelasId]
+  );
+  return { id: kelasId, deleted: result.affectedRows, kept };
 };
 
 
