@@ -499,6 +499,12 @@
           <label class="block text-gray-600 text-xs font-medium mb-1">Jam Selesai</label>
           <input type="text" class="slot-selesai custom-input" placeholder="HH:MM" pattern="[0-2][0-9]:[0-5][0-9]" maxlength="5" />
         </div>
+        <div class="col-span-2">
+          <label class="block text-gray-600 text-xs font-medium mb-1">Edukator Slot Ini</label>
+          <select class="slot-edukator custom-select text-sm">
+            ${buildOptions(state.edukator, "Ikut edukator utama")}
+          </select>
+        </div>
       </div>
     `;
     const removeBtn = card.querySelector(".slot-remove");
@@ -905,16 +911,19 @@
           if (!kelasValue) throw new Error("Kelas wajib dipilih.");
           if (kelasValue === "__new__" && !kelasNama) throw new Error("Nama kelas wajib diisi.");
           if (kelasValue === "__new__" && !programIds.length) throw new Error("Program kelas wajib dipilih.");
-          if (!edukatorId) throw new Error("Edukator wajib dipilih.");
 
           const slots = Array.from(document.querySelectorAll("#jadwalSlots .slot-card")).map(
             (card) => ({
               hari: card.querySelector(".slot-hari").value,
               jam_mulai: card.querySelector(".slot-mulai").value,
               jam_selesai: card.querySelector(".slot-selesai").value,
-              mapel_id: card.querySelector(".slot-mapel").value,
+              mapel_id: card.querySelector(".slot-mapel").value || null,
+              edukator_id: card.querySelector(".slot-edukator")?.value || null,
             })
           );
+          if (!edukatorId && slots.some((slot) => !slot.edukator_id)) {
+            throw new Error("Pilih edukator utama, atau isi edukator di setiap slot hari.");
+          }
           const invalidTime = slots.some(
             (slot) =>
               (slot.jam_mulai && !slot.jam_selesai) || (!slot.jam_mulai && slot.jam_selesai)
@@ -930,7 +939,7 @@
               kelas_id: kelasId,
               kelas_nama: kelasNama,
               program_ids: programIds,
-              edukator_id: edukatorId,
+              edukator_id: edukatorId || null,
               tanggal_mulai: tanggalMulai,
               tanggal_akhir: tanggalAkhir,
               slots,
@@ -996,7 +1005,7 @@
         if ((jamMulai && !jamSelesai) || (!jamMulai && jamSelesai)) {
           throw new Error("Jam mulai dan selesai harus diisi bersama.");
         }
-        await fetchJson(`/api/jadwal/${id}`, {
+        const result = await fetchJson(`/api/jadwal/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1007,7 +1016,15 @@
             mapel_id: document.getElementById("editMapel").value,
           }),
         });
-        if (window.toast.success) {
+        const warnings = result && Array.isArray(result.warnings) ? result.warnings : [];
+        if (warnings.length) {
+          const detail = warnings.join(" | ");
+          if (window.notifyWarning) {
+            window.notifyWarning("Tersimpan, tapi ada bentrok", detail);
+          } else if (window.toast?.error) {
+            window.toast.error("Tersimpan, tapi ada bentrok", detail);
+          }
+        } else if (window.toast.success) {
           window.toast.success("Jadwal diperbarui", "Perubahan tersimpan.");
         }
         // Close edit modal first, then refresh detail

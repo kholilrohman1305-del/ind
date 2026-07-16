@@ -453,15 +453,18 @@ const createPrivatJadwal = async ({ enrollment_id, slots }, cabangId) => {
         throw new Error("Jam mulai harus sebelum jam selesai.");
       }
       if (slot.tanggal && slot.jam_mulai && slot.jam_selesai) {
-        const conflict = await hasConflict({
+        const conflicts = await findConflicts({
           tanggal: slot.tanggal,
           jam_mulai: slot.jam_mulai,
           jam_selesai: slot.jam_selesai,
           edukator_id: slot.edukator_id,
           siswa_id: enrollment.siswa_id,
         });
-        if (conflict) {
-          throw new Error(`Bentrok jadwal pada ${slot.tanggal}.`);
+        if (conflicts.length) {
+          const details = conflicts
+            .map((row) => describeConflict(row, { edukator_id: slot.edukator_id, siswa_id: enrollment.siswa_id }))
+            .join("; ");
+          throw new Error(`Jadwal bentrok: ${details}`);
         }
       }
     }
@@ -534,7 +537,10 @@ const isValidTimeRange = (startTime, endTime) => {
   return String(startTime) < String(endTime);
 };
 
-const hasConflict = async ({
+// Cari jadwal yang bentrok, lengkap dengan detail (siapa, kapan, jam berapa).
+// Hanya jadwal berstatus 'scheduled' yang dihitung — jadwal yang sudah
+// selesai tidak lagi memblokir.
+const findConflicts = async ({
   jadwalId,
   tanggal,
   jam_mulai,
@@ -543,37 +549,80 @@ const hasConflict = async ({
   siswa_id,
 }) => {
   const params = [tanggal, jam_selesai, jam_mulai];
-  let where = "WHERE tanggal = ? AND jam_mulai < ? AND jam_selesai > ?";
+  let where = `WHERE j.tanggal = ? AND j.jam_mulai < ? AND j.jam_selesai > ?
+    AND j.status_jadwal = '${JADWAL_STATUS.SCHEDULED}'`;
 
   if (jadwalId) {
-    where += " AND id != ?";
+    where += " AND j.id != ?";
     params.push(jadwalId);
   }
 
   if (edukator_id && siswa_id) {
-    where +=
-      " AND (edukator_id = ? OR enrollment_id IN (SELECT id FROM enrollment WHERE siswa_id = ?))";
+    where += " AND (j.edukator_id = ? OR en.siswa_id = ?)";
     params.push(Number(edukator_id), Number(siswa_id));
   } else if (edukator_id) {
-    where += " AND edukator_id = ?";
+    where += " AND j.edukator_id = ?";
     params.push(Number(edukator_id));
   } else if (siswa_id) {
-    where += " AND enrollment_id IN (SELECT id FROM enrollment WHERE siswa_id = ?)";
+    where += " AND en.siswa_id = ?";
     params.push(Number(siswa_id));
   } else {
-    return false;
+    return [];
   }
 
-  const [rows] = await db.query(`SELECT id FROM jadwal ${where} LIMIT 1`, params);
-  return rows.length > 0;
+  const [rows] = await db.query(
+    `SELECT j.id, j.tanggal, j.jam_mulai, j.jam_selesai, j.tipe_les, j.edukator_id,
+            en.siswa_id, s.nama AS siswa_nama, k.nama AS kelas_nama,
+            e.nama AS edukator_nama
+     FROM jadwal j
+     LEFT JOIN enrollment en ON en.id = j.enrollment_id
+     LEFT JOIN siswa s ON s.id = en.siswa_id
+     LEFT JOIN kelas k ON k.id = j.kelas_id
+     LEFT JOIN edukator e ON e.id = j.edukator_id
+     ${where}
+     ORDER BY j.jam_mulai ASC
+     LIMIT 5`,
+    params
+  );
+  return rows;
+};
+
+// Susun kalimat rinci untuk satu jadwal yang bentrok.
+const describeConflict = (row, { edukator_id, siswa_id } = {}) => {
+  const jam = `${String(row.jam_mulai).slice(0, 5)}-${String(row.jam_selesai).slice(0, 5)}`;
+  const target = row.siswa_nama
+    ? `les privat ${row.siswa_nama}`
+    : row.kelas_nama
+      ? `kelas ${row.kelas_nama}`
+      : "jadwal lain";
+  const reasons = [];
+  if (edukator_id && Number(row.edukator_id) === Number(edukator_id)) {
+    reasons.push(`edukator ${row.edukator_nama || ""} sudah mengajar`.trim());
+  }
+  if (siswa_id && Number(row.siswa_id) === Number(siswa_id)) {
+    reasons.push("siswa sudah punya jadwal");
+  }
+  const reason = reasons.length ? ` — ${reasons.join(", ")}` : "";
+  return `${row.tanggal} jam ${jam} bentrok dengan ${target}${reason}`;
+};
+
+// Terima hari sebagai angka (0=Minggu..6=Sabtu) atau nama ("senin", dst.)
+const resolveDayIndex = (hari) => {
+  if (typeof hari === "number" && Number.isInteger(hari) && hari >= 0 && hari <= 6) {
+    return hari;
+  }
+  const asString = String(hari || "").trim().toLowerCase();
+  if (/^[0-6]$/.test(asString)) return Number(asString);
+  const mapped = dayMap[asString];
+  return typeof mapped === "number" ? mapped : null;
 };
 
 const buildKelasSchedule = (startDate, endDate, slots) => {
   const entries = [];
   slots.forEach((slot) => {
-    const dayIndex = dayMap[String(slot.hari || "").toLowerCase()];
+    const dayIndex = resolveDayIndex(slot.hari);
     if (typeof dayIndex !== "number") {
-      throw new Error("Hari jadwal tidak valid.");
+      throw new Error(`Hari jadwal tidak valid: "${slot.hari}".`);
     }
     const startDay = startDate.getDay();
     const delta = (dayIndex - startDay + 7) % 7;
@@ -633,9 +682,6 @@ const createKelasJadwal = async (
       throw new Error("Cabang tidak sesuai.");
     }
 
-    if (!edukator_id) {
-      throw new Error("Edukator wajib dipilih.");
-    }
     if (!tanggal_mulai) {
       throw new Error("Tanggal mulai wajib diisi.");
     }
@@ -665,7 +711,11 @@ const createKelasJadwal = async (
 
     for (const slot of scheduleEntries) {
       if (!slot.mapel_id) {
-        throw new Error("Data slot belum lengkap.");
+        throw new Error("Data slot belum lengkap (mapel wajib dipilih di setiap slot).");
+      }
+      // Edukator per slot boleh berbeda; jika kosong, pakai edukator utama.
+      if (!slot.edukator_id && !edukator_id) {
+        throw new Error("Pilih edukator utama, atau isi edukator di setiap slot hari.");
       }
       if ((slot.jam_mulai && !slot.jam_selesai) || (!slot.jam_mulai && slot.jam_selesai)) {
         throw new Error("Jam mulai dan selesai harus diisi bersama.");
@@ -675,18 +725,24 @@ const createKelasJadwal = async (
       }
     }
 
+    const conflictMessages = [];
     for (const slot of scheduleEntries) {
       if (slot.jam_mulai && slot.jam_selesai) {
-        const conflict = await hasConflict({
+        const slotEdukatorId = slot.edukator_id || edukator_id;
+        const conflicts = await findConflicts({
           tanggal: slot.tanggal,
           jam_mulai: slot.jam_mulai,
           jam_selesai: slot.jam_selesai,
-          edukator_id,
+          edukator_id: slotEdukatorId,
         });
-        if (conflict) {
-          throw new Error(`Bentrok jadwal edukator pada ${slot.tanggal}.`);
-        }
+        conflicts.forEach((row) => {
+          conflictMessages.push(describeConflict(row, { edukator_id: slotEdukatorId }));
+        });
+        if (conflictMessages.length >= 5) break;
       }
+    }
+    if (conflictMessages.length) {
+      throw new Error(`Jadwal bentrok: ${conflictMessages.slice(0, 5).join("; ")}`);
     }
 
     const primaryProgramId = programs[0].id;
@@ -694,7 +750,7 @@ const createKelasJadwal = async (
       programs[0].cabang_id,
       null,
       primaryProgramId,
-      Number(edukator_id),
+      Number(slot.edukator_id || edukator_id),
       Number(slot.mapel_id),
       TIPE_LES.KELAS,
       slot.tanggal,
@@ -817,8 +873,11 @@ const updateJadwal = async (id, payload, cabangId) => {
     throw new Error("Jam mulai harus sebelum jam selesai.");
   }
 
+  // Bentrok tidak memblokir perubahan (fleksibel) — perubahan tetap disimpan,
+  // tetapi detail bentroknya dikembalikan sebagai peringatan.
+  let warnings = [];
   if (tanggal && jamMulai && jamSelesai) {
-    const conflict = await hasConflict({
+    const conflicts = await findConflicts({
       jadwalId: id,
       tanggal,
       jam_mulai: jamMulai,
@@ -826,9 +885,9 @@ const updateJadwal = async (id, payload, cabangId) => {
       edukator_id: edukatorId,
       siswa_id: existing.siswa_id || null,
     });
-    if (conflict) {
-      throw new Error("Bentrok jadwal edukator atau siswa.");
-    }
+    warnings = conflicts.map((row) =>
+      describeConflict(row, { edukator_id: edukatorId, siswa_id: existing.siswa_id })
+    );
   }
 
   await db.query(
@@ -844,7 +903,7 @@ const updateJadwal = async (id, payload, cabangId) => {
       id,
     ]
   );
-  return { id };
+  return { id, warnings };
 };
 
 const deletePrivatByEnrollment = async (enrollmentId, cabangId) => {
