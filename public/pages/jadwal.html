@@ -222,6 +222,41 @@
       }
 
       /* Filter Pills */
+      /* Scroll daftar jadwal dengan header tabel menempel di atas */
+      .table-scroll {
+        max-height: 62vh;
+        overflow-y: auto;
+      }
+      .table-scroll thead th {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background: #F8FAFC;
+        box-shadow: 0 1px 0 #E2E8F0;
+      }
+
+      .page-btn {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.6rem;
+        border: 1px solid #E2E8F0;
+        background: #fff;
+        color: #475569;
+        transition: all 0.15s;
+      }
+      .page-btn:hover:not(:disabled) {
+        border-color: #C7D2FE;
+        background: #EEF2FF;
+        color: #4F46E5;
+      }
+      .page-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
       .filter-pill {
         padding: 0.5rem 1rem;
         border-radius: 9999px;
@@ -330,6 +365,11 @@
         <button class="filter-pill" data-filter="kelas">
           <i class="fa-solid fa-users text-emerald-500 mr-1"></i> Kelas
         </button>
+        <div class="relative ml-auto w-full sm:w-72">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
+          <input id="jadwalListSearch" type="text" placeholder="Cari siswa, kelas, atau program..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition" />
+        </div>
       </div>
 
       <!-- Jadwal List -->
@@ -341,7 +381,7 @@
           </h3>
           <p class="text-gray-500 text-xs mt-0.5">Jadwal les privat dan kelas</p>
         </div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto table-scroll">
           <table class="modern-table">
             <thead>
               <tr>
@@ -362,6 +402,23 @@
           </div>
           <p class="text-gray-500 font-medium">Belum ada jadwal.</p>
           <p class="text-gray-400 text-sm mt-1">Klik tombol "Tambah Jadwal" untuk memulai.</p>
+        </div>
+        <div id="jadwalPagination" class="hidden flex-wrap items-center justify-between gap-3 px-5 py-4 border-t border-gray-100">
+          <div id="jadwalPageInfo" class="text-xs text-gray-500"></div>
+          <div class="flex items-center gap-2">
+            <select id="jadwalPageSize" class="text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white text-gray-600 focus:outline-none focus:border-indigo-400">
+              <option value="10" selected>10 / halaman</option>
+              <option value="25">25 / halaman</option>
+              <option value="50">50 / halaman</option>
+            </select>
+            <button type="button" id="jadwalPrevPage" class="page-btn" aria-label="Halaman sebelumnya">
+              <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+            <span id="jadwalPageLabel" class="text-sm font-semibold text-gray-600 px-1"></span>
+            <button type="button" id="jadwalNextPage" class="page-btn" aria-label="Halaman berikutnya">
+              <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+          </div>
         </div>
       </section>
     </main>

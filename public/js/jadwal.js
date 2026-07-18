@@ -14,6 +14,9 @@
     detailSlots: [],
     fillSlotIndex: null,
     currentFilter: "all",
+    listSearch: "",
+    listPage: 1,
+    listPageSize: 10,
     currentTipe: "privat",
     currentStatus: ENROLLMENT_STATUS.AKTIF, // "aktif" or "selesai"
     detailContext: null,
@@ -196,6 +199,7 @@
         container.querySelectorAll(".filter-pill").forEach((p) => p.classList.remove("active"));
         pill.classList.add("active");
         state.currentFilter = pill.dataset.filter;
+        state.listPage = 1;
         renderJadwalList();
       });
     });
@@ -230,11 +234,35 @@
       filteredRows = filteredRows.filter((row) => row.tipe_les === state.currentFilter);
     }
 
+    // Filter pencarian (nama siswa, kelas, program, jenjang)
+    const searchQuery = state.listSearch.trim().toLowerCase();
+    if (searchQuery) {
+      filteredRows = filteredRows.filter((row) =>
+        [row.siswa_nama, row.kelas_nama, row.program_nama, row.program_list, row.jenjang]
+          .some((value) => String(value || "").toLowerCase().includes(searchQuery))
+      );
+    }
+
+    const pagination = document.getElementById("jadwalPagination");
+    const hidePagination = () => {
+      if (pagination) {
+        pagination.classList.add("hidden");
+        pagination.classList.remove("flex");
+      }
+    };
+
     if (!filteredRows.length) {
       empty.classList.remove("hidden");
       empty.classList.add("flex");
       const table = container.closest("table");
       if (table) table.classList.add("hidden");
+      hidePagination();
+      const emptyText = empty.querySelector("p");
+      if (emptyText) {
+        emptyText.textContent = searchQuery
+          ? `Tidak ada jadwal yang cocok dengan "${state.listSearch.trim()}".`
+          : "Belum ada jadwal.";
+      }
       return;
     }
     empty.classList.add("hidden");
@@ -242,9 +270,30 @@
     const table = container.closest("table");
     if (table) table.classList.remove("hidden");
 
+    // Pagination (client-side)
+    const totalRows = filteredRows.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / state.listPageSize));
+    if (state.listPage > totalPages) state.listPage = totalPages;
+    if (state.listPage < 1) state.listPage = 1;
+    const startIndex = (state.listPage - 1) * state.listPageSize;
+    const pageRows = filteredRows.slice(startIndex, startIndex + state.listPageSize);
+
+    if (pagination) {
+      pagination.classList.remove("hidden");
+      pagination.classList.add("flex");
+      const info = document.getElementById("jadwalPageInfo");
+      const label = document.getElementById("jadwalPageLabel");
+      const prevBtn = document.getElementById("jadwalPrevPage");
+      const nextBtn = document.getElementById("jadwalNextPage");
+      if (info) info.textContent = `Menampilkan ${startIndex + 1}-${startIndex + pageRows.length} dari ${totalRows} jadwal`;
+      if (label) label.textContent = `Hal. ${state.listPage} / ${totalPages}`;
+      if (prevBtn) prevBtn.disabled = state.listPage <= 1;
+      if (nextBtn) nextBtn.disabled = state.listPage >= totalPages;
+    }
+
     const isSelesaiTab = state.currentStatus === ENROLLMENT_STATUS.SELESAI;
 
-    filteredRows.forEach((row) => {
+    pageRows.forEach((row) => {
       const isKelas = row.tipe_les === TIPE_LES.KELAS;
       const totalPertemuan = Number(row.jumlah_pertemuan || 0);
       const completed = Number(row.completed_jadwal || 0);
@@ -776,6 +825,7 @@
         statusTabs.forEach((t) => t.classList.remove("active"));
         tab.classList.add("active");
         state.currentStatus = tab.dataset.status;
+        state.listPage = 1;
         renderJadwalList();
 
         // Update header text based on status
@@ -811,9 +861,47 @@
         filterPills.forEach((p) => p.classList.remove("active"));
         pill.classList.add("active");
         state.currentFilter = pill.dataset.filter;
+        state.listPage = 1;
         renderJadwalList();
       });
     });
+  };
+
+  // Search, ukuran halaman, dan navigasi pagination daftar jadwal
+  const initListControls = () => {
+    const searchInput = document.getElementById("jadwalListSearch");
+    const pageSizeSelect = document.getElementById("jadwalPageSize");
+    const prevBtn = document.getElementById("jadwalPrevPage");
+    const nextBtn = document.getElementById("jadwalNextPage");
+
+    if (searchInput) {
+      searchInput.addEventListener("input", () => {
+        state.listSearch = searchInput.value || "";
+        state.listPage = 1;
+        renderJadwalList();
+      });
+    }
+    if (pageSizeSelect) {
+      pageSizeSelect.addEventListener("change", () => {
+        state.listPageSize = Number(pageSizeSelect.value) || 10;
+        state.listPage = 1;
+        renderJadwalList();
+      });
+    }
+    if (prevBtn) {
+      prevBtn.addEventListener("click", () => {
+        if (state.listPage > 1) {
+          state.listPage -= 1;
+          renderJadwalList();
+        }
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        state.listPage += 1;
+        renderJadwalList();
+      });
+    }
   };
 
   const initForms = () => {
@@ -1300,6 +1388,7 @@
   const init = async () => {
     initStatusTabs();
     initFilters();
+    initListControls();
     initForms();
 
     try {
