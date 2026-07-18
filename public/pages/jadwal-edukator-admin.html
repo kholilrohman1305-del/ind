@@ -34,6 +34,40 @@
       }
       .custom-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
 
+      .table-scroll {
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+      .table-scroll thead th {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background: #F8FAFC;
+        box-shadow: 0 1px 0 #E2E8F0;
+      }
+
+      .page-btn {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.6rem;
+        border: 1px solid #E2E8F0;
+        background: #fff;
+        color: #475569;
+        transition: all 0.15s;
+      }
+      .page-btn:hover:not(:disabled) {
+        border-color: #C7D2FE;
+        background: #EEF2FF;
+        color: var(--primary);
+      }
+      .page-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
       .status-pill {
         display: inline-block;
         padding: 2px 10px;
@@ -78,7 +112,12 @@
             <h1 class="text-2xl font-bold text-slate-800">Jadwal Edukator</h1>
             <p class="text-sm text-slate-500 mt-1">Rekap jadwal mengajar seluruh edukator per bulan.</p>
           </div>
-          <div class="flex items-center gap-3">
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+              <input type="text" id="searchEdukator" placeholder="Cari nama edukator..."
+                class="custom-input" style="width: 220px; padding-left: 2.4rem;" />
+            </div>
             <label class="text-sm font-semibold text-slate-600" for="filterBulan">Bulan</label>
             <input type="month" id="filterBulan" class="custom-input" style="width: 180px;" />
           </div>
@@ -104,7 +143,7 @@
         </div>
 
         <div class="glass-panel overflow-hidden">
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto table-scroll">
             <table class="w-full text-sm">
               <thead>
                 <tr class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
@@ -123,6 +162,23 @@
           <div id="edukatorEmpty" class="hidden py-12 text-center text-slate-400">
             <i class="fa-regular fa-calendar text-3xl mb-3 block"></i>
             <p class="text-sm">Tidak ada jadwal edukator pada bulan ini.</p>
+          </div>
+          <div id="edukatorPagination" class="hidden flex-wrap items-center justify-between gap-3 px-5 py-4 border-t border-slate-100">
+            <div id="edukatorPageInfo" class="text-xs text-slate-500"></div>
+            <div class="flex items-center gap-2">
+              <select id="edukatorPageSize" class="custom-input" style="width: auto; padding: 0.4rem 0.6rem; font-size: 0.8rem;">
+                <option value="10" selected>10 / halaman</option>
+                <option value="25">25 / halaman</option>
+                <option value="50">50 / halaman</option>
+              </select>
+              <button type="button" id="edukatorPrevPage" class="page-btn" aria-label="Halaman sebelumnya">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+              </button>
+              <span id="edukatorPageLabel" class="text-sm font-semibold text-slate-600 px-1"></span>
+              <button type="button" id="edukatorNextPage" class="page-btn" aria-label="Halaman berikutnya">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>

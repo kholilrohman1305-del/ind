@@ -2,6 +2,9 @@
   const state = {
     bulan: "",
     rows: [],
+    search: "",
+    page: 1,
+    pageSize: 10,
   };
 
   const fetchJson = async (url, options = {}) => {
@@ -75,21 +78,67 @@
     document.getElementById("statTerjadwal").textContent = totals.total - totals.selesai;
   };
 
+  const getFilteredRows = () => {
+    const query = state.search.trim().toLowerCase();
+    if (!query) return state.rows;
+    return state.rows.filter((row) =>
+      String(row.edukator_nama || "").toLowerCase().includes(query)
+    );
+  };
+
   const renderRows = () => {
     const body = document.getElementById("edukatorRows");
     const empty = document.getElementById("edukatorEmpty");
+    const pagination = document.getElementById("edukatorPagination");
     if (!body || !empty) return;
 
-    if (!state.rows.length) {
+    const hidePagination = () => {
+      if (pagination) {
+        pagination.classList.add("hidden");
+        pagination.classList.remove("flex");
+      }
+    };
+
+    const filtered = getFilteredRows();
+
+    if (!filtered.length) {
       body.innerHTML = "";
       empty.classList.remove("hidden");
+      const emptyText = empty.querySelector("p");
+      if (emptyText) {
+        emptyText.textContent = state.search.trim()
+          ? `Tidak ada edukator yang cocok dengan "${state.search.trim()}".`
+          : "Tidak ada jadwal edukator pada bulan ini.";
+      }
+      hidePagination();
       return;
     }
     empty.classList.add("hidden");
 
-    body.innerHTML = state.rows
+    // Pagination (client-side)
+    const totalRows = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / state.pageSize));
+    if (state.page > totalPages) state.page = totalPages;
+    if (state.page < 1) state.page = 1;
+    const startIndex = (state.page - 1) * state.pageSize;
+    const pageRows = filtered.slice(startIndex, startIndex + state.pageSize);
+
+    if (pagination) {
+      pagination.classList.remove("hidden");
+      pagination.classList.add("flex");
+      const info = document.getElementById("edukatorPageInfo");
+      const label = document.getElementById("edukatorPageLabel");
+      const prevBtn = document.getElementById("edukatorPrevPage");
+      const nextBtn = document.getElementById("edukatorNextPage");
+      if (info) info.textContent = `Menampilkan ${startIndex + 1}-${startIndex + pageRows.length} dari ${totalRows} edukator`;
+      if (label) label.textContent = `Hal. ${state.page} / ${totalPages}`;
+      if (prevBtn) prevBtn.disabled = state.page <= 1;
+      if (nextBtn) nextBtn.disabled = state.page >= totalPages;
+    }
+
+    body.innerHTML = pageRows
       .map(
-        (row, index) => `
+        (row) => `
         <tr class="hover:bg-slate-50 transition">
           <td class="px-5 py-3 font-semibold text-slate-700">${escapeHtml(row.edukator_nama)}</td>
           <td class="px-5 py-3 text-center font-bold text-slate-800">${row.total_jadwal}</td>
@@ -98,7 +147,7 @@
           <td class="px-5 py-3 text-center text-emerald-600 font-semibold">${row.total_selesai}</td>
           <td class="px-5 py-3 text-slate-500 text-xs">${formatTanggal(row.tanggal_pertama)} s/d ${formatTanggal(row.tanggal_terakhir)}</td>
           <td class="px-5 py-3 text-right">
-            <button type="button" data-detail-index="${index}"
+            <button type="button" data-detail-id="${row.edukator_id}"
               class="px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 text-xs font-bold transition">
               <i class="fa-regular fa-eye mr-1"></i>Detail
             </button>
@@ -193,14 +242,46 @@
       filter.value = state.bulan;
       filter.addEventListener("change", () => {
         state.bulan = filter.value || currentMonth();
+        state.page = 1;
         load();
       });
     }
 
+    const searchInput = document.getElementById("searchEdukator");
+    if (searchInput) {
+      searchInput.addEventListener("input", () => {
+        state.search = searchInput.value || "";
+        state.page = 1;
+        renderRows();
+      });
+    }
+
+    const pageSizeSelect = document.getElementById("edukatorPageSize");
+    if (pageSizeSelect) {
+      pageSizeSelect.addEventListener("change", () => {
+        state.pageSize = Number(pageSizeSelect.value) || 10;
+        state.page = 1;
+        renderRows();
+      });
+    }
+
+    document.getElementById("edukatorPrevPage")?.addEventListener("click", () => {
+      if (state.page > 1) {
+        state.page -= 1;
+        renderRows();
+      }
+    });
+    document.getElementById("edukatorNextPage")?.addEventListener("click", () => {
+      state.page += 1;
+      renderRows();
+    });
+
     document.getElementById("edukatorRows")?.addEventListener("click", (event) => {
-      const button = event.target.closest("button[data-detail-index]");
+      const button = event.target.closest("button[data-detail-id]");
       if (!button) return;
-      const row = state.rows[Number(button.dataset.detailIndex)];
+      const row = state.rows.find(
+        (item) => String(item.edukator_id) === String(button.dataset.detailId)
+      );
       if (row) openDetail(row);
     });
 
