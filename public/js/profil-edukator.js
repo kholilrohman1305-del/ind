@@ -152,7 +152,7 @@
       toggleBtn.textContent = active ? "Nonaktifkan Login Biometrik" : "Aktifkan Login Biometrik";
       toggleBtn.style.background = active
         ? "#EF4444"
-        : "linear-gradient(135deg, #00A6B4 0%, #008891 100%)";
+        : "linear-gradient(135deg, #0A2E86 0%, #1B4DB3 100%)";
     };
 
     // Tampilkan tombol langsung dan biarkan selalu bisa diklik; cek dukungan

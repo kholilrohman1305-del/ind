@@ -8,8 +8,8 @@ const createPengajuanSchema = z.object({
     jadwal_id: z.coerce
       .number({ required_error: "Jadwal wajib dipilih." })
       .positive("Jadwal wajib dipilih."),
-    tipe: z.enum(["reschedule", "cancel"], {
-      errorMap: () => ({ message: "Tipe pengajuan harus 'reschedule' atau 'cancel'." }),
+    tipe: z.enum(["reschedule", "izin"], {
+      errorMap: () => ({ message: "Tipe pengajuan harus 'reschedule' atau 'izin'." }),
     }),
     alasan: z
       .string({ required_error: "Alasan wajib diisi." })

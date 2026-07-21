@@ -48,26 +48,26 @@
 
       item.innerHTML = `
         <div class="flex items-center gap-4">
-           <div class="flex flex-col items-center justify-center w-14 h-14 bg-indigo-50 text-indigo-600 rounded-xl border border-indigo-100 shadow-sm group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+           <div class="flex flex-col items-center justify-center w-14 h-14 rounded-xl shadow-sm transition-all duration-300" style="background:var(--edu-accent-blue-bg);color:var(--edu-accent-blue-fg);border:1px solid var(--edu-line);">
               <span class="text-sm font-bold leading-none">${jamMulai}</span>
               <span class="text-[10px] opacity-70 mt-0.5">WIB</span>
            </div>
-           
+
            <div>
-              <div class="font-bold text-slate-800 text-sm md:text-base group-hover:text-indigo-600 transition-colors">${namaSiswa}</div>
+              <div class="font-bold text-sm md:text-base transition-colors" style="color:var(--edu-ink);">${namaSiswa}</div>
               <div class="flex items-center gap-2 mt-1">
-                 <span class="text-xs text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
-                    <i class="fa-solid fa-book-open mr-1 text-slate-400"></i> ${namaProgram}
+                 <span class="text-xs px-2 py-0.5 rounded flex items-center gap-1" style="color:var(--edu-ink-soft);background:#fff;border:1px solid var(--edu-line);">
+                    <span class="material-symbols-outlined" style="font-size:12px;color:var(--edu-ink-mute);">auto_stories</span> ${namaProgram}
                  </span>
-                 <span class="text-xs text-slate-400 flex items-center gap-1">
-                    <i class="fa-regular fa-clock"></i> Sampai ${jamSelesai}
+                 <span class="text-xs flex items-center gap-1" style="color:var(--edu-ink-mute);">
+                    <span class="material-symbols-outlined" style="font-size:12px;">schedule</span> Sampai ${jamSelesai}
                  </span>
               </div>
            </div>
         </div>
-        
-        <button class="hidden sm:flex w-8 h-8 items-center justify-center rounded-full text-slate-300 hover:bg-white hover:text-indigo-600 hover:shadow-md transition-all border border-transparent hover:border-slate-100">
-           <i class="fa-solid fa-chevron-right text-sm"></i>
+
+        <button class="hidden sm:flex w-8 h-8 items-center justify-center rounded-full transition-all border border-transparent" style="color:var(--edu-ink-mute);">
+           <span class="material-symbols-outlined" style="font-size:16px;">chevron_right</span>
         </button>
       `;
       list.appendChild(item);
@@ -78,6 +78,16 @@
     try {
       const searchInput = document.getElementById("dashboardSearch");
       let allRows = [];
+
+      const todayLabel = document.getElementById("todayLabel");
+      if (todayLabel) {
+        const dateText = new Intl.DateTimeFormat("id-ID", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        }).format(new Date());
+        todayLabel.append(document.createTextNode(" " + dateText));
+      }
 
       // 1. Get User Info (Session) to display name
       const profileRes = await fetch("/api/edukator/profile", { credentials: "same-origin" });

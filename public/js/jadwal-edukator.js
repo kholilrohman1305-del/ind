@@ -180,7 +180,7 @@
     
     if (empty) {
       // Sembunyikan pesan kosong jika ada jadwal apapun bulan ini
-      empty.style.display = hasAny ? "none" : "block";
+      empty.classList.toggle("hidden", hasAny);
     }
   };
 
@@ -249,15 +249,15 @@
             
             ${!isDone ? `
             <button type="button" class="w-10 h-10 rounded-full flex items-center justify-center transition flex-shrink-0"
-                    style="background: linear-gradient(135deg, #F59E0B 0%, #FB923C 100%); color: #fff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);"
+                    style="background: linear-gradient(135deg, #F59E0B 0%, #FB923C 100%); color: #fff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); border: none;"
                     data-pengajuan-index="${index}"
                     title="Ajukan Perubahan Jadwal">
-              <i class="fa-solid fa-pen-to-square text-sm"></i>
+              <span class="material-symbols-outlined" style="font-size:18px;">edit_square</span>
             </button>` : `
             <button type="button" class="w-10 h-10 rounded-full bg-slate-100 text-slate-300 flex items-center justify-center shadow-sm border border-slate-100 flex-shrink-0"
                     data-pengajuan-done="1"
                     title="Jadwal sudah selesai">
-              <i class="fa-solid fa-pen-to-square text-sm"></i>
+              <span class="material-symbols-outlined" style="font-size:18px;">edit_square</span>
             </button>`}
           </div>
         `;

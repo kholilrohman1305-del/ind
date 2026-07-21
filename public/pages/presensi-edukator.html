@@ -6,191 +6,144 @@
     <title>Presensi Edukator - ILHAMI</title>
     <link rel="stylesheet" href="/css/tailwind.css" />
     <link rel="stylesheet" href="/css/responsive.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/edukator-mobile.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-      body { font-family: 'Plus Jakarta Sans', sans-serif; }
-      
-      /* Animasi Fade In saat tab berubah (Support untuk logic JS lama) */
-      .jadwal-grid:not(.hidden) {
-        animation: fadeIn 0.4s ease-out forwards;
-      }
-      
+      .jadwal-grid:not(.hidden) { animation: fadeIn 0.4s ease-out forwards; }
       @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
       }
-
-      /* Custom Scrollbar */
       ::-webkit-scrollbar { width: 6px; }
       ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-      /* Styling Tab Active (Sesuai logic JS Anda yang toggle class 'active') */
       .tab-button {
-        transition: all 0.3s ease;
-        border-bottom: 2px solid transparent;
-        color: #64748b; /* slate-500 */
-      }
-      .tab-button:hover {
-        color: #059669; /* emerald-600 */
-        background-color: #f1f5f9;
+        transition: all 0.2s ease;
+        color: var(--edu-ink-soft);
+        border: none;
+        background: transparent;
+        font-family: inherit;
+        cursor: pointer;
       }
       .tab-button.active {
-        color: #059669; /* emerald-600 */
-        background-color: white;
-        border-bottom: 2px solid #059669;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        color: var(--edu-primary-hi);
+        background: #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,.05);
       }
     </style>
   </head>
-  
+
   <body class="h-full" data-page="presensi" data-view="edukator-mobile">
-    <div class="h-full w-full overflow-auto hide-scrollbar" style="background: linear-gradient(180deg, #00A6B4 0%, #008891 100%);">
-      <div class="max-w-md mx-auto h-full flex flex-col bg-[#F5F7FA]">
-        <header class="topbar px-5 pt-5 pb-6" style="background: linear-gradient(135deg, #00A6B4 0%, #008891 100%);">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <p class="text-white/80 text-sm">Presensi Edukator</p>
-              <h1 class="text-white text-xl font-bold mt-1">Absensi Mengajar</h1>
-            </div>
-            <div class="edukator-header-actions">
-              <button class="relative p-2 bg-white/20 rounded-full card-hover" aria-label="Notifikasi">
-                <i class="fa-regular fa-bell text-white text-lg"></i>
-              </button>
-              <a href="/profil-edukator" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden card-hover" aria-label="Profil">
-                <i class="fa-solid fa-user text-white"></i>
-              </a>
-            </div>
-          </div>
-          <div class="relative">
-            <input id="presensiSearch" type="text" placeholder="Cari siswa atau program..." class="w-full py-3 px-4 pl-11 bg-white rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg" style="color: #374151;">
-            <i class="fa-solid fa-magnifying-glass w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-          </div>
+    <div class="edu-shell h-full w-full overflow-auto hide-scrollbar">
+      <div class="edu-frame h-full">
+
+        <header class="edu-topbar">
+          <div class="edu-icon-btn is-brand"><span class="material-symbols-outlined fill">qr_code_scanner</span></div>
+          <h1 class="edu-topbar-title">Absensi Mengajar</h1>
+          <a href="/profil-edukator" class="edu-icon-btn" aria-label="Profil">
+            <span class="material-symbols-outlined">person</span>
+          </a>
         </header>
 
-        <main class="content flex-1 px-5 -mt-2 pb-24 overflow-auto hide-scrollbar">
-          <section class="panel bg-white/80 backdrop-blur-sm rounded-3xl border border-white shadow-xl shadow-slate-200/50 flex flex-col min-h-[600px] overflow-hidden">
-            
-              <div class="panel-head flex flex-col items-start justify-between gap-4 p-6 border-b border-slate-100">
-                <div class="w-full">
-                    <h3 class="panel-title text-lg font-bold text-slate-800 mb-3">Jadwal & Absensi</h3>
-                    <div class="panel-tabs inline-flex p-1 bg-slate-100 rounded-xl w-full md:w-auto">
-                        <button class="tab-button active flex-1 md:flex-none px-6 py-2.5 text-sm font-semibold rounded-lg focus:outline-none" data-tab="privat">Privat</button>
-                        <button class="tab-button flex-1 md:flex-none px-6 py-2.5 text-sm font-semibold rounded-lg focus:outline-none" data-tab="kelas">Kelas</button>
-                    </div>
-                </div>
+        <main class="edu-main flex-1 overflow-auto hide-scrollbar">
 
-                <div class="w-full">
-                    <label class="flex flex-col text-[10px] uppercase tracking-wide text-slate-400 font-semibold">
-                        Tanggal Presensi
-                        <input 
-                            id="presensiDate" 
-                            type="date" 
-                            class="mt-1 bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-600 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition" 
-                        />
-                    </label>
-                </div>
-              </div>
+          <div class="edu-search">
+            <span class="material-symbols-outlined">search</span>
+            <input id="presensiSearch" type="text" placeholder="Cari siswa atau program...">
+          </div>
 
-              <div class="p-6 bg-slate-50/50 flex-1">
-                
-                <div id="jadwalPrivat" class="jadwal-grid grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
-                
-                <div id="jadwalKelas" class="jadwal-grid hidden grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
-                
-                <div id="jadwalEmpty" class="table-empty hidden flex-col items-center justify-center py-20 text-slate-400">
-                     <p>Belum ada jadwal.</p>
-                </div>
+          <section class="edu-card" style="padding:16px;">
+            <div class="edu-tabs" style="margin-bottom:14px;">
+              <button class="tab-button active" data-tab="privat" style="flex:1;padding:10px;font-size:13.5px;font-weight:700;border-radius:12px;">Privat</button>
+              <button class="tab-button" data-tab="kelas" style="flex:1;padding:10px;font-size:13.5px;font-weight:700;border-radius:12px;">Kelas</button>
             </div>
 
+            <label class="edu-field">
+              <span class="edu-field-label">Tanggal Presensi</span>
+              <input id="presensiDate" type="date" class="edu-input" />
+            </label>
           </section>
+
+          <div id="jadwalPrivat" class="jadwal-grid" style="display:flex;flex-direction:column;gap:12px;"></div>
+          <div id="jadwalKelas" class="jadwal-grid hidden" style="display:flex;flex-direction:column;gap:12px;"></div>
+
+          <div id="jadwalEmpty" class="hidden edu-empty">
+            <div class="edu-empty-icon"><span class="material-symbols-outlined">event_busy</span></div>
+            <div class="edu-empty-title">Belum ada jadwal</div>
+            <div class="edu-empty-text">Pilih tanggal lain atau ganti tab untuk melihat jadwal.</div>
+          </div>
         </main>
 
         <footer class="edukator-footer" id="edukatorFooterNav" aria-label="Navigasi Edukator"></footer>
       </div>
     </div>
 
-    <!-- Modal Materi untuk Privat -->
-    <div id="materiModal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
-
-      <div class="modal-card bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden">
-        <div class="modal-header flex items-center justify-between p-6 border-b border-slate-100">
+    <!-- Sheet Materi untuk Privat -->
+    <div id="materiModal" class="edu-sheet-backdrop hidden">
+      <div class="edu-sheet">
+        <div class="edu-sheet-handle"></div>
+        <div class="edu-sheet-head">
           <div>
-            <div class="modal-title text-lg font-bold text-slate-800">Catatan Materi</div>
-            <div class="modal-subtitle text-xs text-slate-500 mt-1">Materi ini akan tersimpan di detail jadwal.</div>
+            <h3 class="edu-sheet-title">Catatan Materi</h3>
+            <div style="font-size:11.5px;color:var(--edu-ink-soft);margin-top:2px;">Materi ini akan tersimpan di detail jadwal.</div>
           </div>
-          <button id="closeMateriModal" class="icon-button p-2 hover:bg-slate-100 rounded-full">✕</button>
+          <button type="button" id="closeMateriModal" class="edu-icon-btn" aria-label="Tutup"><span class="material-symbols-outlined">close</span></button>
         </div>
 
-        <div class="modal-body p-6">
-          <label class="modal-label block text-sm font-medium text-slate-700 mb-2">Materi</label>
-          <textarea id="materiInput" rows="8" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none resize-y min-h-[160px]" placeholder="Contoh: Pecahan & latihan soal 1-10"></textarea>
-          <div id="materiError" class="form-error text-xs text-rose-500 mt-2"></div>
+        <div class="edu-field">
+          <span class="edu-field-label">Materi</span>
+          <textarea id="materiInput" rows="6" class="edu-textarea" placeholder="Contoh: Pecahan & latihan soal 1-10"></textarea>
+          <div id="materiError" style="color:var(--edu-bad);font-size:12px;"></div>
         </div>
 
-        <div class="modal-actions flex justify-end gap-3 p-6 bg-slate-50 border-t border-slate-100">
-          <button type="button" id="cancelMateriModal" class="ghost-button px-4 py-2 text-slate-500 hover:text-slate-700 font-medium">Batal</button>
-          <button type="button" id="submitMateriModal" class="primary-button px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-lg shadow-emerald-200">Simpan & Absen</button>
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button type="button" id="cancelMateriModal" class="edu-btn-ghost" style="flex:1;">Batal</button>
+          <button type="button" id="submitMateriModal" class="edu-btn-primary" style="flex:1;">Simpan &amp; Absen</button>
         </div>
       </div>
     </div>
 
-    <!-- Modal Absensi Kelas dengan List Siswa -->
-    <div id="kelasAbsenModal" class="modal hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
-
-      <div class="modal-card bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden max-h-[90vh] flex flex-col">
-        <div class="modal-header flex items-center justify-between p-6 border-b border-slate-100">
+    <!-- Sheet Absensi Kelas dengan List Siswa -->
+    <div id="kelasAbsenModal" class="edu-sheet-backdrop hidden">
+      <div class="edu-sheet">
+        <div class="edu-sheet-handle"></div>
+        <div class="edu-sheet-head">
           <div>
-            <div class="modal-title text-lg font-bold text-slate-800">Absensi Kelas</div>
-            <div id="kelasNamaHeader" class="modal-subtitle text-xs text-slate-500 mt-1">Nama Kelas</div>
+            <h3 class="edu-sheet-title">Absensi Kelas</h3>
+            <div id="kelasNamaHeader" style="font-size:11.5px;color:var(--edu-ink-soft);margin-top:2px;">Nama Kelas</div>
           </div>
-          <button id="closeKelasModal" class="icon-button p-2 hover:bg-slate-100 rounded-full">✕</button>
+          <button type="button" id="closeKelasModal" class="edu-icon-btn" aria-label="Tutup"><span class="material-symbols-outlined">close</span></button>
         </div>
 
-        <div class="modal-body p-6 overflow-y-auto flex-1">
-          <!-- Student List -->
-          <div class="mb-4">
-            <div class="flex items-center justify-between mb-3">
-              <label class="block text-sm font-semibold text-slate-700">Daftar Siswa</label>
-              <div class="flex gap-2">
-                <button type="button" id="selectAllHadir" class="text-xs px-3 py-1 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 font-medium">Semua Hadir</button>
-                <button type="button" id="selectAllTidakHadir" class="text-xs px-3 py-1 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 font-medium">Semua Tidak Hadir</button>
-              </div>
-            </div>
-            <div id="kelasSiswaList" class="space-y-2 max-h-60 overflow-y-auto">
-              <!-- Student items will be rendered here -->
-              <div class="text-center py-4 text-slate-400 text-sm">Memuat data siswa...</div>
+        <div style="margin-bottom:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span class="edu-field-label" style="font-size:12.5px;">Daftar Siswa</span>
+            <div style="display:flex;gap:6px;">
+              <button type="button" id="selectAllHadir" class="edu-badge good" style="border:none;cursor:pointer;">Semua Hadir</button>
+              <button type="button" id="selectAllTidakHadir" class="edu-badge bad" style="border:none;cursor:pointer;">Semua Tidak Hadir</button>
             </div>
           </div>
-
-          <!-- Summary -->
-          <div class="bg-slate-50 rounded-xl p-4 mb-4">
-            <div class="flex justify-between text-sm">
-              <span class="text-slate-600">Total Siswa:</span>
-              <span id="totalSiswaCount" class="font-bold text-slate-800">0</span>
-            </div>
-            <div class="flex justify-between text-sm mt-1">
-              <span class="text-emerald-600">Hadir:</span>
-              <span id="hadirCount" class="font-bold text-emerald-600">0</span>
-            </div>
-            <div class="flex justify-between text-sm mt-1">
-              <span class="text-rose-600">Tidak Hadir:</span>
-              <span id="tidakHadirCount" class="font-bold text-rose-600">0</span>
-            </div>
+          <div id="kelasSiswaList" style="display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;">
+            <div class="text-center py-4 text-sm" style="color:var(--edu-ink-mute);">Memuat data siswa...</div>
           </div>
-
-          <!-- Materi -->
-          <label class="modal-label block text-sm font-medium text-slate-700 mb-2">Materi</label>
-          <textarea id="kelasMateriInput" rows="6" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 outline-none resize-y min-h-[120px]" placeholder="Contoh: Pecahan & latihan soal 1-10"></textarea>
-          <div id="kelasMateriError" class="form-error text-xs text-rose-500 mt-2"></div>
         </div>
 
-        <div class="modal-actions flex justify-end gap-3 p-6 bg-slate-50 border-t border-slate-100">
-          <button type="button" id="cancelKelasModal" class="ghost-button px-4 py-2 text-slate-500 hover:text-slate-700 font-medium">Batal</button>
-          <button type="button" id="submitKelasModal" class="primary-button px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-lg shadow-emerald-200">Simpan & Absen</button>
+        <div class="edu-card" style="padding:14px;margin-bottom:14px;background:var(--edu-bg);">
+          <div class="flex justify-between text-sm"><span style="color:var(--edu-ink-soft);">Total Siswa:</span><span id="totalSiswaCount" style="font-weight:800;color:var(--edu-ink);">0</span></div>
+          <div class="flex justify-between text-sm mt-1"><span style="color:var(--edu-good);">Hadir:</span><span id="hadirCount" style="font-weight:800;color:var(--edu-good);">0</span></div>
+          <div class="flex justify-between text-sm mt-1"><span style="color:var(--edu-bad);">Tidak Hadir:</span><span id="tidakHadirCount" style="font-weight:800;color:var(--edu-bad);">0</span></div>
+        </div>
+
+        <div class="edu-field">
+          <span class="edu-field-label">Materi</span>
+          <textarea id="kelasMateriInput" rows="4" class="edu-textarea" placeholder="Contoh: Pecahan & latihan soal 1-10"></textarea>
+          <div id="kelasMateriError" style="color:var(--edu-bad);font-size:12px;"></div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:16px;">
+          <button type="button" id="cancelKelasModal" class="edu-btn-ghost" style="flex:1;">Batal</button>
+          <button type="button" id="submitKelasModal" class="edu-btn-primary" style="flex:1;">Simpan &amp; Absen</button>
         </div>
       </div>
     </div>

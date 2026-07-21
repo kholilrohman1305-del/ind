@@ -72,15 +72,16 @@
 
     rows.forEach((row) => {
       const card = document.createElement("div");
-      card.className = "bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group hover:-translate-y-1";
+      card.className = "edu-card group";
+      card.style.cssText = "padding:20px;transition:all .3s ease;";
 
       const isDone = row.status_jadwal === JADWAL_STATUS.COMPLETED;
       const pertemuan = row.pertemuan_ke ? `Pertemuan ${row.pertemuan_ke}` : "-";
       const isKelas = row.tipe_les === TIPE_LES.KELAS;
 
-      const btnClass = isDone
-        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-        : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 hover:shadow-emerald-300 active:scale-[0.98]";
+      const btnStyle = isDone
+        ? "background:#f1f5f9;color:#94a3b8;cursor:not-allowed;"
+        : "background:linear-gradient(135deg,#0A2E86,#1B4DB3);color:#fff;box-shadow:0 8px 20px rgba(10,46,134,.25);";
 
       const btnText = isDone ? "Sudah Absen" : "Absen Sekarang";
       const iconBtn = isDone
@@ -90,15 +91,15 @@
       card.innerHTML = `
         <div class="flex justify-between items-start mb-4">
           <div>
-            <span class="inline-block px-2.5 py-1 bg-violet-50 text-violet-600 text-[10px] font-bold uppercase tracking-wider rounded-md mb-2 border border-violet-100">
+            <span class="edu-badge info" style="text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">
                 ${row.program_nama || 'Program'}
             </span>
-            <h3 class="font-bold text-lg text-slate-800 group-hover:text-emerald-600 transition-colors line-clamp-1" title="${row.mapel_nama}">
+            <h3 class="font-bold text-lg line-clamp-1" style="color:var(--edu-ink);margin-top:6px;" title="${row.mapel_nama}">
                 ${row.mapel_nama || '-'}
             </h3>
           </div>
           <div class="text-right">
-            <div class="text-xs font-semibold text-slate-400 bg-slate-50 px-2 py-1 rounded-lg border border-slate-100 whitespace-nowrap">
+            <div class="text-xs font-semibold whitespace-nowrap" style="color:var(--edu-ink-mute);background:var(--edu-bg);padding:4px 8px;border-radius:8px;border:1px solid var(--edu-line);">
                ${pertemuan}
             </div>
           </div>
@@ -126,7 +127,8 @@
         </div>
 
         <button
-            class="w-full py-3 px-4 text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 ${btnClass}"
+            class="w-full py-3 px-4 text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
+            style="${btnStyle}border:none;"
             data-id="${row.id}"
             data-tipe="${row.tipe_les || 'privat'}"
             ${isDone ? "disabled" : ""}>

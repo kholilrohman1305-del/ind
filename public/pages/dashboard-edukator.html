@@ -7,12 +7,10 @@
     <link rel="stylesheet" href="/css/tailwind.css" />
     <link rel="stylesheet" href="/css/responsive.css" />
     <link rel="stylesheet" href="/css/notification-fix.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/edukator-mobile.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-      body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
+    <style>
       .hide-scrollbar::-webkit-scrollbar { display: none; }
       .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -20,116 +18,154 @@
         from { opacity: 0; transform: translateY(16px); }
         to { opacity: 1; transform: translateY(0); }
       }
-      .animate-slide-up {
-        animation: slide-up 0.4s ease-out forwards;
-      }
-      .card-hover { transition: all 0.3s ease; }
-      .card-hover:active { transform: scale(0.97); }
+      .animate-slide-up { animation: slide-up 0.4s ease-out forwards; }
 
-      /* Custom Scrollbar (non hidden areas) */
+      .edu-quick-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        padding: 2px 0;
+      }
+      .edu-quick-link:active { transform: scale(0.94); }
+      .edu-quick-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: inset 0 0 0 1px rgba(15, 23, 42, .04);
+      }
+      .edu-quick-label {
+        font-size: 10px;
+        font-weight: 800;
+        color: var(--edu-ink-soft);
+        letter-spacing: .01em;
+        white-space: nowrap;
+      }
+
       ::-webkit-scrollbar { width: 6px; }
       ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
   </head>
-  
+
   <body class="h-full" data-page="dashboard" data-view="dashboard-edukator">
 
-    <div class="h-full w-full overflow-auto hide-scrollbar" style="background: linear-gradient(180deg, #00A6B4 0%, #008891 100%);">
-      <div class="max-w-md mx-auto h-full flex flex-col bg-[#F5F7FA]">
-        <header class="topbar px-5 pt-5 pb-6" style="background: linear-gradient(135deg, #00A6B4 0%, #008891 100%);">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <p class="text-white/80 text-sm">Halo, Selamat Mengajar!</p>
-              <h1 class="text-white text-xl font-bold mt-1">
-                <span id="userName">Edukator</span>
-              </h1>
-            </div>
-            <div class="flex gap-3">
-              <button id="notificationBellBtn" class="relative w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition card-hover" aria-label="Notifikasi">
-                <i class="fa-regular fa-bell"></i>
-                <span id="notificationBadge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
-              </button>
-              <a href="/profil-edukator" class="w-10 h-10 rounded-full bg-white flex items-center justify-center overflow-hidden border-2 border-white/30 card-hover shadow-lg" aria-label="Profil">
-                <i class="fa-solid fa-user text-cyan-600"></i>
-              </a>
-            </div>
-          </div>
+    <div class="edu-shell h-full w-full overflow-auto hide-scrollbar">
+      <div class="edu-frame h-full">
 
-          <div class="relative">
-            <input id="dashboardSearch" type="text" placeholder="Cari jadwal, siswa, atau program..." class="w-full py-3 px-4 pl-11 bg-white rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg" style="color: #374151;">
-            <i class="fa-solid fa-magnifying-glass w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <header class="edu-topbar">
+          <div class="edu-icon-btn is-brand"><span class="material-symbols-outlined fill">school</span></div>
+          <h1 class="edu-topbar-title">ILHAMI Edukator</h1>
+          <div style="display:flex;gap:8px;">
+            <button id="notificationBellBtn" class="edu-icon-btn" style="position:relative;" aria-label="Notifikasi">
+              <span class="material-symbols-outlined">notifications</span>
+              <span id="notificationBadge" class="hidden" style="position:absolute;top:-2px;right:-2px;min-width:16px;height:16px;padding:0 3px;background:var(--edu-bad);color:#fff;font-size:9px;font-weight:800;border-radius:999px;display:flex;align-items:center;justify-content:center;border:2px solid var(--edu-bg);">0</span>
+            </button>
+            <a href="/profil-edukator" class="edu-icon-btn" aria-label="Profil">
+              <span class="material-symbols-outlined">person</span>
+            </a>
           </div>
         </header>
 
-        <main class="content flex-1 px-5 -mt-2 pb-24 overflow-auto hide-scrollbar">
-          <section class="bg-white rounded-3xl p-4 shadow-lg mb-4 animate-slide-up">
-            <div class="grid grid-cols-4 gap-3">
-              <a href="/jadwal-edukator" class="flex flex-col items-center gap-2 card-hover">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #4ECDC4 0%, #7EDDD6 100%);">
-                  <i class="fa-solid fa-calendar-days text-white text-lg"></i>
+        <main class="edu-main flex-1 overflow-auto hide-scrollbar">
+
+          <div class="edu-hero animate-slide-up">
+            <div class="edu-hero-greeting">Halo, Selamat Mengajar!</div>
+            <div class="edu-hero-name"><span id="userName">Edukator</span> 👋</div>
+            <div class="edu-hero-tags">
+              <span class="edu-hero-tag" id="todayLabel"><span class="material-symbols-outlined" style="font-size:13px;">calendar_month</span></span>
+            </div>
+          </div>
+
+          <div class="edu-search">
+            <span class="material-symbols-outlined">search</span>
+            <input id="dashboardSearch" type="text" placeholder="Cari jadwal, siswa, atau program...">
+          </div>
+
+          <section class="edu-card animate-slide-up" style="padding:14px 12px;">
+            <div class="edu-section-title-main" style="padding:0 4px;margin-bottom:12px;">
+              <span class="material-symbols-outlined">apps</span> Menu Cepat
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;">
+              <a href="/jadwal-edukator" class="edu-quick-link">
+                <div class="edu-quick-icon" style="background:var(--edu-accent-blue-bg);color:var(--edu-accent-blue-fg);">
+                  <span class="material-symbols-outlined fill">calendar_month</span>
                 </div>
-                <span class="text-xs font-medium text-gray-700">Jadwal</span>
+                <span class="edu-quick-label">Jadwal</span>
               </a>
-              <a href="/presensi-edukator" class="flex flex-col items-center gap-2 card-hover">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #A78BFA 0%, #C4B5FD 100%);">
-                  <i class="fa-solid fa-clipboard-check text-white text-lg"></i>
+              <a href="/presensi-edukator" class="edu-quick-link">
+                <div class="edu-quick-icon" style="background:var(--edu-accent-purple-bg);color:var(--edu-accent-purple-fg);">
+                  <span class="material-symbols-outlined fill">qr_code_scanner</span>
                 </div>
-                <span class="text-xs font-medium text-gray-700">Presensi</span>
+                <span class="edu-quick-label">Presensi</span>
               </a>
-              <a href="/rekap-presensi-edukator" class="flex flex-col items-center gap-2 card-hover">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);">
-                  <i class="fa-solid fa-chart-line text-white text-lg"></i>
+              <a href="/rekap-presensi-edukator" class="edu-quick-link">
+                <div class="edu-quick-icon" style="background:var(--edu-accent-red-bg);color:var(--edu-accent-red-fg);">
+                  <span class="material-symbols-outlined fill">fact_check</span>
                 </div>
-                <span class="text-xs font-medium text-gray-700">Rekap</span>
+                <span class="edu-quick-label">Rekap</span>
               </a>
-              <a href="/rincian-gaji-edukator" class="flex flex-col items-center gap-2 card-hover">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);">
-                  <i class="fa-solid fa-wallet text-white text-lg"></i>
+              <a href="/rincian-gaji-edukator" class="edu-quick-link">
+                <div class="edu-quick-icon" style="background:var(--edu-accent-amber-bg);color:var(--edu-accent-amber-fg);">
+                  <span class="material-symbols-outlined fill">account_balance_wallet</span>
                 </div>
-                <span class="text-xs font-medium text-gray-700">Gaji</span>
+                <span class="edu-quick-label">Gaji</span>
               </a>
             </div>
           </section>
 
-          <section class="bg-white rounded-3xl p-5 shadow-lg mb-4 animate-slide-up" style="animation-delay: 0.1s;">
-            <div class="flex justify-between items-center mb-3">
-              <h3 class="font-bold text-gray-900">Ringkasan Aktivitas</h3>
-              <span class="text-xs font-medium px-3 py-1 rounded-full" style="background: #E0F7FA; color: #00838F;">Bulan ini</span>
+          <section class="animate-slide-up">
+            <div class="edu-section-title">
+              <div class="edu-section-title-main"><span class="material-symbols-outlined">insights</span> Ringkasan Aktivitas</div>
+              <span class="edu-badge info">Bulan ini</span>
             </div>
-            <div class="grid grid-cols-4 gap-2 text-sm">
-              <div class="bg-slate-50 rounded-2xl p-3 text-center">
-                <div class="text-[11px] leading-tight text-slate-500">Program Aktif</div>
-                <div id="statProgram" class="text-xl font-bold text-slate-800 mt-1">0</div>
+            <div class="edu-stats-grid">
+              <div class="edu-stat-tile">
+                <div class="edu-stat-icon" style="background:var(--edu-accent-blue-bg);color:var(--edu-accent-blue-fg);"><span class="material-symbols-outlined fill">auto_stories</span></div>
+                <div>
+                  <div id="statProgram" class="edu-stat-value">0</div>
+                  <div class="edu-stat-label">Program Aktif</div>
+                </div>
               </div>
-              <div class="bg-slate-50 rounded-2xl p-3 text-center">
-                <div class="text-[11px] leading-tight text-slate-500">Total Siswa</div>
-                <div id="statSiswa" class="text-xl font-bold text-slate-800 mt-1">0</div>
+              <div class="edu-stat-tile">
+                <div class="edu-stat-icon" style="background:var(--edu-accent-red-bg);color:var(--edu-accent-red-fg);"><span class="material-symbols-outlined fill">groups</span></div>
+                <div>
+                  <div id="statSiswa" class="edu-stat-value">0</div>
+                  <div class="edu-stat-label">Total Siswa</div>
+                </div>
               </div>
-              <div class="bg-slate-50 rounded-2xl p-3 text-center">
-                <div class="text-[11px] leading-tight text-slate-500">Kehadiran</div>
-                <div id="statKehadiran" class="text-xl font-bold text-slate-800 mt-1">0</div>
+              <div class="edu-stat-tile">
+                <div class="edu-stat-icon" style="background:var(--edu-good-bg);color:var(--edu-good);"><span class="material-symbols-outlined fill">event_available</span></div>
+                <div>
+                  <div id="statKehadiran" class="edu-stat-value">0</div>
+                  <div class="edu-stat-label">Kehadiran</div>
+                </div>
               </div>
-              <div class="bg-slate-50 rounded-2xl p-3 text-center">
-                <div class="text-[11px] leading-tight text-slate-500">Jadwal Hari Ini</div>
-                <div id="statJadwalHariIni" class="text-xl font-bold text-slate-800 mt-1">0</div>
+              <div class="edu-stat-tile">
+                <div class="edu-stat-icon" style="background:var(--edu-accent-amber-bg);color:var(--edu-accent-amber-fg);"><span class="material-symbols-outlined fill">today</span></div>
+                <div>
+                  <div id="statJadwalHariIni" class="edu-stat-value">0</div>
+                  <div class="edu-stat-label">Jadwal Hari Ini</div>
+                </div>
               </div>
             </div>
           </section>
 
-          <section class="mb-4 animate-slide-up" style="animation-delay: 0.2s;">
-            <div class="flex justify-between items-center mb-3">
-              <h3 class="font-bold text-gray-900">Jadwal Hari Ini</h3>
-              <a href="/jadwal-edukator" class="text-sm font-medium" style="color: #00A6B4;">Lihat Semua</a>
+          <section class="animate-slide-up">
+            <div class="edu-section-title">
+              <div class="edu-section-title-main"><span class="material-symbols-outlined">event_note</span> Jadwal Hari Ini</div>
+              <a href="/jadwal-edukator" class="edu-section-action">Lihat Semua <span class="material-symbols-outlined" style="font-size:15px;">chevron_right</span></a>
             </div>
-            <div class="bg-white rounded-3xl p-4 shadow-lg">
-              <div id="jadwalList" class="divide-y divide-slate-100"></div>
-              <div id="jadwalEmpty" class="hidden py-8 text-center text-slate-400">
-                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <i class="fa-solid fa-mug-hot text-2xl text-slate-300"></i>
-                </div>
-                <p class="text-sm font-semibold text-slate-600">Tidak ada jadwal mengajar</p>
-                <p class="text-xs text-slate-400 mt-1">Gunakan waktu ini untuk persiapan materi.</p>
+            <div class="edu-card" style="overflow:hidden;">
+              <div id="jadwalList"></div>
+              <div id="jadwalEmpty" class="hidden edu-empty">
+                <div class="edu-empty-icon"><span class="material-symbols-outlined">local_cafe</span></div>
+                <div class="edu-empty-title">Tidak ada jadwal mengajar</div>
+                <div class="edu-empty-text">Gunakan waktu ini untuk persiapan materi.</div>
               </div>
             </div>
           </section>
@@ -142,7 +178,7 @@
     <!-- Notification Panel -->
     <div id="notificationOverlay" class="hidden fixed inset-0 bg-black/20 z-40"></div>
     <div id="notificationPanel" class="hidden fixed top-0 right-0 w-full max-w-md h-full bg-white shadow-2xl z-50 flex flex-col">
-      <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+      <div class="p-4 border-b border-slate-200 flex items-center justify-between text-white" style="background: linear-gradient(135deg, #0A2E86, #1B4DB3);">
         <h3 class="font-bold text-lg">Notifikasi</h3>
         <button id="markAllReadBtn" class="text-xs px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg transition">
           Tandai Dibaca Semua

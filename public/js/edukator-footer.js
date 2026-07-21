@@ -5,11 +5,11 @@
   if (!isEdukatorPage) return;
 
   const footerItems = [
-    { page: "dashboard", label: "Home", href: "/dashboard-edukator", icon: "fa-solid fa-house" },
-    { page: "jadwal", label: "Jadwal", href: "/jadwal-edukator", icon: "fa-solid fa-calendar-days" },
-    { page: "presensi", label: "Presensi", href: "/presensi-edukator", icon: "fa-solid fa-qrcode", center: true },
-    { page: "rekap-kehadiran", label: "Rekap", href: "/rekap-presensi-edukator", icon: "fa-solid fa-clipboard-check" },
-    { page: "rincian-gaji", label: "Gaji", href: "/rincian-gaji-edukator", icon: "fa-solid fa-wallet" },
+    { page: "dashboard", label: "Home", href: "/dashboard-edukator", icon: "space_dashboard" },
+    { page: "jadwal", label: "Jadwal", href: "/jadwal-edukator", icon: "calendar_month" },
+    { page: "presensi", label: "Presensi", href: "/presensi-edukator", icon: "qr_code_scanner" },
+    { page: "rekap-kehadiran", label: "Rekap", href: "/rekap-presensi-edukator", icon: "fact_check" },
+    { page: "rincian-gaji", label: "Gaji", href: "/rincian-gaji-edukator", icon: "account_balance_wallet" },
   ];
 
   const buildFooterNav = () => {
@@ -23,13 +23,14 @@
       const anchor = document.createElement("a");
       anchor.href = item.href;
       anchor.dataset.page = item.page;
-      anchor.className = `edukator-footer-link${item.center ? " is-center" : ""}`;
+      anchor.className = "edukator-footer-link";
       anchor.setAttribute("aria-label", item.label);
 
       const iconWrap = document.createElement("span");
       iconWrap.className = "nav-icon";
-      const icon = document.createElement("i");
-      icon.className = item.icon;
+      const icon = document.createElement("span");
+      icon.className = "material-symbols-outlined";
+      icon.textContent = item.icon;
       iconWrap.appendChild(icon);
       anchor.appendChild(iconWrap);
 
@@ -46,7 +47,10 @@
 
     const currentPage = document.body.dataset.page;
     container.querySelectorAll(".edukator-footer-link").forEach((item) => {
-      item.classList.toggle("active", item.dataset.page === currentPage);
+      const active = item.dataset.page === currentPage;
+      item.classList.toggle("active", active);
+      const icon = item.querySelector(".material-symbols-outlined");
+      if (icon) icon.classList.toggle("fill", active);
     });
   };
 

@@ -35,18 +35,18 @@
 
   const getStatusBadge = (status) => {
     const badges = {
-      menunggu: '<span class="status-pill" style="background: #fef3c7; color: #92400e;">Menunggu</span>',
-      disetujui: '<span class="status-pill" style="background: #d1fae5; color: #065f46;">Disetujui</span>',
-      ditolak: '<span class="status-pill" style="background: #fee2e2; color: #991b1b;">Ditolak</span>',
+      menunggu: '<span class="edu-badge warn">Menunggu</span>',
+      disetujui: '<span class="edu-badge good">Disetujui</span>',
+      ditolak: '<span class="edu-badge bad">Ditolak</span>',
     };
     return badges[status] || status;
   };
 
   const getTipeBadge = (tipe) => {
     if (tipe === "reschedule") {
-      return '<span class="status-pill" style="background: #e0e7ff; color: #3730a3;">Reschedule</span>';
+      return '<span class="edu-badge info">Reschedule</span>';
     }
-    return '<span class="status-pill" style="background: #fce7f3; color: #9d174d;">Izin</span>';
+    return '<span class="edu-badge purple">Izin</span>';
   };
 
   // Tab switching
@@ -73,18 +73,22 @@
     });
   };
 
-  // Modal functions
+  // Modal functions. Pakai classList (bukan inline style) supaya konsisten
+  // dengan pola modal lain di aplikasi ini — sebagian file CSS lama masih
+  // mendefinisikan `.hidden { display: none !important; }` secara global,
+  // yang akan mengalahkan `style.display` inline dan membuat modal terlihat
+  // tidak merespons walau event click-nya sebenarnya berjalan.
   const openModal = () => {
     const modal = document.getElementById("pengajuanModal");
     if (modal) {
-      modal.style.display = "flex";
+      modal.classList.remove("hidden");
     }
   };
 
   const closeModal = () => {
     const modal = document.getElementById("pengajuanModal");
     if (modal) {
-      modal.style.display = "none";
+      modal.classList.add("hidden");
       resetForm();
     }
   };
@@ -94,7 +98,7 @@
     if (form) form.reset();
 
     const rescheduleFields = document.getElementById("rescheduleFields");
-    if (rescheduleFields) rescheduleFields.style.display = "none";
+    if (rescheduleFields) rescheduleFields.classList.add("hidden");
 
     const counter = document.getElementById("alasanCounter");
     if (counter) counter.textContent = "0";
@@ -134,7 +138,7 @@
     if (tipeSelect && rescheduleFields) {
       tipeSelect.addEventListener("change", () => {
         if (tipeSelect.value === "reschedule") {
-          rescheduleFields.style.display = "block";
+          rescheduleFields.classList.remove("hidden");
           document.getElementById("tanggal_usulan").required = true;
           document.getElementById("jam_mulai_usulan").required = true;
           document.getElementById("jam_selesai_usulan").required = true;
@@ -143,7 +147,7 @@
           const today = new Date().toISOString().split("T")[0];
           document.getElementById("tanggal_usulan").min = today;
         } else {
-          rescheduleFields.style.display = "none";
+          rescheduleFields.classList.add("hidden");
           document.getElementById("tanggal_usulan").required = false;
           document.getElementById("jam_mulai_usulan").required = false;
           document.getElementById("jam_selesai_usulan").required = false;
@@ -280,37 +284,37 @@
             ? `${formatTime(p.jam_mulai_usulan)} - ${formatTime(p.jam_selesai_usulan)}`
             : "-";
           usulanInfo = `
-            <div style="margin-top: 8px; padding: 8px; background: #f0fdf4; border-radius: 6px; font-size: 12px;">
-              <span style="color: #15803d; font-weight: 600;">Usulan:</span> ${tanggalUsulan} | ${jamUsulan}
+            <div style="margin-top: 8px; padding: 8px 10px; background: var(--edu-good-bg); border-radius: 10px; font-size: 12px; color: var(--edu-good);">
+              <b>Usulan:</b> ${tanggalUsulan} | ${jamUsulan}
             </div>
           `;
         }
 
         const createdAt = formatDate(p.created_at);
         const catatanAdmin = p.catatan_admin
-          ? `<div style="margin-top: 8px; padding: 8px; background: #fef3c7; border-radius: 6px; font-size: 12px;"><span style="font-weight: 600;">Catatan Admin:</span> ${p.catatan_admin}</div>`
+          ? `<div style="margin-top: 8px; padding: 8px 10px; background: var(--edu-warn-bg); border-radius: 10px; font-size: 12px; color: #92400e;"><b>Catatan Admin:</b> ${p.catatan_admin}</div>`
           : "";
 
         const canCancel = p.status === PENGAJUAN_STATUS.MENUNGGU;
 
         return `
-          <div class="list-item" style="flex-direction: column; align-items: stretch; gap: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div style="flex: 1;">
-                <div class="list-title">${title}</div>
-                <div class="list-sub">Jadwal: ${tanggalAsal} | ${jamAsal}</div>
-                <div class="list-sub" style="margin-top: 4px;">Alasan: ${p.alasan}</div>
+          <div class="edu-card" style="padding: 14px; display:flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+              <div style="flex: 1; min-width: 0;">
+                <div class="edu-list-title" style="white-space: normal;">${title}</div>
+                <div class="edu-list-sub">Jadwal: ${tanggalAsal} | ${jamAsal}</div>
+                <div class="edu-list-sub" style="margin-top: 4px;">Alasan: ${p.alasan}</div>
               </div>
-              <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end;">
+              <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-end; flex-shrink: 0;">
                 ${getTipeBadge(p.tipe)}
                 ${getStatusBadge(p.status)}
               </div>
             </div>
             ${usulanInfo}
             ${catatanAdmin}
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding-top: 8px; border-top: 1px solid #e2e8f0;">
-              <span style="font-size: 11px; color: #94a3b8;">Diajukan: ${createdAt}</span>
-              ${canCancel ? `<button class="ghost-button" onclick="window.cancelPengajuan(${p.id})" style="font-size: 11px; padding: 4px 10px; color: #dc2626;">Batalkan</button>` : ""}
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px; padding-top: 8px; border-top: 1px solid var(--edu-line);">
+              <span style="font-size: 11px; color: var(--edu-ink-mute);">Diajukan: ${createdAt}</span>
+              ${canCancel ? `<button type="button" class="edu-btn-ghost" onclick="window.cancelPengajuan(${p.id})" style="width:auto;font-size: 11px; padding: 5px 12px; color: var(--edu-bad); background: var(--edu-bad-bg);">Batalkan</button>` : ""}
             </div>
           </div>
         `;

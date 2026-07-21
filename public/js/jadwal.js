@@ -171,7 +171,10 @@
 
   // Render filter pills based on tipe_les
   const renderFilterPills = () => {
-    const container = document.querySelector(".filter-pill")?.parentElement;
+    // Kontainer khusus untuk pill filter (terpisah dari kotak pencarian)
+    // supaya render ulang pill tidak ikut menghapus input pencarian, yang
+    // sebelumnya jadi anak sekaligus dari elemen yang di-innerHTML-timpa ini.
+    const container = document.getElementById("jadwalFilterPills");
     if (!container) return;
 
     // Get unique tipe_les from jadwal

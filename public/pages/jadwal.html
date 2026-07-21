@@ -357,14 +357,16 @@
 
       <!-- Filters -->
       <div class="mb-6 flex flex-wrap items-center gap-3">
-        <span class="text-sm font-medium text-gray-500">Filter:</span>
-        <button class="filter-pill active" data-filter="all">Semua</button>
-        <button class="filter-pill" data-filter="privat">
-          <i class="fa-solid fa-user text-blue-500 mr-1"></i> Privat
-        </button>
-        <button class="filter-pill" data-filter="kelas">
-          <i class="fa-solid fa-users text-emerald-500 mr-1"></i> Kelas
-        </button>
+        <div id="jadwalFilterPills" class="flex flex-wrap items-center gap-3">
+          <span class="text-sm font-medium text-gray-500">Filter:</span>
+          <button class="filter-pill active" data-filter="all">Semua</button>
+          <button class="filter-pill" data-filter="privat">
+            <i class="fa-solid fa-user text-blue-500 mr-1"></i> Privat
+          </button>
+          <button class="filter-pill" data-filter="kelas">
+            <i class="fa-solid fa-users text-emerald-500 mr-1"></i> Kelas
+          </button>
+        </div>
         <div class="relative ml-auto w-full sm:w-72">
           <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none"></i>
           <input id="jadwalListSearch" type="text" placeholder="Cari siswa, kelas, atau program..."

@@ -6,110 +6,97 @@
     <title>Profil Edukator - ILHAMI</title>
     <link rel="stylesheet" href="/css/tailwind.css" />
     <link rel="stylesheet" href="/css/responsive.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/edukator-mobile.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-      body { font-family: 'Plus Jakarta Sans', sans-serif; }
       .hide-scrollbar::-webkit-scrollbar { display: none; }
       .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      .card-hover { transition: all 0.3s ease; }
-      .card-hover:active { transform: scale(0.97); }
     </style>
   </head>
 
   <body class="h-full" data-page="profil" data-view="edukator-mobile">
-    <div class="h-full w-full overflow-auto hide-scrollbar" style="background: linear-gradient(180deg, #00A6B4 0%, #008891 100%);">
-      <div class="max-w-md mx-auto h-full flex flex-col bg-[#F5F7FA]">
-        <header class="topbar px-5 pt-5 pb-6" style="background: linear-gradient(135deg, #00A6B4 0%, #008891 100%);">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <p class="text-white/80 text-sm">Profil Edukator</p>
-              <h1 class="text-white text-xl font-bold mt-1">Akun & Data Diri</h1>
-            </div>
-            <div class="edukator-header-actions">
-              <button class="relative p-2 bg-white/20 rounded-full card-hover" aria-label="Notifikasi">
-                <i class="fa-regular fa-bell text-white text-lg"></i>
-              </button>
-              <a href="/profil-edukator" class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden card-hover" aria-label="Profil">
-                <i class="fa-solid fa-user text-white"></i>
-              </a>
-            </div>
-          </div>
-          <div class="flex gap-2 mt-3">
-            <button type="submit" form="profilForm" id="profilSaveBtn" class="flex-1 py-3 rounded-2xl font-semibold text-white shadow-lg" style="background: linear-gradient(135deg, #00A6B4 0%, #008891 100%);">
-              <i class="fa-solid fa-floppy-disk mr-2"></i>Simpan
-            </button>
-            <button type="button" id="logoutBtn" class="flex-1 py-3 rounded-2xl font-semibold bg-white/20 text-white hover:bg-white/30 shadow-lg">
-              <i class="fa-solid fa-right-from-bracket mr-2"></i>Logout
-            </button>
-          </div>
+    <div class="edu-shell h-full w-full overflow-auto hide-scrollbar">
+      <div class="edu-frame h-full">
+
+        <header class="edu-topbar">
+          <div class="edu-icon-btn is-brand"><span class="material-symbols-outlined fill">badge</span></div>
+          <h1 class="edu-topbar-title">Akun &amp; Data Diri</h1>
+          <a href="/profil-edukator" class="edu-icon-btn" aria-label="Profil">
+            <span class="material-symbols-outlined fill">person</span>
+          </a>
         </header>
 
-        <main class="content flex-1 px-5 -mt-2 pb-40 overflow-auto hide-scrollbar space-y-4">
-          <section class="panel bg-white rounded-3xl p-5 shadow-lg">
-            <div class="flex items-center gap-2 mb-4 text-slate-700 font-bold">
-              <i class="fa-solid fa-fingerprint"></i>
-              <span>Login Biometrik</span>
+        <main class="edu-main flex-1 overflow-auto hide-scrollbar" style="padding-bottom:calc(150px + env(safe-area-inset-bottom,0px));">
+
+          <div style="display:flex;gap:10px;">
+            <button type="submit" form="profilForm" id="profilSaveBtn" class="edu-btn-primary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;">
+              <span class="material-symbols-outlined" style="font-size:18px;">save</span> Simpan
+            </button>
+            <button type="button" id="logoutBtn" class="edu-btn-ghost" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;">
+              <span class="material-symbols-outlined" style="font-size:18px;">logout</span> Logout
+            </button>
+          </div>
+
+          <section class="edu-card" style="padding:18px;">
+            <div class="edu-section-title-main" style="margin-bottom:10px;">
+              <span class="material-symbols-outlined">fingerprint</span> Login Biometrik
             </div>
-            <p id="biometricStatusText" class="text-sm text-slate-500 mb-4">Masuk lebih cepat dengan sidik jari/wajah di perangkat ini.</p>
-            <button type="button" id="biometricToggleBtn" class="w-full py-3 rounded-2xl font-semibold text-white shadow-lg" style="background: linear-gradient(135deg, #00A6B4 0%, #008891 100%);">
+            <p id="biometricStatusText" style="font-size:12.5px;color:var(--edu-ink-soft);margin-bottom:14px;line-height:1.6;">Masuk lebih cepat dengan sidik jari/wajah di perangkat ini.</p>
+            <button type="button" id="biometricToggleBtn" class="edu-btn-primary">
               Aktifkan Login Biometrik
             </button>
           </section>
 
-          <form id="profilForm" class="space-y-4">
-            <section class="panel bg-white rounded-3xl p-5 shadow-lg">
-              <div class="flex items-center gap-2 mb-4 text-slate-700 font-bold">
-                <i class="fa-solid fa-id-card"></i>
-                <span>Data Diri</span>
+          <form id="profilForm" style="display:flex;flex-direction:column;gap:14px;">
+            <section class="edu-card" style="padding:18px;">
+              <div class="edu-section-title-main" style="margin-bottom:14px;">
+                <span class="material-symbols-outlined">contact_page</span> Data Diri
               </div>
-              <div class="space-y-3">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  Nama Lengkap
-                  <input id="profilNama" type="text" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 outline-none" placeholder="Nama lengkap">
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <label class="edu-field">
+                  <span class="edu-field-label">Nama Lengkap</span>
+                  <input id="profilNama" type="text" class="edu-input" placeholder="Nama lengkap">
                 </label>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  Nomor Telepon
-                  <input id="profilTelepon" type="text" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 outline-none" placeholder="08xxxxxxxxxx">
+                <label class="edu-field">
+                  <span class="edu-field-label">Nomor Telepon</span>
+                  <input id="profilTelepon" type="text" class="edu-input" placeholder="08xxxxxxxxxx">
                 </label>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  Alamat
-                  <textarea id="profilAlamat" rows="3" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 outline-none" placeholder="Alamat lengkap"></textarea>
+                <label class="edu-field">
+                  <span class="edu-field-label">Alamat</span>
+                  <textarea id="profilAlamat" rows="3" class="edu-textarea" placeholder="Alamat lengkap"></textarea>
                 </label>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  Pendidikan Terakhir
-                  <input id="profilPendidikan" type="text" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 outline-none" placeholder="Contoh: S1 Pendidikan Matematika">
+                <label class="edu-field">
+                  <span class="edu-field-label">Pendidikan Terakhir</span>
+                  <input id="profilPendidikan" type="text" class="edu-input" placeholder="Contoh: S1 Pendidikan Matematika">
                 </label>
               </div>
             </section>
 
-            <section class="panel bg-white rounded-3xl p-5 shadow-lg">
-              <div class="flex items-center gap-2 mb-4 text-slate-700 font-bold">
-                <i class="fa-solid fa-envelope"></i>
-                <span>Email</span>
+            <section class="edu-card" style="padding:18px;">
+              <div class="edu-section-title-main" style="margin-bottom:14px;">
+                <span class="material-symbols-outlined">mail</span> Email
               </div>
-              <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                Email Akun
-                <input id="profilEmail" type="email" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 outline-none" placeholder="nama@email.com">
+              <label class="edu-field">
+                <span class="edu-field-label">Email Akun</span>
+                <input id="profilEmail" type="email" class="edu-input" placeholder="nama@email.com">
               </label>
             </section>
 
-            <section class="panel bg-white rounded-3xl p-5 shadow-lg">
-              <div class="flex items-center gap-2 mb-4 text-slate-700 font-bold">
-                <i class="fa-solid fa-lock"></i>
-                <span>Password</span>
+            <section class="edu-card" style="padding:18px;">
+              <div class="edu-section-title-main" style="margin-bottom:14px;">
+                <span class="material-symbols-outlined">lock</span> Password
               </div>
-              <div class="space-y-3">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  Password Baru
-                  <input id="profilPassword" type="password" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 outline-none" placeholder="Minimal 6 karakter">
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <label class="edu-field">
+                  <span class="edu-field-label">Password Baru</span>
+                  <input id="profilPassword" type="password" class="edu-input" placeholder="Minimal 6 karakter">
                 </label>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                  Konfirmasi Password
-                  <input id="profilPasswordConfirm" type="password" class="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:ring-2 focus:ring-emerald-200 focus:border-emerald-400 outline-none" placeholder="Ulangi password baru">
+                <label class="edu-field">
+                  <span class="edu-field-label">Konfirmasi Password</span>
+                  <input id="profilPasswordConfirm" type="password" class="edu-input" placeholder="Ulangi password baru">
                 </label>
               </div>
-              <p class="text-xs text-slate-500 mt-3">Kosongkan jika tidak ingin mengubah password.</p>
+              <p style="font-size:11.5px;color:var(--edu-ink-mute);margin-top:10px;">Kosongkan jika tidak ingin mengubah password.</p>
             </section>
           </form>
         </main>

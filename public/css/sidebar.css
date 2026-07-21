@@ -569,86 +569,10 @@ body[data-role="edukator"] main.content {
   padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
-.edukator-footer {
-  width: 100%;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: transparent;
-  padding: 0 0 0.75rem;
-  box-shadow: none;
-  z-index: 50;
-}
-
-.edukator-footer-inner {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.25rem;
-  padding: 0.6rem 0.75rem;
-  max-width: 520px;
-  margin: 0 auto;
-  background: #fff;
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
-}
-
-.edukator-footer-link {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
-  padding: 0.45rem 0.1rem;
-  border-radius: 0.9rem;
-  text-decoration: none;
-  color: #64748b;
-  font-size: 0.7rem;
-  font-weight: 600;
-  background: transparent;
-  border: 1px solid transparent;
-  position: relative;
-}
-
-.edukator-footer-link.active,
-.edukator-footer-link:hover {
-  color: #7c3aed;
-}
-
-.edukator-footer-link .nav-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  background: #f1f5f9;
-  color: #64748b;
-  font-size: 16px;
-}
-
-.edukator-footer-link.active .nav-icon {
-  background: rgba(124, 58, 237, 0.16);
-  color: #7c3aed;
-}
-
-.edukator-footer-link.is-center {
-  transform: translateY(-18px);
-}
-
-.edukator-footer-link.is-center .nav-icon {
-  width: 54px;
-  height: 54px;
-  border-radius: 18px;
-  background: #7c3aed;
-  color: #fff;
-  font-size: 22px;
-  box-shadow: 0 12px 25px rgba(124, 58, 237, 0.35);
-}
-
-.edukator-footer-link.is-center .nav-label {
-  margin-top: 0.2rem;
-}
+/* Styling .edukator-footer* dipindahkan ke /css/edukator-mobile.css agar
+   selaras dengan desain "Portal Mobile Admin" pdmada/mymada. Definisi di
+   sini sengaja dihapus supaya tidak menimpa (link edukator-mobile.css
+   dimuat lebih dulu, tapi sidebar.css disisipkan terakhir oleh server). */
 
 .siswa-footer {
   width: 100%;
