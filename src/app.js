@@ -49,7 +49,21 @@ const publicDir = path.join(__dirname, "..", "public");
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(sessionConfig);
-app.use(express.static(publicDir, { index: false }));
+// no-cache (bukan no-store) supaya browser/WebView tetap boleh menyimpan
+// salinan tapi WAJIB validasi ulang (If-None-Match) ke server setiap request
+// — mencegah JS/CSS lama "nyangkut" di klien setelah sebuah perbaikan
+// di-deploy, tanpa mengorbankan efisiensi (304 tetap dikirim kalau file
+// belum berubah).
+app.use(
+  express.static(publicDir, {
+    index: false,
+    setHeaders: (res, filePath) => {
+      if (/\.(js|css|html)$/.test(filePath)) {
+        res.setHeader("Cache-Control", "no-cache");
+      }
+    },
+  })
+);
 
 // Digital Asset Links untuk aplikasi Android TWA (express.static
 // mengabaikan folder berawalan titik, jadi dilayani eksplisit).

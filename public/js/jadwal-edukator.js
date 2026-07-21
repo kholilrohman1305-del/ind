@@ -357,9 +357,18 @@
         const button = event.target.closest("button[data-pengajuan-index]");
         if (!button) return;
         const row = renderedRows[Number(button.dataset.pengajuanIndex)];
-        if (!row) return;
+        if (!row) {
+          console.error("Ajukan Perubahan: baris jadwal tidak ditemukan di renderedRows.", button.dataset.pengajuanIndex, renderedRows);
+          return;
+        }
         if (typeof window.openPengajuanModal === "function") {
           window.openPengajuanModal(row.id, row);
+        } else {
+          // pengajuan-jadwal-edukator.js gagal dimuat/dieksekusi (mis. cache
+          // browser lama, atau file belum ter-deploy) — jangan gagal diam-diam,
+          // beri tahu pengguna secara eksplisit.
+          console.error("window.openPengajuanModal tidak tersedia — pengajuan-jadwal-edukator.js mungkin belum termuat.");
+          alert("Form pengajuan gagal dimuat. Coba muat ulang halaman ini (tarik ke bawah atau refresh browser).");
         }
       });
     }
