@@ -239,12 +239,12 @@ app.get("/", (req, res) => {
 
 // Public Landing Page Route
 app.get("/landing", (req, res) => {
-  res.sendFile(path.join(publicDir, "pages", "landing.html"));
+  res.redirect("/pages/landing.html");
 });
 
 // Public Register Page Route
 app.get("/register", (req, res) => {
-  res.sendFile(path.join(publicDir, "pages", "register.html"));
+  res.redirect("/pages/register.html");
 });
 
 app.get("/dashboard", (req, res) => {
