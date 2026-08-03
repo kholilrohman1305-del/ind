@@ -314,11 +314,11 @@ async function handleApprovalSubmit(e) {
       window.toast.success(json.message || `Pengajuan berhasil ${action === "approve" ? "disetujui" : "ditolak"}`);
       await fetchPengajuan();
     } else {
-      window.toast.error(json.message || "Gagal memproses pengajuan");
+      window.toast.error(json.message || "Gagal memproses pengajuan", 12000);
     }
   } catch (err) {
     console.error("Error processing approval:", err);
-    window.toast.error(err.message || "Gagal memproses pengajuan");
+    window.toast.error(err.message || "Gagal memproses pengajuan", 12000);
   } finally {
     submitBtn.disabled = false;
     submitBtn.classList.remove("opacity-60", "cursor-not-allowed");

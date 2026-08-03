@@ -109,6 +109,9 @@ const approve = async (req, res) => {
     if (err.message.includes("tidak ditemukan")) {
       return res.status(404).json({ success: false, message: err.message });
     }
+    if (err.message.includes("bentrok") || err.message.includes("sudah diproses")) {
+      return res.status(409).json({ success: false, message: err.message });
+    }
     return res.status(500).json({ success: false, message: err.message });
   }
 };

@@ -1,6 +1,22 @@
 const db = require("../db");
 const { PENGAJUAN_STATUS, JADWAL_STATUS } = require("../config/constants");
 
+const shortTime = (value) => String(value || "-").slice(0, 5);
+
+const describeApprovalConflict = (row) => {
+  const target = row.siswa_nama
+    ? `siswa ${row.siswa_nama}`
+    : row.kelas_nama
+      ? `kelas ${row.kelas_nama}`
+      : `jadwal #${row.id}`;
+  const lesson = [row.program_nama, row.mapel_nama].filter(Boolean).join(" / ") || "program tidak tercatat";
+  const location = row.cabang_nama
+    ? `${row.cabang_nama}${row.cabang_alamat ? ` (${row.cabang_alamat})` : ""}`
+    : "lokasi cabang tidak tercatat";
+
+  return `${target}; ${lesson}; ${shortTime(row.jam_mulai)}-${shortTime(row.jam_selesai)}; edukator ${row.edukator_nama || "tidak tercatat"}; lokasi ${location}`;
+};
+
 const listPengajuan = async (filters = {}) => {
   const { edukatorId, cabangId, status } = filters;
   const params = [];
@@ -211,28 +227,42 @@ const approvePengajuan = async (id, userId, catatanAdmin, cabangId) => {
     if (pj.tipe === "reschedule") {
       // Check for time conflicts
       const [conflicts] = await conn.query(
-        `SELECT id FROM jadwal
-        WHERE edukator_id = ?
-          AND tanggal = ?
-          AND status_jadwal = '${JADWAL_STATUS.SCHEDULED}'
-          AND id != ?
-          AND (
-            (jam_mulai <= ? AND jam_selesai > ?) OR
-            (jam_mulai < ? AND jam_selesai >= ?) OR
-            (jam_mulai >= ? AND jam_selesai <= ?)
-          )`,
+        `SELECT j.id, j.tanggal, j.jam_mulai, j.jam_selesai,
+                e.nama AS edukator_nama, s.nama AS siswa_nama,
+                k.nama AS kelas_nama, p.nama AS program_nama,
+                m.nama AS mapel_nama, c.nama AS cabang_nama,
+                c.alamat AS cabang_alamat
+         FROM jadwal j
+         LEFT JOIN edukator e ON e.id = j.edukator_id
+         LEFT JOIN enrollment en ON en.id = j.enrollment_id
+         LEFT JOIN siswa s ON s.id = en.siswa_id
+         LEFT JOIN kelas k ON k.id = j.kelas_id
+         LEFT JOIN program p ON p.id = j.program_id
+         LEFT JOIN mapel m ON m.id = j.mapel_id
+         LEFT JOIN cabang c ON c.id = j.cabang_id
+         WHERE j.edukator_id = ?
+           AND j.tanggal = ?
+           AND j.status_jadwal = '${JADWAL_STATUS.SCHEDULED}'
+           AND j.id != ?
+           AND j.jam_mulai < ?
+           AND j.jam_selesai > ?
+         ORDER BY j.jam_mulai ASC
+         LIMIT 5`,
         [
           pj.edukator_id,
           pj.tanggal_usulan,
           pj.jadwal_id,
-          pj.jam_mulai_usulan, pj.jam_mulai_usulan,
-          pj.jam_selesai_usulan, pj.jam_selesai_usulan,
-          pj.jam_mulai_usulan, pj.jam_selesai_usulan
+          pj.jam_selesai_usulan,
+          pj.jam_mulai_usulan
         ]
       );
 
       if (conflicts && conflicts.length > 0) {
-        throw new Error("Jadwal usulan bentrok dengan jadwal lain");
+        const proposedTime = `${shortTime(pj.jam_mulai_usulan)}-${shortTime(pj.jam_selesai_usulan)}`;
+        const details = conflicts.map((row, index) => `${index + 1}. ${describeApprovalConflict(row)}`).join(" | ");
+        throw new Error(
+          `Pengajuan tidak dapat disetujui. Jadwal usulan ${pj.tanggal_usulan} pukul ${proposedTime} bentrok dengan: ${details}`
+        );
       }
 
       // Update jadwal
