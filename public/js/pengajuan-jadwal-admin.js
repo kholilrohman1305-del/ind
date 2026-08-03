@@ -281,6 +281,7 @@ function closeApprovalModal() {
 async function handleApprovalSubmit(e) {
   e.preventDefault();
 
+  const submitBtn = document.getElementById("submitApprovalBtn");
   const pengajuanId = document.getElementById("approval_pengajuan_id").value;
   const action = document.getElementById("approval_action").value;
   const catatan = document.getElementById("approval_catatan").value.trim();
@@ -291,6 +292,9 @@ async function handleApprovalSubmit(e) {
   }
 
   try {
+    submitBtn.disabled = true;
+    submitBtn.classList.add("opacity-60", "cursor-not-allowed");
+
     const endpoint = action === "approve" ? "approve" : "reject";
     const res = await requester(`/api/pengajuan-jadwal/${pengajuanId}/${endpoint}`, {
       method: "PUT",
@@ -306,15 +310,18 @@ async function handleApprovalSubmit(e) {
 
     const json = await res.json();
     if (json.success) {
-      window.toast.success(json.message || `Pengajuan berhasil ${action === "approve" ? "disetujui" : "ditolak"}`);
       closeApprovalModal();
-      fetchPengajuan();
+      window.toast.success(json.message || `Pengajuan berhasil ${action === "approve" ? "disetujui" : "ditolak"}`);
+      await fetchPengajuan();
     } else {
       window.toast.error(json.message || "Gagal memproses pengajuan");
     }
   } catch (err) {
     console.error("Error processing approval:", err);
     window.toast.error(err.message || "Gagal memproses pengajuan");
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.classList.remove("opacity-60", "cursor-not-allowed");
   }
 }
 
