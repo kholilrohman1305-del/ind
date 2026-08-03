@@ -234,7 +234,7 @@ const renderPage = (pageFile) => (req, res) => {
 };
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(publicDir, "pages", "landing.html"));
+  res.redirect("/pages/landing.html");
 });
 
 // Public Landing Page Route
@@ -261,7 +261,7 @@ pages.forEach((page) => {
 });
 
 app.get("/login", (req, res) => {
-  res.sendFile(path.join(publicDir, "login.html"));
+  res.redirect("/login.html");
 });
 
 // Global error handler - always return JSON for API routes
