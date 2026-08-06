@@ -369,6 +369,36 @@
              <select id="program_id" required class="w-full bg-white border-gray-300 rounded-lg p-2 border focus:ring-indigo-500"></select>
           </div>
 
+          <div class="bg-cyan-50/50 p-4 rounded-xl border border-cyan-100 space-y-3">
+            <div>
+              <label class="block text-cyan-900 font-semibold mb-1">Rencana Mulai <span class="text-red-500">*</span></label>
+              <input id="tanggal_mulai_belajar" type="date" required class="w-full bg-white border-gray-300 rounded-lg p-2 border focus:ring-cyan-500" />
+            </div>
+            <div>
+              <label class="block text-cyan-900 font-semibold mb-2">Hari Belajar <span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                <label class="text-center"><input type="checkbox" name="admin_preferred_days" value="senin" class="mr-1">Sen</label>
+                <label class="text-center"><input type="checkbox" name="admin_preferred_days" value="selasa" class="mr-1">Sel</label>
+                <label class="text-center"><input type="checkbox" name="admin_preferred_days" value="rabu" class="mr-1">Rab</label>
+                <label class="text-center"><input type="checkbox" name="admin_preferred_days" value="kamis" class="mr-1">Kam</label>
+                <label class="text-center"><input type="checkbox" name="admin_preferred_days" value="jumat" class="mr-1">Jum</label>
+                <label class="text-center"><input type="checkbox" name="admin_preferred_days" value="sabtu" class="mr-1">Sab</label>
+                <label class="text-center"><input type="checkbox" name="admin_preferred_days" value="minggu" class="mr-1">Min</label>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-cyan-900 font-semibold mb-1">Jam Mulai <span class="text-red-500">*</span></label>
+                <input id="preferred_jam_mulai" type="time" required class="w-full bg-white border-gray-300 rounded-lg p-2 border focus:ring-cyan-500" />
+              </div>
+              <div>
+                <label class="block text-cyan-900 font-semibold mb-1">Jam Selesai <span class="text-red-500">*</span></label>
+                <input id="preferred_jam_selesai" type="time" required class="w-full bg-white border-gray-300 rounded-lg p-2 border focus:ring-cyan-500" />
+              </div>
+            </div>
+            <p class="text-xs text-cyan-700">Data ini digunakan saat admin cabang mengaktivasi siswa dan membuat jadwal.</p>
+          </div>
+
           <!-- Mapel Selection -->
           <div class="bg-violet-50/50 p-4 rounded-xl border border-violet-100">
              <label class="block text-violet-900 font-semibold mb-1">Mata Pelajaran</label>
@@ -386,7 +416,7 @@
              </div>
           </div>
 
-          <div class="flex items-center justify-between py-2">
+          <div id="activeStatusField" class="flex items-center justify-between py-2">
             <span class="font-medium text-gray-700">Status Aktif</span>
             <input id="is_active" type="checkbox" checked class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300" />
           </div>

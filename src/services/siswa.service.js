@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const db = require("../db");
 const tagihanService = require("./tagihan.service");
-const { ENROLLMENT_STATUS, JADWAL_STATUS, TAGIHAN_STATUS, TIPE_LES, ROLES } = require("../config/constants");
+const { ENROLLMENT_STATUS, JADWAL_STATUS, TAGIHAN_STATUS, TIPE_LES, ROLES, PENDAFTARAN_STATUS } = require("../config/constants");
 
 const listSiswa = async (cabangId, { limit, offset } = {}) => {
   // Query dengan koneksi ke jadwal, presensi, dan tagihan
@@ -620,9 +620,11 @@ const createSiswa = async (payload) => {
       jenjang,
       kelas,
       foto,
-      is_active,
-      edukator_id,
       mapel_ids, // Mapel selection
+      tanggal_mulai_belajar,
+      preferred_days,
+      preferred_jam_mulai,
+      preferred_jam_selesai,
     } = payload;
 
     if (!email || !password || !nama) {
@@ -630,6 +632,12 @@ const createSiswa = async (payload) => {
     }
     if (!program_id) {
       throw new Error("Program wajib dipilih.");
+    }
+    if (!tanggal_mulai_belajar || !Array.isArray(preferred_days) || preferred_days.length === 0) {
+      throw new Error("Tanggal mulai dan minimal satu hari belajar wajib dipilih.");
+    }
+    if (!preferred_jam_mulai || !preferred_jam_selesai || preferred_jam_mulai >= preferred_jam_selesai) {
+      throw new Error("Jam belajar tidak valid. Jam selesai harus lebih akhir dari jam mulai.");
     }
 
     const [existingEmail] = await conn.query(
@@ -653,7 +661,8 @@ const createSiswa = async (payload) => {
     // Gunakan cabang dari program sebagai source of truth
     const finalCabangId = program.cabang_id;
 
-    const activeFlag = typeof is_active === "undefined" ? 1 : is_active ? 1 : 0;
+    // Siswa yang dibuat admin tetap harus melalui persetujuan/aktivasi admin cabang.
+    const activeFlag = 0;
     const hashed = await bcrypt.hash(String(password), 10);
 
     const [userRes] = await conn.query(
@@ -665,8 +674,10 @@ const createSiswa = async (payload) => {
 
     const [siswaRes] = await conn.query(
       `INSERT INTO siswa
-        (user_id, cabang_id, nama, nik, telepon, alamat, tanggal_lahir, sekolah_asal, jenjang, kelas, foto, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (user_id, cabang_id, nama, nik, telepon, alamat, tanggal_lahir, sekolah_asal, jenjang, kelas, foto,
+         is_active, status_pendaftaran, program_id, tanggal_mulai_belajar, preferred_days,
+         preferred_jam_mulai, preferred_jam_selesai)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '${PENDAFTARAN_STATUS.PENDING}', ?, ?, ?, ?, ?)`,
       [
         userId,
         finalCabangId,
@@ -680,40 +691,31 @@ const createSiswa = async (payload) => {
         kelas || null,
         foto || null,
         activeFlag,
+        program.id,
+        tanggal_mulai_belajar,
+        JSON.stringify(preferred_days || []),
+        preferred_jam_mulai,
+        preferred_jam_selesai,
       ]
     );
 
-    // Sync mapel for siswa
-    if (mapel_ids && Array.isArray(mapel_ids) && mapel_ids.length > 0) {
-      await syncSiswaMapel(conn, siswaRes.insertId, mapel_ids);
+    // Gunakan pilihan admin; jika kosong, turunkan mapel dari program agar
+    // proses aktivasi selalu memiliki mapel untuk penjadwalan.
+    let effectiveMapelIds = Array.isArray(mapel_ids) ? mapel_ids : [];
+    if (effectiveMapelIds.length === 0) {
+      const [programMapels] = await conn.query(
+        "SELECT mapel_id FROM program_mapel WHERE program_id = ? ORDER BY id ASC",
+        [program.id]
+      );
+      effectiveMapelIds = programMapels.map((row) => row.mapel_id);
+      if (effectiveMapelIds.length === 0 && program.mapel_id) effectiveMapelIds = [program.mapel_id];
     }
-
-    const totalPertemuan = Number(program.jumlah_pertemuan || 0);
-    if (!totalPertemuan) {
-      throw new Error("Jumlah pertemuan program belum diatur.");
+    if (effectiveMapelIds.length > 0) {
+      await syncSiswaMapel(conn, siswaRes.insertId, effectiveMapelIds);
     }
-
-    // Status awal 'menunggu_jadwal' - akan berubah ke 'aktif' setelah jadwal dibuat
-    const [enrollRes] = await conn.query(
-      `INSERT INTO enrollment
-        (siswa_id, program_id, kelas_id, tanggal_daftar, total_pertemuan, sisa_pertemuan, status_enrollment)
-       VALUES (?, ?, ?, ?, ?, ?, '${ENROLLMENT_STATUS.MENUNGGU_JADWAL}')`,
-      [siswaRes.insertId, program.id, null, new Date(), totalPertemuan, totalPertemuan]
-    );
-
-    const enrollmentId = enrollRes.insertId;
-    await tagihanService.createTagihanForEnrollment(conn, enrollmentId, finalCabangId);
-
-    await autoHandleEnrollmentScheduling(conn, {
-      enrollmentId,
-      program,
-      siswaId: siswaRes.insertId,
-      cabangId: finalCabangId,
-      preferredEdukatorId: edukator_id || null,
-    });
 
     await conn.commit();
-    return { id: siswaRes.insertId, user_id: userId, enrollment_id: enrollmentId };
+    return { id: siswaRes.insertId, user_id: userId, status_pendaftaran: PENDAFTARAN_STATUS.PENDING };
   } catch (err) {
     await conn.rollback();
     throw err;

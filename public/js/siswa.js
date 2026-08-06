@@ -68,6 +68,7 @@
   const fields = [
     "siswaId", "nama", "nik", "telepon", "alamat", "tanggal_lahir",
     "sekolah_asal", "jenjang", "kelas", "email", "password", "is_active", "program_id",
+    "tanggal_mulai_belajar", "preferred_jam_mulai", "preferred_jam_selesai",
     "edukator_id" // Field baru (virtual/injected)
   ].reduce((acc, id) => {
     acc[id] = document.getElementById(id);
@@ -877,10 +878,26 @@
     fields.jenjang.value = data?.jenjang || "";
     fields.kelas.value = data?.kelas || "";
     fields.program_id.value = data?.program_id || "";
+    fields.tanggal_mulai_belajar.value = data?.tanggal_mulai_belajar
+      ? String(data.tanggal_mulai_belajar).split("T")[0]
+      : mode === "create" ? new Date().toISOString().slice(0, 10) : "";
+    fields.preferred_jam_mulai.value = data?.preferred_jam_mulai?.slice(0, 5) || "";
+    fields.preferred_jam_selesai.value = data?.preferred_jam_selesai?.slice(0, 5) || "";
+    const preferredDays = Array.isArray(data?.preferred_days)
+      ? data.preferred_days
+      : (() => { try { return JSON.parse(data?.preferred_days || "[]"); } catch { return []; } })();
+    form.querySelectorAll('input[name="admin_preferred_days"]').forEach((checkbox) => {
+      checkbox.checked = preferredDays.includes(checkbox.value);
+    });
     fields.email.value = data?.email || "";
     fields.password.value = "";
     if (fields.edukator_id) fields.edukator_id.value = ""; // Reset edukator
     fields.is_active.checked = data ? (data.is_active ? true : false) : true;
+    const activeStatusField = document.getElementById("activeStatusField");
+    if (activeStatusField) activeStatusField.classList.toggle("hidden", mode === "create");
+    fields.tanggal_mulai_belajar.required = mode === "create";
+    fields.preferred_jam_mulai.required = mode === "create";
+    fields.preferred_jam_selesai.required = mode === "create";
     fields.password.required = mode === "create";
 
     // Reset UI Rekomendasi
@@ -936,6 +953,10 @@
       program_id: positiveIdOrNull(fields.program_id.value),
       edukator_id: positiveIdOrNull(currentEdukatorField?.value),
       mapel_ids: getSelectedMapelIds(), // Mapel selection
+      tanggal_mulai_belajar: fields.tanggal_mulai_belajar.value || null,
+      preferred_days: Array.from(form.querySelectorAll('input[name="admin_preferred_days"]:checked')).map((checkbox) => checkbox.value),
+      preferred_jam_mulai: fields.preferred_jam_mulai.value || null,
+      preferred_jam_selesai: fields.preferred_jam_selesai.value || null,
       is_active: fields.is_active.checked,
     };
     if (fields.email.value.trim()) payload.email = fields.email.value.trim();
@@ -1290,9 +1311,18 @@
         if (state.mode === "create") {
           if (!payload.email || !payload.password) throw new Error("Email dan password akun wajib diisi.");
           if (!payload.program_id) throw new Error("Silakan pilih program bimbingan.");
+          if (!payload.tanggal_mulai_belajar) throw new Error("Silakan pilih tanggal mulai belajar.");
+          if (!payload.preferred_days.length) throw new Error("Silakan pilih minimal satu hari belajar.");
+          if (!payload.preferred_jam_mulai || !payload.preferred_jam_selesai) throw new Error("Silakan lengkapi jam mulai dan selesai belajar.");
+          if (payload.preferred_jam_mulai >= payload.preferred_jam_selesai) throw new Error("Jam selesai harus lebih akhir dari jam mulai.");
         }
         await saveSiswa(payload, fields.siswaId.value || null);
-        if (window.toast.success) window.toast.success(state.mode === "edit" ? "Data Diperbarui" : "Siswa Ditambahkan", payload.nama);
+        if (window.toast.success) {
+          window.toast.success(
+            state.mode === "edit" ? "Data Diperbarui" : "Siswa masuk ke Siswa Baru",
+            state.mode === "edit" ? payload.nama : `${payload.nama} menunggu aktivasi admin cabang.`
+          );
+        }
         close();
         fetchSiswa();
       } catch (err) {

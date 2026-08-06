@@ -40,6 +40,14 @@ const createSiswaSchema = z.object({
           .positive("Mata pelajaran yang dipilih tidak valid. Hapus pilihan tersebut lalu pilih kembali.")
       )
       .optional(),
+    tanggal_mulai_belajar: z.string().min(1, "Tanggal mulai belajar wajib dipilih."),
+    preferred_days: z.array(z.enum(["senin", "selasa", "rabu", "kamis", "jumat", "sabtu", "minggu"]))
+      .min(1, "Pilih minimal satu hari belajar."),
+    preferred_jam_mulai: z.string().min(1, "Jam mulai belajar wajib diisi."),
+    preferred_jam_selesai: z.string().min(1, "Jam selesai belajar wajib diisi."),
+  }).refine((data) => data.preferred_jam_mulai < data.preferred_jam_selesai, {
+    message: "Jam selesai harus lebih akhir dari jam mulai.",
+    path: ["preferred_jam_selesai"],
   }),
 });
 
