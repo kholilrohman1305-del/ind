@@ -93,6 +93,7 @@
     recommendedScores: {},
     riskScores: {}, // Store risk data: { siswa_id: { score, details } }
   };
+  let programsRequest = null;
 
   const PAGE_SIZE = 10; // 10 rows per page is standard for tables
 
@@ -698,6 +699,9 @@
   const renderPrograms = () => {
     const select = fields.program_id;
     if (!select) return;
+    // Daftar program dapat dimuat ulang ketika modal sudah terbuka. Simpan
+    // pilihan user agar render ulang tidak mengembalikannya ke placeholder.
+    const selectedProgramId = select.value;
     select.innerHTML = "";
     
     const placeholder = document.createElement("option");
@@ -712,20 +716,39 @@
       select.appendChild(option);
     });
 
+    if (selectedProgramId && Array.from(select.options).some((option) => option.value === selectedProgramId)) {
+      select.value = selectedProgramId;
+    }
+
     if (renewFields.programId) {
+      const selectedRenewProgramId = renewFields.programId.value;
       renewFields.programId.innerHTML = select.innerHTML;
+      if (selectedRenewProgramId) renewFields.programId.value = selectedRenewProgramId;
     }
   };
 
-  const fetchPrograms = async () => {
-    try {
-      const res = await requester("/api/program", { credentials: "same-origin" });
-      if (!res.ok) { state.programs = []; renderPrograms(); return; }
-      const payload = await res.json();
-      const data = unwrapData(payload);
-      state.programs = Array.isArray(data) ? data : [];
-      renderPrograms();
-    } catch (err) { state.programs = []; renderPrograms(); }
+  const fetchPrograms = () => {
+    // Modal dan inisialisasi halaman dapat meminta data pada waktu bersamaan.
+    // Gunakan promise yang sama supaya respons tidak saling menimpa pilihan.
+    if (programsRequest) return programsRequest;
+
+    programsRequest = (async () => {
+      try {
+        const res = await requester("/api/program", { credentials: "same-origin" });
+        if (!res.ok) { state.programs = []; renderPrograms(); return; }
+        const payload = await res.json();
+        const data = unwrapData(payload);
+        state.programs = Array.isArray(data) ? data : [];
+        renderPrograms();
+      } catch (err) {
+        state.programs = [];
+        renderPrograms();
+      } finally {
+        programsRequest = null;
+      }
+    })();
+
+    return programsRequest;
   };
 
   const fetchEdukators = async () => {
@@ -1305,4 +1328,3 @@
   // Delay UI injection slightly to ensure DOM is ready
   setTimeout(renderEducatorSelectionUI, 500);
 })();
-
