@@ -798,7 +798,14 @@
   const getSelectedMapelIds = () => {
     if (!mapelCheckboxList) return [];
     const checkboxes = mapelCheckboxList.querySelectorAll('input[name="mapel_ids"]:checked');
-    return Array.from(checkboxes).map(cb => Number(cb.value));
+    return Array.from(checkboxes)
+      .map((checkbox) => Number(checkbox.value))
+      .filter((id) => Number.isInteger(id) && id > 0);
+  };
+
+  const positiveIdOrNull = (value) => {
+    const id = Number(value);
+    return Number.isInteger(id) && id > 0 ? id : null;
   };
 
   const fetchRisks = async () => {
@@ -916,6 +923,7 @@
   const closeRenew = () => setModalVisible(renewModal, false);
 
   const createPayload = () => {
+    const currentEdukatorField = document.getElementById("edukator_id");
     const payload = {
       nama: fields.nama.value.trim(),
       nik: fields.nik.value.trim(),
@@ -925,8 +933,8 @@
       sekolah_asal: fields.sekolah_asal.value.trim(),
       jenjang: fields.jenjang.value || null,
       kelas: fields.kelas.value.trim(),
-      program_id: fields.program_id.value || null,
-      edukator_id: fields.edukator_id ? fields.edukator_id.value : null,
+      program_id: positiveIdOrNull(fields.program_id.value),
+      edukator_id: positiveIdOrNull(currentEdukatorField?.value),
       mapel_ids: getSelectedMapelIds(), // Mapel selection
       is_active: fields.is_active.checked,
     };

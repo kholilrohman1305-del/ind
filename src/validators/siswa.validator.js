@@ -19,7 +19,11 @@ const createSiswaSchema = z.object({
     program_id: z.coerce
       .number({ required_error: "Program wajib dipilih." })
       .positive("Program wajib dipilih."),
-    edukator_id: z.coerce.number().positive().optional().nullable(),
+    edukator_id: z.coerce
+      .number({ error: "Edukator yang dipilih tidak valid. Hapus pilihan edukator lalu pilih kembali." })
+      .positive("Edukator yang dipilih tidak valid. Hapus pilihan edukator lalu pilih kembali.")
+      .optional()
+      .nullable(),
     nik: z.string().optional().nullable(),
     telepon: z.string().optional().nullable(),
     alamat: z.string().optional().nullable(),
@@ -29,7 +33,13 @@ const createSiswaSchema = z.object({
     kelas: z.string().optional().nullable(),
     foto: z.string().optional().nullable(),
     is_active: z.any().optional(),
-    mapel_ids: z.array(z.coerce.number().positive()).optional(),
+    mapel_ids: z
+      .array(
+        z.coerce
+          .number({ error: "Mata pelajaran yang dipilih tidak valid. Hapus pilihan tersebut lalu pilih kembali." })
+          .positive("Mata pelajaran yang dipilih tidak valid. Hapus pilihan tersebut lalu pilih kembali.")
+      )
+      .optional(),
   }),
 });
 
