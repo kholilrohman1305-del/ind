@@ -82,6 +82,18 @@ const authLimiter = rateLimit({
 
 app.use("/api/auth/register", authLimiter);
 
+// Respons API dapat berbeda untuk setiap akun/session. Cegah CDN/proxy
+// Hostinger menyajikan respons jadwal milik pengguna sebelumnya ke pengguna
+// lain yang membuka URL API yang sama.
+app.use("/api", (_req, res, next) => {
+  res.set("Cache-Control", "private, no-store, no-cache, must-revalidate");
+  res.set("Pragma", "no-cache");
+  res.set("Expires", "0");
+  res.set("Surrogate-Control", "no-store");
+  res.vary("Cookie");
+  next();
+});
+
 app.get("/api/csrf-token", (req, res) => {
   if (!req.session.csrfToken) {
     req.session.csrfToken = crypto.randomBytes(32).toString("hex");

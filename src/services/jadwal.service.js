@@ -446,6 +446,11 @@ const createPrivatJadwal = async ({ enrollment_id, slots }, cabangId) => {
     // dikembalikan sebagai peringatan.
     const warnings = [];
     for (const slot of filledSlots) {
+      await validateEdukatorAssignment(conn, {
+        edukatorId: slot.edukator_id,
+        mapelId: slot.mapel_id,
+        cabangId: enrollment.cabang_id,
+      });
       if (
         (slot.jam_mulai && !slot.jam_selesai) ||
         (!slot.jam_mulai && slot.jam_selesai)
@@ -535,6 +540,25 @@ const addDays = (date, days) => {
 const isValidTimeRange = (startTime, endTime) => {
   if (!startTime || !endTime) return false;
   return String(startTime) < String(endTime);
+};
+
+const validateEdukatorAssignment = async (conn, { edukatorId, mapelId, cabangId }) => {
+  const [rows] = await conn.query(
+    `SELECT e.id
+     FROM edukator e
+     JOIN edukator_mapel em ON em.edukator_id = e.id
+     WHERE e.id = ?
+       AND e.cabang_utama_id = ?
+       AND e.is_active = 1
+       AND em.mapel_id = ?
+     LIMIT 1`,
+    [Number(edukatorId), Number(cabangId), Number(mapelId)]
+  );
+  if (!rows.length) {
+    throw new Error(
+      "Penugasan edukator tidak valid. Edukator harus aktif, berasal dari cabang yang sama, dan mengampu mata pelajaran yang dipilih. Pilih ulang edukator pada slot jadwal."
+    );
+  }
 };
 
 // Cari jadwal yang bentrok, lengkap dengan detail (siapa, kapan, jam berapa).
@@ -717,6 +741,11 @@ const createKelasJadwal = async (
       if (!slot.edukator_id && !edukator_id) {
         throw new Error("Pilih edukator utama, atau isi edukator di setiap slot hari.");
       }
+      await validateEdukatorAssignment(conn, {
+        edukatorId: slot.edukator_id || edukator_id,
+        mapelId: slot.mapel_id,
+        cabangId: programs[0].cabang_id,
+      });
       if ((slot.jam_mulai && !slot.jam_selesai) || (!slot.jam_mulai && slot.jam_selesai)) {
         throw new Error("Jam mulai dan selesai harus diisi bersama.");
       }
@@ -871,6 +900,11 @@ const updateJadwal = async (id, payload, cabangId) => {
   if (!edukatorId || !mapelId) {
     throw new Error("Data jadwal belum lengkap.");
   }
+  await validateEdukatorAssignment(db, {
+    edukatorId,
+    mapelId,
+    cabangId: existing.cabang_id,
+  });
   if ((jamMulai && !jamSelesai) || (!jamMulai && jamSelesai)) {
     throw new Error("Jam mulai dan selesai harus diisi bersama.");
   }
