@@ -93,21 +93,36 @@ const approve = async (req, res) => {
     const role = req.session.user.role;
     const cabangId = role === ROLES.ADMIN_CABANG ? req.session.user.cabang_id : null;
     const catatanAdmin = req.body.catatan_admin || null;
+    const forceConflict = req.body.force_conflict === true;
 
-    await pengajuanJadwalService.approvePengajuan(
+    const result = await pengajuanJadwalService.approvePengajuan(
       id,
       req.session.user.id,
       catatanAdmin,
-      cabangId
+      cabangId,
+      forceConflict
     );
 
-    return res.json({ success: true, message: "Pengajuan disetujui" });
+    return res.json({
+      success: true,
+      message: result?.forced
+        ? "Pengajuan disetujui oleh admin meskipun terdapat benturan jadwal."
+        : "Pengajuan disetujui"
+    });
   } catch (err) {
     if (err.message.includes("tidak memiliki akses") || err.message.includes("Forbidden")) {
       return res.status(403).json({ success: false, message: err.message });
     }
     if (err.message.includes("tidak ditemukan")) {
       return res.status(404).json({ success: false, message: err.message });
+    }
+    if (err.code === "SCHEDULE_CONFLICT") {
+      return res.status(409).json({
+        success: false,
+        code: err.code,
+        message: err.message,
+        conflicts: err.conflicts || [],
+      });
     }
     if (err.message.includes("bentrok") || err.message.includes("sudah diproses")) {
       return res.status(409).json({ success: false, message: err.message });

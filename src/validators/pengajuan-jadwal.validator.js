@@ -40,6 +40,7 @@ const approvePengajuanSchema = z.object({
   }),
   body: z.object({
     catatan_admin: z.string().optional().nullable(),
+    force_conflict: z.boolean().optional().default(false),
   }),
 });
 

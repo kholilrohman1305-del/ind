@@ -184,8 +184,9 @@ const createPengajuan = async (payload, edukatorId) => {
   return { id: result.insertId };
 };
 
-const approvePengajuan = async (id, userId, catatanAdmin, cabangId) => {
+const approvePengajuan = async (id, userId, catatanAdmin, cabangId, forceConflict = false) => {
   const conn = await db.getConnection();
+  let forced = false;
   try {
     await conn.beginTransaction();
 
@@ -260,9 +261,15 @@ const approvePengajuan = async (id, userId, catatanAdmin, cabangId) => {
       if (conflicts && conflicts.length > 0) {
         const proposedTime = `${shortTime(pj.jam_mulai_usulan)}-${shortTime(pj.jam_selesai_usulan)}`;
         const details = conflicts.map((row, index) => `${index + 1}. ${describeApprovalConflict(row)}`).join(" | ");
-        throw new Error(
-          `Pengajuan tidak dapat disetujui. Jadwal usulan ${pj.tanggal_usulan} pukul ${proposedTime} bentrok dengan: ${details}`
-        );
+        if (!forceConflict) {
+          const conflictError = new Error(
+            `Pengajuan tidak dapat langsung disetujui. Jadwal usulan ${pj.tanggal_usulan} pukul ${proposedTime} bentrok dengan: ${details}`
+          );
+          conflictError.code = "SCHEDULE_CONFLICT";
+          conflictError.conflicts = conflicts;
+          throw conflictError;
+        }
+        forced = true;
       }
 
       // Update jadwal
@@ -280,6 +287,11 @@ const approvePengajuan = async (id, userId, catatanAdmin, cabangId) => {
       );
     }
 
+    // Simpan jejak keputusan admin bila konflik sengaja dioverride.
+    const storedAdminNote = forced
+      ? [catatanAdmin, "[Disetujui admin meskipun terdapat benturan jadwal.]"].filter(Boolean).join("\n")
+      : catatanAdmin;
+
     // Update pengajuan status
     await conn.query(
       `UPDATE pengajuan_jadwal
@@ -288,10 +300,11 @@ const approvePengajuan = async (id, userId, catatanAdmin, cabangId) => {
           approved_by = ?,
           approved_at = NOW()
       WHERE id = ?`,
-      [catatanAdmin || null, userId, id]
+      [storedAdminNote || null, userId, id]
     );
 
     await conn.commit();
+    return { forced };
   } catch (err) {
     await conn.rollback();
     throw err;

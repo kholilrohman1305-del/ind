@@ -296,19 +296,34 @@ async function handleApprovalSubmit(e) {
     submitBtn.classList.add("opacity-60", "cursor-not-allowed");
 
     const endpoint = action === "approve" ? "approve" : "reject";
-    const res = await requester(`/api/pengajuan-jadwal/${pengajuanId}/${endpoint}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-      body: JSON.stringify({ catatan_admin: catatan || null })
-    });
+    const sendDecision = async (forceConflict = false) => {
+      const response = await requester(`/api/pengajuan-jadwal/${pengajuanId}/${endpoint}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          catatan_admin: catatan || null,
+          ...(action === "approve" ? { force_conflict: forceConflict } : {})
+        })
+      });
+      const payload = await response.json();
+      return { response, payload };
+    };
+
+    let { response: res, payload: json } = await sendDecision(false);
+    if (!res.ok && res.status === 409 && json.code === "SCHEDULE_CONFLICT") {
+      window.toast.error(json.message, 15000);
+      const approveAnyway = window.confirm(
+        `${json.message}\n\nJadwal kedua kegiatan akan saling bertumpuk. Apakah Anda yakin ingin tetap menyetujui pengajuan ini?`
+      );
+      if (!approveAnyway) return;
+      ({ response: res, payload: json } = await sendDecision(true));
+    }
 
     if (!res.ok) {
-      const json = await res.json();
       throw new Error(json.message || `Gagal ${action === "approve" ? "menyetujui" : "menolak"} pengajuan`);
     }
 
-    const json = await res.json();
     if (json.success) {
       closeApprovalModal();
       window.toast.success(json.message || `Pengajuan berhasil ${action === "approve" ? "disetujui" : "ditolak"}`);
