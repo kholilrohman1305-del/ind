@@ -278,6 +278,47 @@ function closeApprovalModal() {
   }, 200);
 }
 
+function showConflictApprovalModal(message) {
+  const modal = document.getElementById("conflictApprovalModal");
+  const messageEl = document.getElementById("conflictApprovalMessage");
+  const confirmBtn = document.getElementById("confirmConflictApproval");
+  const cancelBtn = document.getElementById("cancelConflictApproval");
+  const closeBtn = document.getElementById("closeConflictApproval");
+
+  if (!modal || !messageEl || !confirmBtn || !cancelBtn || !closeBtn) {
+    return Promise.resolve(false);
+  }
+
+  messageEl.textContent = message;
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  return new Promise((resolve) => {
+    let resolved = false;
+    const finish = (approved) => {
+      if (resolved) return;
+      resolved = true;
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      confirmBtn.removeEventListener("click", approve);
+      cancelBtn.removeEventListener("click", cancel);
+      closeBtn.removeEventListener("click", cancel);
+      modal.removeEventListener("click", backdropCancel);
+      resolve(approved);
+    };
+    const approve = () => finish(true);
+    const cancel = () => finish(false);
+    const backdropCancel = (event) => {
+      if (event.target === modal) finish(false);
+    };
+
+    confirmBtn.addEventListener("click", approve);
+    cancelBtn.addEventListener("click", cancel);
+    closeBtn.addEventListener("click", cancel);
+    modal.addEventListener("click", backdropCancel);
+  });
+}
+
 async function handleApprovalSubmit(e) {
   e.preventDefault();
 
@@ -313,9 +354,7 @@ async function handleApprovalSubmit(e) {
     let { response: res, payload: json } = await sendDecision(false);
     if (!res.ok && res.status === 409 && json.code === "SCHEDULE_CONFLICT") {
       window.toast.error(json.message, 15000);
-      const approveAnyway = window.confirm(
-        `${json.message}\n\nJadwal kedua kegiatan akan saling bertumpuk. Apakah Anda yakin ingin tetap menyetujui pengajuan ini?`
-      );
+      const approveAnyway = await showConflictApprovalModal(json.message);
       if (!approveAnyway) return;
       ({ response: res, payload: json } = await sendDecision(true));
     }
