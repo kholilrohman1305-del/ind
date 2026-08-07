@@ -85,6 +85,7 @@
             
             // Required Attributes Management
             els.cabang.required = true;
+            if (els.programId) els.programId.required = true;
             els.eduCabang.required = false;
             if (els.tanggalMulaiBelajar) els.tanggalMulaiBelajar.required = true;
             if (els.jamBelajar) els.jamBelajar.required = true;
@@ -104,6 +105,7 @@
 
             // Required Attributes Management
             els.cabang.required = false;
+            if (els.programId) els.programId.required = false;
             els.eduCabang.required = true;
             if (els.tanggalMulaiBelajar) {
                 els.tanggalMulaiBelajar.required = false;
@@ -142,6 +144,7 @@
 
         els.cabang.innerHTML = branchOptions;
         els.eduCabang.innerHTML = branchOptions;
+        renderProgramOptions();
 
         // Render Mapels for Edukator (Styled Chips - UPDATED: Light Theme)
         if (els.mapelContainer) {
@@ -175,7 +178,52 @@
         }
     };
 
-    // Note: Program selection removed for siswa - now uses mapel selection instead
+    const renderProgramOptions = () => {
+        if (!els.programId) return;
+        const previousValue = els.programId.value;
+        const cabangId = els.cabang?.value || "";
+        const jenjang = document.getElementById("jenjang")?.value || "";
+        const programs = dataCache.programs.filter((program) => {
+            const matchesCabang = !cabangId || String(program.cabang_id) === String(cabangId);
+            const matchesJenjang = !jenjang || String(program.jenjang || "") === jenjang;
+            return matchesCabang && matchesJenjang;
+        });
+
+        const placeholder = !cabangId
+            ? "-- Pilih kantor cabang terlebih dahulu --"
+            : programs.length ? "-- Pilih Program --" : "-- Program tidak tersedia untuk pilihan ini --";
+        els.programId.innerHTML = `<option value="">${placeholder}</option>` +
+            programs.map((program) => `<option value="${program.id}">${program.nama}</option>`).join("");
+
+        if (previousValue && programs.some((program) => String(program.id) === String(previousValue))) {
+            els.programId.value = previousValue;
+        }
+    };
+
+    const showSelectedProgram = () => {
+        if (!els.programId) return;
+        const program = dataCache.programs.find((item) => String(item.id) === String(els.programId.value));
+        selectedProgram = program || null;
+        if (!els.selectedProgramInfo || !els.selectedProgramName) return;
+        if (!program) {
+            els.selectedProgramInfo.classList.add("hidden");
+            return;
+        }
+        els.selectedProgramName.textContent = `${program.nama} (${program.jenjang || "Semua jenjang"})`;
+        els.selectedProgramInfo.classList.remove("hidden");
+    };
+
+    els.cabang?.addEventListener("change", () => {
+        els.programId.value = "";
+        renderProgramOptions();
+        showSelectedProgram();
+    });
+    document.getElementById("jenjang")?.addEventListener("change", () => {
+        els.programId.value = "";
+        renderProgramOptions();
+        showSelectedProgram();
+    });
+    els.programId?.addEventListener("change", showSelectedProgram);
 
     // --- Event: Password Toggle ---
     if(els.togglePass) {
@@ -326,14 +374,16 @@
 
         // Set program (from landing page)
         if(programParam && els.programId) {
-            els.programId.value = programParam;
-
             // Find program in cache and display info
             const program = dataCache.programs.find(p => String(p.id) === programParam);
-            if(program && els.selectedProgramInfo && els.selectedProgramName) {
-                selectedProgram = program;
-                els.selectedProgramName.textContent = `${program.nama} (${program.jenjang})`;
-                els.selectedProgramInfo.classList.remove('hidden');
+            if(program) {
+                // Program adalah sumber data utama untuk cabang dan jenjang.
+                if (els.cabang) els.cabang.value = String(program.cabang_id);
+                const jenjangEl = document.getElementById('jenjang');
+                if (jenjangEl && program.jenjang) jenjangEl.value = program.jenjang;
+                renderProgramOptions();
+                els.programId.value = programParam;
+                showSelectedProgram();
 
                 // Auto-select mapel based on program's mapel_id if available
                 if(program.mapel_id && els.siswaMapelContainer) {

@@ -244,7 +244,8 @@ app.get("/landing", (req, res) => {
 
 // Public Register Page Route
 app.get("/register", (req, res) => {
-  res.redirect("/pages/register.html");
+  const query = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
+  res.redirect(`/pages/register.html${query}`);
 });
 
 app.get("/dashboard", (req, res) => {

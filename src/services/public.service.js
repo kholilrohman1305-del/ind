@@ -97,6 +97,21 @@ const registerSiswa = async (payload) => {
       throw new Error("Pilih tanggal mulai belajar.");
     }
 
+    const [programRows] = await conn.query(
+      `SELECT id, cabang_id, mapel_id
+       FROM program
+       WHERE id = ? AND is_active = 1
+       LIMIT 1`,
+      [program_id]
+    );
+    const selectedProgram = programRows[0];
+    if (!selectedProgram) {
+      throw new Error("Program yang dipilih tidak tersedia. Silakan pilih program kembali.");
+    }
+    if (Number(selectedProgram.cabang_id) !== Number(cabang_id)) {
+      throw new Error("Program tidak tersedia di kantor cabang yang dipilih. Sesuaikan cabang atau pilih program lain.");
+    }
+
     // Check if email already exists
     const [existing] = await conn.query("SELECT id FROM users WHERE email = ?", [email]);
     if (existing.length > 0) {
@@ -144,18 +159,20 @@ const registerSiswa = async (payload) => {
     // 3. Insert siswa_mapel junction records
     // Mapel mengikuti program (untuk kebutuhan penjadwalan), bukan membuat program baru.
     let mapelIdsToInsert = [];
-    const [progRows] = await conn.query(
-      "SELECT mapel_id FROM program WHERE id = ?",
-      [program_id]
-    );
-    if (progRows[0]?.mapel_id) {
-      mapelIdsToInsert.push(progRows[0].mapel_id);
-    } else if (mapel_ids && Array.isArray(mapel_ids) && mapel_ids.length > 0) {
-      // Fallback jika program belum punya mapel_id
+    if (selectedProgram.mapel_id) {
+      mapelIdsToInsert.push(selectedProgram.mapel_id);
+    } else {
+      const [programMapels] = await conn.query(
+        "SELECT mapel_id FROM program_mapel WHERE program_id = ? ORDER BY id ASC",
+        [program_id]
+      );
+      mapelIdsToInsert = programMapels.map((row) => Number(row.mapel_id)).filter((id) => id > 0);
+    }
+    if (mapelIdsToInsert.length === 0 && mapel_ids && Array.isArray(mapel_ids) && mapel_ids.length > 0) {
+      // Fallback jika program belum memiliki relasi mapel.
       mapel_ids.forEach((mid) => {
-        if (!mapelIdsToInsert.includes(Number(mid))) {
-          mapelIdsToInsert.push(Number(mid));
-        }
+        const mapelId = Number(mid);
+        if (mapelId > 0 && !mapelIdsToInsert.includes(mapelId)) mapelIdsToInsert.push(mapelId);
       });
     }
 
